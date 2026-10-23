@@ -1,0 +1,26 @@
+# TCL Google TV debloat list (tested on TCL 55C6KS, Google TV / Android TV 12, firmware V8-0008T01-LF1V548.002110).
+# Packages are DISABLED for user 0 (pm disable-user), never uninstalled. `./debloat.sh restore` re-enables them.
+# Remove a line (or prefix it with #) to keep that app.
+
+# Tracking and ads
+tv.samba.ssm.ui                     # Samba TV: ACR (recognises what's on screen for ad targeting)
+com.tcl.esticker                    # promo / sticker overlays
+com.tcl.messagebox                  # TCL push messages and promotions
+com.tcl.logkit                      # log and diagnostics uploader
+
+# TCL extras
+com.tcl.exhibit                     # store demo mode
+com.tcl.ocean.instructions          # e-manual
+com.tcl.repairguide                 # repair guide
+com.tcl.guard                       # "cleaner / optimiser"
+
+# TCL features: only if you don't use them
+com.tcl.smartalexa                  # Amazon Alexa integration (Google Assistant unaffected)
+com.tcl.channelplus                 # TCL Channel (free ad-supported TV)
+com.tcl.magiconnectfree             # MagiConnect phone remote / casting
+com.tcl.gamebar                     # Game Bar overlay
+
+# Google extras
+com.google.android.play.games       # Play Games
+com.google.android.feedback         # feedback / crash reporter
+com.google.android.youtube.tvmusic  # YouTube Music

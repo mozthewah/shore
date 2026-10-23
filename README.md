@@ -1,101 +1,152 @@
-# CleanFrame
+# CleanFrame for TCL Google TV
 
-A quieter home screen for Samsung The Frame. Your apps, a photograph and the time, with an interface made for the TV remote.
+A calm, uncluttered home screen for TCL Google TVs: your apps, your HDMI devices, a beautiful wallpaper and the time, made for the remote.
 
-![CleanFrame browser preview using the bundled Manrope font](docs/images/cleanframe-dock.jpg)
+![CleanFrame on a TCL 55C6KS](docs/images/tcl/home.jpg)
 
-I built CleanFrame for one TV: my own Samsung The Frame, running Tizen. I'm sharing the code and setup notes as a starting point for other people to build on.
+CleanFrame-TCL is a port of [Nathan Clark's CleanFrame](https://github.com/nthnclrk/CleanFrame) (built for Samsung The Frame / Tizen) to **Android TV / Google TV**, tuned and tested on a **TCL 55C6KS** (55" Mini LED, 4K, Google TV on Android TV 12, firmware `V8-0008T01-LF1V548.002110`). The interface is the same HTML/CSS/ES5 app; a small Java shell runs it full screen and connects it to the TV.
 
-**Use it at your own risk.** Most of the work has gone into making it work well on my TV. Very little has gone into making it portable. The setup scripts reflect my computer, TV and firmware, so expect to adapt them and test the result on your own hardware.
+> **Unofficial.** Not affiliated with TCL, Google, Samsung or any streaming service. Use at your own risk; everything here is reversible, and the steps below say how.
 
-I highly recommend forking it and building on top of it, ideally with a coding agent that can help you understand and adapt the setup. Start with the browser preview, make the interface your own, then work through TV installation when you're ready. Native Home/startup changes need particular care; the setup guide covers the risks and recovery steps.
+## Features
 
-## Try the interface
+- **Dock or List layout** with app logos drawn in one consistent style, or plain names.
+- **Installed apps** discovered automatically; pick and order up to nine for Home.
+- **HDMI inputs that appear by themselves.** Switch a console or set-top box on and its tile shows up instantly; switch it off and it disappears. Show them first in Home or in their own row.
+- **Remote Home button opens CleanFrame** (optional accessibility service). Hold Home for the original Google TV Home.
+- **15 bundled photographs** with pre-rendered glass, plus **online wallpapers**:
+  - NASA Astronomy Picture of the Day
+  - Bing Picture of the Day
+  - Wikimedia Commons Picture of the Day
+  - Random photos (Picsum)
+  - Unsplash themes: Nature and landscapes, Cities and architecture, Night sky and space *(API key)*
+- **Animated wallpapers**: bundled seamless loops, Pexels HD video loops *(API key)* and GIPHY *(API key)* with preset keywords.
+- **Drift motion**: a slow Ken Burns zoom where the photo and its glass move together.
+- Animations pause automatically outside Home (Settings, All apps), so menus stay snappy.
+- **Rotation**: a new wallpaper every time Home opens, or every 5, 15 or 60 minutes.
+- Typography, focus style and glass materials, all in the same remote-friendly Settings.
+- An optional, reversible **debloat** list for TCL's preinstalled extras.
 
-You need Node.js 22+ and Python 3.10+ to run the browser preview.
+| | |
+| --- | --- |
+| ![Inputs in their own row](docs/images/tcl/inputs-row.jpg) | ![Settings](docs/images/tcl/settings.jpg) |
+| ![Online wallpapers](docs/images/tcl/online.jpg) | ![Animated wallpapers](docs/images/tcl/animated.jpg) |
+| ![Wallpaper gallery with online photos and credits](docs/images/tcl/gallery.jpg) | ![Layout settings](docs/images/tcl/layout.jpg) |
+
+Bundled animated loops (previews; on the TV they play at 1080p behind the interface):
+
+| Aurora | Dusk | Deep sea |
+| --- | --- | --- |
+| ![Aurora loop](docs/images/tcl/loop-aurora.webp) | ![Dusk loop](docs/images/tcl/loop-dusk.webp) | ![Deep sea loop](docs/images/tcl/loop-deep-sea.webp) |
+
+## Install on the TV
+
+You need a computer on the same Wi-Fi with [Android platform tools](https://developer.android.com/tools/releases/platform-tools) (`adb`).
+
+1. **Enable developer options.** On the TV: *Settings → System → About*, scroll to **Android TV OS build** and press OK **seven times** until "You are now a developer". Use the main (admin) profile; kids profiles hide this.
+2. **Turn on debugging.** *Settings → System → Developer options* → **USB debugging** on. (Some builds also show **Wireless debugging**; see below.)
+3. **Connect** (replace `<tv-ip>` with the TV's address from *Settings → Network*):
+
+   ```sh
+   adb connect <tv-ip>:5555
+   ```
+
+   A prompt "Allow debugging?" appears on the TV: tick **Always allow from this computer** and press OK.
+
+   *Android 14 builds with "Wireless debugging":* open it → **Pair device with pairing code**, then `adb pair <ip>:<pair-port> <code>` and `adb connect <ip>:<port>` (the pairing port differs from the connect port).
+4. **Install** the APK from [Releases](https://github.com/taynotfound/CleanFrame-TCL/releases) (or build it, below):
+
+   ```sh
+   adb install -r CleanFrame-TCL.apk
+   ```
+
+CleanFrame now appears in your Apps. Open it once; it remembers everything locally.
+
+### Make the Home button open CleanFrame
+
+Google TV always sends Home to its own launcher and ignores Android's "default home app" setting. CleanFrame includes a tiny accessibility service that catches the Home key instead (the same approach launchers such as Projectivy use). Turn it on yourself on the TV:
+
+**Settings → System → Accessibility → CleanFrame Home button → On**
+
+- **Press Home**: CleanFrame.
+- **Hold Home** (about a second): the original Google TV Home. *Settings → Google TV → Google TV Home* inside CleanFrame does the same.
+- If Google TV Home appears by itself (for example after leaving an app), CleanFrame takes over, unless you opened it on purpose.
+
+The service only listens for the Home key and which app is in front. It never reads screen content, and nothing is disabled. Turn the switch off to undo.
+
+### HDMI inputs
+
+Inputs come from Android's TV Input Framework, using the TV's own state events: a device that is **plugged in and switched on** gets a tile; standby or unplugged devices are hidden. OK switches the TV to that input. If you rename an input in the TV settings, CleanFrame uses that name. Choose **Settings → Layout → Inputs → First in Home** or **Own row**.
+
+## Online and animated wallpapers
+
+*Settings → Background → Online wallpapers.* The TV downloads up to eight images or clips from the chosen source, then renders the same files the bundled gallery ships with (photo, thumbnail and four pre-blurred glass layers) **once, on download**. Nothing is blurred live, so Home stays smooth. New wallpapers arrive every few hours, and rotation then cycles through that source.
+
+Animated wallpapers play as muted MP4 loops behind the interface. Their glass is rendered from the first frame. GIPHY results use GIPHY's MP4 versions, which are far lighter than GIFs.
+
+NASA (shared `DEMO_KEY`), Bing, Wikimedia, Picsum and the bundled loops work without keys. For Unsplash, Pexels and GIPHY, create free developer keys and put them in `android/local.properties` (ignored by git), or pass them as environment variables when building:
+
+```properties
+unsplash.accessKey=...   # https://unsplash.com/developers
+pexels.apiKey=...        # https://www.pexels.com/api/
+giphy.apiKey=...         # https://developers.giphy.com/
+nasa.apiKey=...          # optional, https://api.nasa.gov/ (default DEMO_KEY is rate limited)
+```
+
+Keys are compiled into your APK, so don't share an APK that contains your keys. Credits for each photo or clip appear in the wallpaper gallery, as the sources' terms ask.
+
+## Build from source
+
+Requirements: JDK 17 and the Android SDK (platform 35), or Android Studio.
 
 ```sh
-git clone https://github.com/nthnclrk/CleanFrame.git
-cd CleanFrame
-npm ci
-npm run dev:public
+git clone https://github.com/taynotfound/CleanFrame-TCL.git
+cd CleanFrame-TCL
+echo "sdk.dir=$HOME/Android/Sdk" > android/local.properties
+gradle -p android assembleRelease        # Gradle 8.11
+adb install -r android/app/build/outputs/apk/release/app-release.apk
 ```
 
-Open [localhost:4795/home/](http://localhost:4795/home/). Use the arrow keys, Enter and Escape, or click the controls. App launches and Samsung screens require a TV; the preview reports that limitation when you select them.
+Without signing secrets the APK is signed with your machine's debug key. Keep using the same key to update in place without losing settings. The GitHub Actions workflow (`.github/workflows/android.yml`) builds the APK on every push.
 
-The public preview uses the included Manrope, Geist and Newsreader fonts.
+The web UI also runs in a desktop browser for quick design work: `npm ci && npm run dev:public`, then open [localhost:4795/home/](http://localhost:4795/home/). Run `npm run check` after changing `app/`.
 
-## What you can change
+### Project layout
 
-- Choose a List or Dock layout, with icons, names or both.
-- Use a photograph, light or dark background, with a simple 12-hour clock.
-- Adjust typography, focus and glass materials through the same Settings interface.
-- Choose and reorder Home apps; discover installed apps on the TV.
-- Select from fifteen wallpapers and save your preferences locally.
-
-The glass and blur are rendered ahead of time. The TV loads the finished images and uses transforms and opacity for focus feedback.
-
-## Use a coding agent
-
-Open this repo in a local coding agent and give it a bounded change:
-
-```text
-Read AGENTS.md, docs/development.md and docs/interaction-behaviour.md.
-Help me adapt CleanFrame. Start with the public-font browser preview.
-My first change is: <describe one change>.
-Preserve remote navigation, saved preferences and the ES5 runtime.
-Run the source checks and relevant browser checks. Show the result.
-This task is browser-only: do not connect to a TV, sign or install a
-package, or change Home/startup settings.
-```
-
-See [working with an agent](docs/for-agents.md) for the TV setup prompt and the distinction between UI work, app installation and native Home changes. An agent needs local computer access for TV work; a hosted chat cannot reach your TV merely by reading this repo.
-
-## Put it on a TV
-
-Use the staged [Samsung The Frame setup guide](docs/agent-tv-setup-guide.md) to understand the process used on my TV and adapt it to yours. It covers the remote's Developer Mode sequence, official Samsung tools, your own certificates and app identity, installation, visible checks and recovery.
-
-The signing and TV scripts are specific to my setup. Your agent will need to adapt the paths, signing profile, identity checks and installed-app IDs, then verify each stage with you. Installing the app and assigning the remote Home button are separate steps.
-
-| Area | Evidence and limits |
+| Path | What it is |
 | --- | --- |
-| Reference hardware | Samsung QA55LS03DAWXXY / LS03D, firmware 2130.0, Tizen 9.0, 32-bit ARM |
-| App installation | Signed installation and launch commands succeeded through 0.6.1. Latest rendering and remote feel still need physical observation. |
-| App launch and Home | Netflix/YouTube launch and physical Home from Netflix were confirmed on the reference setup. |
-| Still open | Normal power-on after streaming/Art Mode, corrected Smart Hub escape and native Art Mode destinations need definite physical checks. |
-| Other TVs | No compatibility claim. This is Tizen source; Android TV, Google TV, LG webOS and Roku need their own implementations. |
+| `app/` | The CleanFrame web UI (shared with the Tizen version) |
+| `app/device-android.js` | Android adapter: apps, inputs, online wallpapers |
+| `android/` | Java shell: WebView, app and input bridge, Home button service, wallpaper downloader |
+| `android/app/src/main/assets-android/loops/` | Bundled animated loops (generated, original) |
+| `debloat/` | Optional, reversible debloat list and script |
+| `docs/android-tv.md` | Port notes; `docs/upstream-README.md` is the original Samsung README |
 
-The detailed [device record](docs/tv-status.md) separates observed results from SDK responses. Native Home/startup uses undocumented, guarded helpers; it is optional and can fail after firmware changes. Keep a recovery baseline before attempting that work. The app can be opened manually without it.
+## Optional: debloat
 
-## Develop and check
+`debloat/packages.txt` lists TCL and Google extras that are safe to switch off: Samba TV tracking, promo overlays, the store demo, Alexa and so on, each with a comment. Edit the list, then:
 
 ```sh
-npm run check
-npx playwright install chromium
-CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser
-npm run check:public
-npm run export:public
+TV=<tv-ip>:5555 debloat/debloat.sh disable   # turn them off (pm disable-user, nothing is uninstalled)
+TV=<tv-ip>:5555 debloat/debloat.sh status
+TV=<tv-ip>:5555 debloat/debloat.sh restore   # turn them back on
 ```
 
-The browser checks use isolated Chromium profiles and a loopback preview. They never contact a TV. The public export creates `dist/CleanFrame-public-unsigned.wgt`, with public fonts and notices. It needs your own identity and signing before installation. It does not certify asset redistribution rights or device compatibility.
+Live TV, inputs, settings, the remote, AirPlay/Miracast, updates and Google TV itself are never in the list. Firmware updates or a factory reset may re-enable apps.
 
-| Location | Purpose |
-| --- | --- |
-| `app/` | Current packaged UI and runtime assets |
-| `scripts/` | Preview, validation, asset generation and reference TV tools |
-| [Development](docs/development.md) / [testing](docs/testing.md) | Runtime map, preferences, checks and device boundaries |
-| [Assets](docs/assets.md) / [third-party notices](THIRD_PARTY_NOTICES.md) | Rendering recipes, font separation and asset provenance |
-| [Asset sources](docs/asset-sources.md) | Photo credits and verification of the bundled third-party assets |
-| `.local/`, `dist/` | Ignored private setup, recovery data, generated files and packages |
+## Ideas and roadmap
 
-## Contribute
+- Weather and calendar on the clock (Open-Meteo, no key)
+- "Now playing" card from the active media session
+- HDMI-CEC device names ("PlayStation 5" instead of "HDMI 1")
+- Sunrise/sunset wallpaper switching and a night dim mode
+- Upload your own photos and GIFs from your phone over Wi-Fi
+- Update notifications from GitHub Releases
 
-Fork it, experiment and build something that suits your TV. If you find a useful fix or improve the setup instructions, contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before a larger change. Reports should include model, firmware and the observed result, with private identifiers removed.
+## Credits and licences
 
-## Licence and credits
-
-CleanFrame's original code and documentation use the [MIT licence](LICENSE). Fonts, photographs and logos retain their own terms; read [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Paid Pangram binaries are excluded from Git and public exports. A local package may include them, so keep personal builds separate from public downloads.
-
-The [release review](docs/public-release.md) records the publication checks. Third-party assets retain the terms listed in their notices. CleanFrame is an independent project with no Samsung or streaming-service affiliation.
-
-[TV Detox](https://github.com/Ansub/tv-detox) is a useful example of making an agent-assisted TV project approachable. Its Android setup is a different implementation; the prompts and instructions here are written for CleanFrame and Tizen.
+- **CleanFrame** by Nathan Clark: MIT. This fork keeps the original licence and notices ([LICENSE](LICENSE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)).
+- Android TV port, inputs, Home button, online/animated wallpapers and TCL tuning: CleanFrame-TCL contributors, MIT.
+- App logos: [Simple Icons](https://simpleicons.org) (CC0) and public-domain wordmarks from Wikimedia Commons. See `app/assets/icons/SOURCES.json`. Trademarks belong to their owners.
+- Online wallpapers belong to their authors and are shown under each provider's terms: [NASA APOD](https://apod.nasa.gov), [Bing](https://www.bing.com), [Wikimedia Commons](https://commons.wikimedia.org), [Lorem Picsum](https://picsum.photos), [Unsplash](https://unsplash.com), [Pexels](https://www.pexels.com), [GIPHY](https://giphy.com).
+- Bundled animated loops are generated procedurally for this project.

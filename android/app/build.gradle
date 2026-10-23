@@ -1,0 +1,59 @@
+plugins {
+    id 'com.android.application'
+}
+
+def keystorePath = System.getenv('CLEANFRAME_KEYSTORE')
+
+// Optional API keys: android/local.properties (ignored by git) or environment variables.
+def localProps = new Properties()
+if (rootProject.file('local.properties').exists()) rootProject.file('local.properties').withInputStream { localProps.load(it) }
+def secret = { String prop, String env, String fallback -> (localProps.getProperty(prop) ?: System.getenv(env) ?: fallback).replace('"', '') }
+
+android {
+    namespace 'app.cleanframe.tv'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'app.cleanframe.tv'
+        minSdk 26
+        targetSdk 35
+        versionCode 2
+        versionName '0.7.0-tcl'
+        buildConfigField 'String', 'UNSPLASH_ACCESS_KEY', '"' + secret('unsplash.accessKey', 'UNSPLASH_ACCESS_KEY', '') + '"'
+        buildConfigField 'String', 'PEXELS_API_KEY', '"' + secret('pexels.apiKey', 'PEXELS_API_KEY', '') + '"'
+        buildConfigField 'String', 'GIPHY_API_KEY', '"' + secret('giphy.apiKey', 'GIPHY_API_KEY', '') + '"'
+        buildConfigField 'String', 'NASA_API_KEY', '"' + secret('nasa.apiKey', 'NASA_API_KEY', 'DEMO_KEY') + '"'
+    }
+    buildFeatures { buildConfig true }
+
+    // The web UI is shared with the Tizen widget: package app/ as-is.
+    sourceSets {
+        // assets-android/ holds Android-only files (bundled animated loops) kept out of the Tizen widget.
+        main { assets.srcDirs = ['../../app', 'src/main/assets-android'] }
+    }
+
+    signingConfigs {
+        if (keystorePath) {
+            release {
+                storeFile file(keystorePath)
+                storePassword System.getenv('CLEANFRAME_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('CLEANFRAME_KEY_ALIAS')
+                keyPassword System.getenv('CLEANFRAME_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig keystorePath ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+}
