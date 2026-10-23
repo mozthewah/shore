@@ -60,7 +60,12 @@
     mori: { name: 'Mori', family: 'Study Mori', display: 200, ui: 400, clock: 200 },
     pangram: { name: 'Pangram Sans', family: 'Study Pangram', display: 300, ui: 400, clock: 300 },
     geist: { name: 'Geist', family: 'Study Geist', display: 300, ui: 400, clock: 300 },
-    newsreader: { name: 'Newsreader', family: 'Study Newsreader', display: 400, ui: 400, clock: 400 }
+    newsreader: { name: 'Newsreader', family: 'Study Newsreader', display: 400, ui: 400, clock: 400 },
+    inter: { name: 'Inter', family: 'Study Inter', display: 300, ui: 400, clock: 300 },
+    outfit: { name: 'Outfit', family: 'Study Outfit', display: 300, ui: 400, clock: 300 },
+    spacegrotesk: { name: 'Space Grotesk', family: 'Study Space Grotesk', display: 300, ui: 400, clock: 300 },
+    sora: { name: 'Sora', family: 'Study Sora', display: 300, ui: 400, clock: 300 },
+    playfair: { name: 'Playfair Display', family: 'Study Playfair', display: 400, ui: 400, clock: 400 }
   };
   var PRIVATE_FONTS = window.CleanFramePrivateFontIDs || [], fontMetrics = {}, unavailableFonts = {}, widthCache = {}, fontsReady = false;
   var LOOK_KEYS = ['bg', 'layout', 'apps', 'font', 'controls', 'focus', 'material'];

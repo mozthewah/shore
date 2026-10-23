@@ -34,5 +34,95 @@
     "bytes": 4394,
     "sha256": "fdfad38143ec470553cae82a1e45320bdd1b9ec70415d37bd0171051d8a4ded8",
     "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "inter",
+    "file": "inter/Inter-Variable.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf",
+    "accessed": "2026-10-23",
+    "bytes": 876576,
+    "sha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+    "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "inter",
+    "file": "inter/OFL.txt",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt",
+    "accessed": "2026-10-23",
+    "bytes": 4377,
+    "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57",
+    "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "outfit",
+    "file": "outfit/Outfit-Variable.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/outfit/Outfit%5Bwght%5D.ttf",
+    "accessed": "2026-10-23",
+    "bytes": 110884,
+    "sha256": "fc7287273e66929776e2ba54f144fe699080bec29f61bf649d70d871468aeade",
+    "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "outfit",
+    "file": "outfit/OFL.txt",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/outfit/OFL.txt",
+    "accessed": "2026-10-23",
+    "bytes": 4389,
+    "sha256": "c676351bf8576b9aba743cd5eaa8c0e7ee0d51f805d720447b4df4ddb6a2e416",
+    "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "spacegrotesk",
+    "file": "spacegrotesk/SpaceGrotesk-Variable.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf",
+    "accessed": "2026-10-23",
+    "bytes": 136676,
+    "sha256": "acad6de1fc93436f5c0f1f4137751ef04f1aea3063e7036535970ffcfbd79f72",
+    "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "spacegrotesk",
+    "file": "spacegrotesk/OFL.txt",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/spacegrotesk/OFL.txt",
+    "accessed": "2026-10-23",
+    "bytes": 4495,
+    "sha256": "564ce565c371c5e5bbf286006565a7c9aa55a9f56e7ca58d56e05d649dd61a72",
+    "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "sora",
+    "file": "sora/Sora-Variable.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/sora/Sora%5Bwght%5D.ttf",
+    "accessed": "2026-10-23",
+    "bytes": 111400,
+    "sha256": "84ff7096ae3ec6c8be47d906d1a0ba4de7f2ce78c615275c77301964a316e16c",
+    "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "sora",
+    "file": "sora/OFL.txt",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/sora/OFL.txt",
+    "accessed": "2026-10-23",
+    "bytes": 4385,
+    "sha256": "ba0b9729c9428ba79a0459ab8ec575791b51509dbec213e383d0316d37fec299",
+    "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "playfair",
+    "file": "playfair/PlayfairDisplay-Variable.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf",
+    "accessed": "2026-10-23",
+    "bytes": 300724,
+    "sha256": "c40f2293766a503bc70cce9e512ef844a4ccb7cbcde792fe2ea31d191917d8d6",
+    "unchanged_upstream_bytes": true
+  },
+  {
+    "family": "playfair",
+    "file": "playfair/OFL.txt",
+    "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/playfairdisplay/OFL.txt",
+    "accessed": "2026-10-23",
+    "bytes": 4449,
+    "sha256": "566be814f8e96e93dfa16101331557eb6b5467e9e03f627c0910fe93ca12300e",
+    "unchanged_upstream_bytes": true
   }
 ]

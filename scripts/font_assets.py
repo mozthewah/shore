@@ -10,7 +10,7 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC_FONT_IDS = ['geist', 'newsreader']
+PUBLIC_FONT_IDS = ['geist', 'newsreader', 'inter', 'outfit', 'spacegrotesk', 'sora', 'playfair']
 PRIVATE_FONTS = [
     {
         'id': 'montreal', 'family': 'Study Montreal', 'folder': 'neue-montreal',

@@ -24,7 +24,8 @@ CleanFrame-TCL is a port of [Nathan Clark's CleanFrame](https://github.com/nthnc
 - **Drift motion**: a slow Ken Burns zoom where the photo and its glass move together.
 - Animations pause automatically outside Home (Settings, All apps), so menus stay snappy.
 - **Rotation**: a new wallpaper every time Home opens, or every 5, 15 or 60 minutes.
-- Typography, focus style and glass materials, all in the same remote-friendly Settings.
+- **Eight fonts** (all Open Font License): Manrope, Geist, Newsreader, Inter, Outfit, Space Grotesk, Sora and Playfair Display, with matched metrics so the clock and labels never jump.
+- Focus style and glass materials, all in the same remote-friendly Settings.
 - An optional, reversible **debloat** list for TCL's preinstalled extras.
 
 | | |

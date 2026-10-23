@@ -613,3 +613,4 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .wallpaper-choice .setting-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .setting-choice.is-focus .setting-credit{color:var(--solid-mute,rgba(28,28,26,.6))}
 .anim-paused .photo,.anim-paused .mat-img,.anim-paused .ph-field-img{animation-play-state:paused}
+.detail-typography .setting-choice{min-height:76px}

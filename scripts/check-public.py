@@ -71,7 +71,7 @@ for path in private_fonts:
     if git('hash-object', str(path)).decode().strip() in object_ids:
         findings.append('Known proprietary font bytes in Git history: ' + path.name)
 
-for name in ['app/assets/fonts/geist/OFL.txt', 'app/assets/fonts/newsreader/OFL.txt', 'app/assets/manrope-OFL.txt']:
+for name in ['app/assets/fonts/geist/OFL.txt', 'app/assets/fonts/newsreader/OFL.txt', 'app/assets/fonts/inter/OFL.txt', 'app/assets/fonts/outfit/OFL.txt', 'app/assets/fonts/spacegrotesk/OFL.txt', 'app/assets/fonts/sora/OFL.txt', 'app/assets/fonts/playfair/OFL.txt', 'app/assets/manrope-OFL.txt']:
     if not (ROOT / name).is_file():
         findings.append('Missing public font licence: ' + name)
 
