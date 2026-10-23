@@ -4,13 +4,15 @@ A calm, uncluttered home screen for TCL Google TVs: your apps, your HDMI devices
 
 ![CleanFrame on a TCL 55C6KS](docs/images/tcl/home.jpg)
 
+![Shelf layout with app banners](docs/images/tcl/shelf.jpg)
+
 CleanFrame-TCL is a port of [Nathan Clark's CleanFrame](https://github.com/nthnclrk/CleanFrame) (built for Samsung The Frame / Tizen) to **Android TV / Google TV**, tuned and tested on a **TCL 55C6KS** (55" Mini LED, 4K, Google TV on Android TV 12, firmware `V8-0008T01-LF1V548.002110`). The interface is the same HTML/CSS/ES5 app; a small Java shell runs it full screen and connects it to the TV.
 
 > **Unofficial.** Not affiliated with TCL, Google, Samsung or any streaming service. Use at your own risk; everything here is reversible, and the steps below say how.
 
 ## Features
 
-- **Dock or List layout** with app logos drawn in one consistent style, or plain names.
+- **Dock, List or Shelf layout.** Shelf is an Apple TV–inspired row of each app's own colourful Android TV banner; the focused card lifts with a sheen. Dock and List draw app logos in one consistent style.
 - **Installed apps** discovered automatically; pick and order up to nine for Home.
 - **HDMI inputs that appear by themselves.** Switch a console or set-top box on and its tile shows up instantly; switch it off and it disappears. Show them first in Home or in their own row.
 - **Remote Home button opens CleanFrame** (optional accessibility service). Hold Home for the original Google TV Home.

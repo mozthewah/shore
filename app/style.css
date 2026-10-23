@@ -648,3 +648,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 /* Eight Settings groups fit on one page. */
 .settings-group{height:84px;padding-top:4px;padding-bottom:4px}
 .detail-clock .setting-section+.setting-section,.detail-display .setting-section+.setting-section{margin-top:20px}
+/* Shelf layout (tvOS-inspired): Android TV banner cards without the glass dock; the focused card lifts.
+   Slots are 288x250: the 260x146 card sits 40px down so its lift and growth stay inside the clipped shelf. */
+.ls-shelf .dock .mat,.ls-shelf .dock .plate,.ls-shelf .dock-action,.ls-shelf .tile .nudge{display:none}
+.ls-shelf .tile .card{position:absolute;left:14px;top:40px;width:260px;height:146px;border-radius:16px;overflow:hidden;background:rgba(24,26,30,.62);box-shadow:0 8px 20px rgba(0,0,0,.32);transform-origin:50% 60%;transition:transform 200ms ease,box-shadow 200ms ease}
+.ls-shelf .tile .card-art{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover}
+.ls-shelf .tile .card-mark{display:none}
+.ls-shelf .tile .no-art .card-mark{display:block;position:absolute;left:70px;top:37px;width:120px;height:72px}
+.ls-shelf .tile .no-art .card-mark .mark{position:absolute;left:0;top:0}
+.ls-shelf .tile.is-focus .card{transform:translateY(-12px) scale(1.12);box-shadow:0 26px 48px rgba(0,0,0,.55)}
+.ls-shelf .tile.is-focus .card::after{content:'';position:absolute;left:0;top:0;right:0;bottom:0;border-radius:16px;background:linear-gradient(118deg,rgba(255,255,255,.30),rgba(255,255,255,.04) 42%,rgba(255,255,255,0) 60%);pointer-events:none}
+.ls-shelf .tile .label{top:200px!important;font-size:28px!important;line-height:36px!important;opacity:0!important;transform:none!important;transition:opacity 160ms linear}
+.ls-shelf .tile.is-focus .label{opacity:1!important}

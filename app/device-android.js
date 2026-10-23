@@ -88,6 +88,9 @@
     platform: 'android',
     launch: launch, launchApp: launchApp, apps: apps,
     inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online,
+    /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */
+    packageOf: function (id) { var brand = TIZEN[id] || BRAND[id] || (PACKAGES[id] ? id : ''), pkg = brand === 'youtube' ? FALLBACK.youtube : TIZEN[id] ? PACKAGES[TIZEN[id]] : PACKAGES[id] || id; // YouTube tile shows YouTube's banner
+      return /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$/.test(pkg) ? pkg : null; },
     /* No Art Mode on Android TV: start the system screensaver instead. */
     art: function (done) { reply(ask('screensaver'), done, 'The screensaver could not start.'); },
     home: function (done) { reply(ask('systemHome'), done, 'The TV’s own Home screen could not open.'); },

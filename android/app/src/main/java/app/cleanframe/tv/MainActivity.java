@@ -64,6 +64,7 @@ public class MainActivity extends Activity {
                 .addPathHandler("/assets/assets/", online.handler()) // online photos, then bundled files
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
                 .addPathHandler("/appicon/", new AppIconHandler(this))
+                .addPathHandler("/appbanner/", new AppIconHandler(this, true))
                 .build();
 
         web.setWebViewClient(new WebViewClient() {
