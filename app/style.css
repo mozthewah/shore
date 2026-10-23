@@ -613,4 +613,38 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .wallpaper-choice .setting-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .setting-choice.is-focus .setting-credit{color:var(--solid-mute,rgba(28,28,26,.6))}
 .anim-paused .photo,.anim-paused .mat-img,.anim-paused .ph-field-img{animation-play-state:paused}
-.detail-typography .setting-choice{min-height:76px}
+.detail-fonts .setting-choice{min-height:76px}
+.detail-fonts .appearance-rows{top:260px}
+/* ---------- CleanFrame-TCL customisation ---------- */
+/* Clock size (base 48px) and weight; the baseline shift and digit cells scale with the clock. */
+.cs-medium .home .clock{font-size:80px;line-height:96px;--clock-k:1.6667}
+.cs-large .home .clock{font-size:120px;line-height:136px;--clock-k:2.5}
+.cs-huge .home .clock{font-size:176px;line-height:188px;--clock-k:3.6667;letter-spacing:-.02em}
+.cs-medium .home .clock-digit,.cs-large .home .clock-digit,.cs-huge .home .clock-digit{width:calc(var(--font-clock-digit) * var(--clock-k))}
+.font-custom.cs-medium .home .clock,.font-custom.cs-large .home .clock,.font-custom.cs-huge .home .clock{top:calc(var(--font-clock-shift) * var(--clock-k))}
+.cw-thin .home .clock{font-weight:200!important}
+.cw-light .home .clock{font-weight:300!important}
+.cw-regular .home .clock{font-weight:400!important}
+.cw-bold .home .clock{font-weight:700!important}
+.cap-date{font-size:28px;line-height:36px;font-weight:500;opacity:.86;text-shadow:0 1px 3px rgba(0,0,0,.22);white-space:nowrap}
+.font-custom .home .cap-date{font-family:var(--font-ui-family),sans-serif;font-weight:var(--font-ui-weight)}
+/* Text weight for app names, controls and captions. */
+.tw-light .home .tile .label,.tw-light .home .u,.tw-light .home .ph-name,.tw-light .home .cap-date{font-weight:300!important}
+.tw-regular .home .tile .label,.tw-regular .home .u,.tw-regular .home .ph-name,.tw-regular .home .cap-date{font-weight:400!important}
+.tw-bold .home .tile .label,.tw-bold .home .u,.tw-bold .home .ph-name,.tw-bold .home .cap-date{font-weight:700!important}
+/* App name size on top of the fitted size. */
+.ts-small .home .tile .label{transform:scale(.86);transform-origin:50% 0}
+.ts-large .home .tile .label{transform:scale(1.14);transform-origin:50% 0}
+/* Night mode: one brightness filter on every photo-registered layer keeps the glass matched. */
+.is-night{--night:.55}
+.is-night.nd-soft{--night:.72}
+.is-night.nd-strong{--night:.38}
+.is-night .photo,.is-night .photo-video,.is-night .mat-img,.is-night .ph-field-img,.is-night .sheet-bg{filter:brightness(var(--night))}
+.is-night .home .caption,.is-night .home .utils,.is-night .home .tile .label,.is-night .home .tile .mark{opacity:.78}
+.is-night.nd-strong .home .caption,.is-night.nd-strong .home .utils,.is-night.nd-strong .home .tile .label,.is-night.nd-strong .home .tile .mark{opacity:.62}
+/* Idle: controls fade away, the clock and picture stay. */
+.home .dock,.home .utils,.home .input-row,.home .app-focus-name,.home .util-focus-label,.home .ut-lens,.home .focus-status{transition:opacity 900ms ease}
+.is-idle .home .dock,.is-idle .home .utils,.is-idle .home .input-row,.is-idle .home .app-focus-name,.is-idle .home .util-focus-label,.is-idle .ut-lens,.is-idle .focus-status{opacity:0!important}
+/* Eight Settings groups fit on one page. */
+.settings-group{height:84px;padding-top:4px;padding-bottom:4px}
+.detail-clock .setting-section+.setting-section,.detail-display .setting-section+.setting-section{margin-top:20px}

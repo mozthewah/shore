@@ -43,7 +43,7 @@ jobs:
           # Optional online wallpaper keys (repository secrets). Empty keys simply disable those sources.
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+          KLIPY_API_KEY: ${{ secrets.KLIPY_API_KEY }}
           NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
         run: gradle -p android assembleRelease
 

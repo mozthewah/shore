@@ -21,7 +21,7 @@ android {
         versionName '0.7.0-tcl'
         buildConfigField 'String', 'UNSPLASH_ACCESS_KEY', '"' + secret('unsplash.accessKey', 'UNSPLASH_ACCESS_KEY', '') + '"'
         buildConfigField 'String', 'PEXELS_API_KEY', '"' + secret('pexels.apiKey', 'PEXELS_API_KEY', '') + '"'
-        buildConfigField 'String', 'GIPHY_API_KEY', '"' + secret('giphy.apiKey', 'GIPHY_API_KEY', '') + '"'
+        buildConfigField 'String', 'KLIPY_API_KEY', '"' + secret('klipy.apiKey', 'KLIPY_API_KEY', '') + '"'
         buildConfigField 'String', 'NASA_API_KEY', '"' + secret('nasa.apiKey', 'NASA_API_KEY', 'DEMO_KEY') + '"'
     }
     buildFeatures { buildConfig true }

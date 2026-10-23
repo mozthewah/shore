@@ -40,8 +40,8 @@
     { id: 'unsplash-space', name: 'Unsplash · Night sky and space', unsplash: true },
     { id: 'loops', name: 'Bundled loops', page: 'animated' }, { id: 'pexels-ocean', name: 'Pexels · Ocean waves', key: 'pexels', page: 'animated' },
     { id: 'pexels-rain', name: 'Pexels · Rain on glass', key: 'pexels', page: 'animated' }, { id: 'pexels-clouds', name: 'Pexels · Clouds', key: 'pexels', page: 'animated' },
-    { id: 'pexels-city', name: 'Pexels · City at night', key: 'pexels', page: 'animated' }, { id: 'giphy-lofi', name: 'GIPHY · Lofi', key: 'giphy', page: 'animated' },
-    { id: 'giphy-rain', name: 'GIPHY · Cozy rain', key: 'giphy', page: 'animated' }, { id: 'giphy-space', name: 'GIPHY · Space', key: 'giphy', page: 'animated' }];
+    { id: 'pexels-city', name: 'Pexels · City at night', key: 'pexels', page: 'animated' }, { id: 'klipy-lofi', name: 'Klipy · Lofi', key: 'klipy', page: 'animated' },
+    { id: 'klipy-rain', name: 'Klipy · Cozy rain', key: 'klipy', page: 'animated' }, { id: 'klipy-space', name: 'Klipy · Space', key: 'klipy', page: 'animated' }];
   SOURCES.forEach(function (o) { if (o.unsplash) { o.key = 'unsplash'; o.page = 'unsplash'; } else if (!o.page) o.page = 'online'; });
   var ONLINE_STATUS = { loading: 'Downloading wallpapers…', error: 'Couldn’t reach this source. CleanFrame tries again later.', empty: 'No suitable landscape photos right now.', ready: 'New wallpapers arrive every few hours.', off: '' };
 
@@ -69,9 +69,15 @@
   };
   var PRIVATE_FONTS = window.CleanFramePrivateFontIDs || [], fontMetrics = {}, unavailableFonts = {}, widthCache = {}, fontsReady = false;
   var LOOK_KEYS = ['bg', 'layout', 'apps', 'font', 'controls', 'focus', 'material'];
-  var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], inputs: ['front', 'row'], motion: ['still', 'drift'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'] };
-  var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', focus: 'Focus', material: 'Material' };
-  var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift' };
+  var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], inputs: ['front', 'row'], motion: ['still', 'drift'], tweight: ['auto', 'light', 'regular', 'bold'], tsize: ['small', 'default', 'large'],
+    cformat: ['12', '24'], cdate: ['off', 'on'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
+    night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'] };
+  var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', csize: 'Clock size', cweight: 'Clock weight',
+    night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material' };
+  var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
+    medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
+    '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min' };
+  VALUE_NAMES.off = 'Off'; VALUE_NAMES.light = VALUE_NAMES.light || 'Light';
   var UTIL = { art: [TV.art, 'art'], apps: ['All apps', 'apps'], arrange: ['Arrange', 'arrange'], settings: ['Settings', 'settings'] };
   var MSG = {
     leave: { title: 'Leave Home?', line: 'Open ' + TV.home + '?', note: '', actions: [['stay', 'Stay'], ['samsung', TV.home]] }
@@ -111,7 +117,8 @@
     for (var i = 0; i < list.length; i++) if (list[i].toLowerCase() === v) return list[i];
     return fallback;
   }
-  function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, motion: c.motion, focus: c.focus, material: c.material }; }
+  function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, csize: c.csize, cweight: c.cweight,
+      night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
   function derivedTheme() { return S.c.layout === 'list' ? 'list' : 'shore'; }
 
@@ -372,6 +379,11 @@
     return {
       bg: pick(modern.bg, LOOK_VALUES.bg, legacyList ? 'dark' : 'photo'), layout: pick(modern.layout, LOOK_VALUES.layout, legacyList ? 'list' : 'dock'),
       apps: pick(modern.apps, LOOK_VALUES.apps, legacyList ? 'text' : 'both'), controls: pick(modern.controls, LOOK_VALUES.controls, 'both'), inputs: pick(modern.inputs, LOOK_VALUES.inputs, 'front'), motion: pick(modern.motion, LOOK_VALUES.motion, 'still'),
+      tweight: pick(modern.tweight, LOOK_VALUES.tweight, 'auto'), tsize: pick(modern.tsize, LOOK_VALUES.tsize, 'default'),
+      cformat: pick(modern.cformat, LOOK_VALUES.cformat, '12'), cdate: pick(modern.cdate, LOOK_VALUES.cdate, 'off'),
+      csize: pick(modern.csize, LOOK_VALUES.csize, 'small'), cweight: pick(modern.cweight, LOOK_VALUES.cweight, 'auto'),
+      night: pick(modern.night, LOOK_VALUES.night, 'off'), nhours: pick(modern.nhours, LOOK_VALUES.nhours, '22-6'),
+      ndim: pick(modern.ndim, LOOK_VALUES.ndim, 'medium'), idle: pick(modern.idle, LOOK_VALUES.idle, 'off'),
       focus: pick(modern.focus, LOOK_VALUES.focus, legacyList ? 'type' : 'glass'), material: pick(modern.material, LOOK_VALUES.material, 'soft'),
       font: pick(modern.font, LOOK_VALUES.font, 'manrope'), wall: wall(modern.wall || s.wallpaper) ? modern.wall || s.wallpaper : WALLS[0].id,
       home: h, recent: recent, lastApp: h.indexOf(s.lastApp) >= 0 ? s.lastApp : h[0],
@@ -553,7 +565,7 @@
   function addAppsRoute() { openEditor('home'); }
   function openSettings() { push({ id: 'settings', f: { id: S.settingsFocus } }); }
   function openAppearance(group) {
-    var axis = { background: 'bg', layout: 'layout', typography: 'font', focus: 'focus' }[group];
+    var axis = { background: 'bg', layout: 'layout', typography: 'tweight', fonts: 'font', focus: 'focus', clock: 'cformat', display: 'night' }[group];
     var action = S.detailFocus[group] || (axis ? 'choice.' + axis + '.' + S.c[axis] : group === 'rotation' ? 'rotation.' + S.c.mode : PARENT[group] === 'online' || group === 'online' ? 'online.' + S.c.source : 'samsung.home');
     push({ id: 'appearance', group: group, f: { action: action } });
   }
@@ -876,7 +888,7 @@
   function closeEditor() { clearSession(); pop(); }
 
   /* ---------- Settings, Layout and messages ---------- */
-  var PARENT = { rotation: 'background', online: 'background', unsplash: 'online', animated: 'online' };
+  var PARENT = { rotation: 'background', online: 'background', unsplash: 'online', animated: 'online', fonts: 'typography' };
   function subPage(t) { return !!PARENT[t.group]; }
   function parentName(t) { return PARENT[t.group] ? DETAIL_NAMES[PARENT[t.group]] : 'Settings'; }
   function source() { for (var i = 0; i < SOURCES.length; i++) if (SOURCES[i].id === S.c.source) return SOURCES[i]; return SOURCES[0]; }
@@ -885,7 +897,9 @@
     var n = S.c.home.length;
     return [{ id: 'background', label: 'Background', value: S.c.bg === 'photo' ? wall(S.c.wall).name : VALUE_NAMES[S.c.bg] },
       { id: 'layout', label: 'Layout', value: VALUE_NAMES[S.c.layout] },
-      { id: 'typography', label: 'Typography', value: FONTS[S.c.font].name },
+      { id: 'typography', label: 'Text', value: FONTS[S.c.font].name + (S.c.tweight !== 'auto' ? ', ' + VALUE_NAMES[S.c.tweight] : '') + (S.c.tsize !== 'default' ? ', ' + VALUE_NAMES[S.c.tsize] : '') },
+      { id: 'clock', label: 'Clock', value: VALUE_NAMES[S.c.cformat] + ', ' + VALUE_NAMES[S.c.csize] + (S.c.cdate === 'on' ? ', with date' : '') },
+      { id: 'display', label: 'Night and idle', value: S.c.night === 'off' ? 'Night mode off' : S.c.night === 'always' ? 'Always dimmed' : 'Dimmed ' + VALUE_NAMES[S.c.nhours] },
       { id: 'focus', label: 'Focus', value: VALUE_NAMES[S.c.focus] + (materialApplies() ? ', ' + VALUE_NAMES[S.c.material] : '') },
       { id: 'editor', label: 'Apps on Home', value: n + (n === 1 ? ' app' : ' apps') },
       { id: 'samsung', label: TV.brand, value: 'Home and TV settings' }];
@@ -908,11 +922,11 @@
     if (id === 'editor') openEditor('settings');
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { online: 'Online wallpapers', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Typography', focus: 'Focus', rotation: 'Rotation and motion', samsung: TV.brand };
+  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Online wallpapers', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation and motion', samsung: TV.brand };
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: SOURCES.filter(function (o) { return o.id === value; })[0].name };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : VALUE_NAMES[value] };
+      label: axis === 'cdate' ? 'Date' : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : VALUE_NAMES[value] };
   }
   function detailSections(t) {
     var flat = S.c.bg !== 'photo', inactive = !materialApplies();
@@ -930,7 +944,21 @@
       { id: 'inputs', title: 'Inputs', horizontal: true, items: options('inputs', ['front', 'row'], S.c.layout === 'list'),
         reason: S.c.layout === 'list' ? 'Own row needs the Dock layout.' : '' }
     ];
-    if (t.group === 'typography') return [{ id: 'font', title: '', items: options('font', LOOK_VALUES.font) }];
+    if (t.group === 'fonts') return [{ id: 'font', title: '', items: options('font', LOOK_VALUES.font) }];
+    if (t.group === 'typography') return [
+      { id: 'fontpick', title: 'Font', items: [{ action: 'typography.fonts', label: FONTS[S.c.font].name }] },
+      { id: 'tweight', title: 'Text weight', horizontal: true, items: options('tweight', ['auto', 'light', 'regular', 'bold']) },
+      { id: 'tsize', title: 'App name size', horizontal: true, items: options('tsize', ['small', 'default', 'large']) }];
+    if (t.group === 'clock') return [
+      { id: 'cformat', title: 'Format', horizontal: true, items: options('cformat', ['12', '24']).concat(options('cdate', ['on'])) },
+      { id: 'csize', title: 'Clock size', horizontal: true, items: options('csize', ['small', 'medium', 'large', 'huge']) },
+      { id: 'cweight', title: 'Clock weight', horizontal: true, items: options('cweight', ['auto', 'thin', 'light', 'bold']) }];
+    if (t.group === 'display') return [
+      { id: 'night', title: 'Night mode', horizontal: true, items: options('night', ['off', 'scheduled', 'always']) },
+      { id: 'nhours', title: 'Night hours', horizontal: true, items: options('nhours', ['21-7', '22-6', '23-7'], S.c.night !== 'scheduled') },
+      { id: 'ndim', title: 'Night dimming', horizontal: true, items: options('ndim', ['soft', 'medium', 'strong'], S.c.night === 'off') },
+      { id: 'idle', title: 'Hide controls when idle', horizontal: true, items: options('idle', ['off', '1', '5']),
+        reason: S.c.idle !== 'off' ? 'The clock and picture stay. Any button brings the controls back.' : '' }];
     if (t.group === 'focus') return [
       { id: 'focus', title: 'Focus style', horizontal: true, items: options('focus', ['type', 'glass']) },
       { id: 'material', title: 'Material', horizontal: true, items: options('material', ['soft', 'frost', 'tint'], inactive),
@@ -984,7 +1012,7 @@
     if (!write(c, 'Wallpaper rotation')) S.lookError = { type: 'save', patch: { mode: value }, row: 'mode', transient: false };
   }
   function keyNote(keys) {
-    var names = keys.filter(function (k, i) { return keys.indexOf(k) === i; }).map(function (k) { return { unsplash: 'Unsplash', pexels: 'Pexels', giphy: 'GIPHY' }[k]; });
+    var names = keys.filter(function (k, i) { return keys.indexOf(k) === i; }).map(function (k) { return { unsplash: 'Unsplash', pexels: 'Pexels', klipy: 'Klipy' }[k]; });
     return names.join(' and ') + (names.length > 1 ? ' need API keys' : ' needs an API key') + ' when the app is built. See the README.';
   }
   function applySource(value) {
@@ -1026,10 +1054,12 @@
       else if (error) setLook(error.patch, { row: error.row });
     } else if (item.axis === 'mode') applyRotation(item.value);
     else if (item.axis === 'source') applySource(item.value);
+    else if (item.axis === 'cdate') { patch.cdate = S.c.cdate === 'on' ? 'off' : 'on'; setLook(patch, { row: item.axis }); }
     else if (item.axis) { patch[item.axis] = item.value; setLook(patch, { row: item.axis }); }
     else if (item.action === 'background.wallpaper') openWallpaper();
     else if (item.action === 'background.rotation') openAppearance('rotation');
     else if (item.action === 'background.online') openAppearance('online');
+    else if (item.action === 'typography.fonts') openAppearance('fonts');
     else if (item.action === 'open.unsplash') openAppearance('unsplash');
     else if (item.action === 'open.animated') openAppearance('animated');
     else if (item.action === 'samsung.home') perform(TV.home, FrameDevice.home);
@@ -1038,7 +1068,7 @@
   V.appearance = {
     norm: function (t) {
       var rows = detailRows(t), exists = false, applied = null;
-      var axis = { background: 'bg', layout: 'layout', typography: 'font', focus: 'focus', rotation: 'mode', online: 'source', unsplash: 'source', animated: 'source' }[t.group];
+      var axis = { background: 'bg', layout: 'layout', typography: 'tweight', focus: 'focus', rotation: 'mode', online: 'source', unsplash: 'source', animated: 'source', fonts: 'font', clock: 'cformat', display: 'night' }[t.group];
       rows.forEach(function (items) { items.forEach(function (item) {
         if (item.action === t.f.action) exists = true;
         if (item.axis === axis && item.value === S.c[axis]) applied = item;
@@ -1138,6 +1168,19 @@
   var DRIFT_MS = 90000, driftPausedAt = 0, driftOffset = 0;
   /* Animations run only on Home: Settings and other panels freeze them to keep the TV responsive.
      Drift uses a virtual clock that stops while paused, so layers created meanwhile stay in phase. */
+  /* Night mode: dims the photo, video and glass together (one brightness filter) and softens the text. */
+  function nightActive() {
+    if (S.c.night === 'always') return true;
+    if (S.c.night !== 'scheduled') return false;
+    var p = S.c.nhours.split('-'), from = +p[0], to = +p[1], h = new Date().getHours();
+    return from > to ? h >= from || h < to : h >= from && h < to;
+  }
+  var idleTimer = 0;
+  function idleReset() {
+    clearTimeout(idleTimer);
+    if (S.idleHidden) { S.idleHidden = false; render(); }
+    idleTimer = S.c.idle === 'off' ? 0 : setTimeout(function () { idleTimer = 0; if (S.c.idle !== 'off' && top().id === 'home' && !document.hidden) { S.idleHidden = true; render(); } }, +S.c.idle * QA.minuteMs);
+  }
   function animationsPaused() { return document.hidden || top().id !== 'home'; }
   function driftNow() { return (driftPausedAt || Date.now()) - driftOffset; }
   function syncPause() {
@@ -1171,7 +1214,8 @@
   function render() {
     var t = top(), sheet = !!V[t.id].sheet, shown = wall(S.shown ? S.shown.wall : S.c.wall), palette = ADAPTIVE_INK[shown.id];
     var adaptive = applyAdaptiveInk(palette), tr = adaptive && palette.tr ? palette.tr.pol : shown.ut.tr, br = adaptive && palette.br ? palette.br.pol : shown.ut.br;
-    stage.className = 'stage bg-' + S.c.bg + ' l-' + S.c.layout + ' v-' + S.variant + ' m-' + (materialApplies() ? S.c.material : 'none') + ' f-' + S.c.focus + ' a-' + S.c.apps + ' u-' + S.c.controls + ' g-' + S.geom + ' tone-' + shown.tone + ' tr-' + tr + ' br-' + br + wallClasses(shown) + inkRungClasses(palette, adaptive) + ' at-' + t.id + ' font-' + homeFont() + (homeFont() !== 'manrope' ? ' font-custom' : '') + (S.fontSwitch ? ' is-font-switch' : '') + (adaptive ? ' has-adaptive-ink adaptive-tl-' + palette.tl.pol : '') + (!adaptive && shown.clockInk ? ' has-clock-ink' : '') + (!adaptive && shown.dockClockInk ? ' has-dock-clock-ink' : '') + (registeredMaterial(shown.id) ? ' registered-material' : '') + (sheet ? ' is-sheet' : '') + (S.reflow ? ' is-reflow' : '') + ' mo-' + (S.c.bg === 'photo' && !shown.video ? S.c.motion : 'still') + (syncPause() ? ' anim-paused' : '');
+    stage.className = 'stage bg-' + S.c.bg + ' l-' + S.c.layout + ' v-' + S.variant + ' m-' + (materialApplies() ? S.c.material : 'none') + ' f-' + S.c.focus + ' a-' + S.c.apps + ' u-' + S.c.controls + ' g-' + S.geom + ' tone-' + shown.tone + ' tr-' + tr + ' br-' + br + wallClasses(shown) + inkRungClasses(palette, adaptive) + ' at-' + t.id + ' font-' + homeFont() + (homeFont() !== 'manrope' ? ' font-custom' : '') + (S.fontSwitch ? ' is-font-switch' : '') + (adaptive ? ' has-adaptive-ink adaptive-tl-' + palette.tl.pol : '') + (!adaptive && shown.clockInk ? ' has-clock-ink' : '') + (!adaptive && shown.dockClockInk ? ' has-dock-clock-ink' : '') + (registeredMaterial(shown.id) ? ' registered-material' : '') + (sheet ? ' is-sheet' : '') + (S.reflow ? ' is-reflow' : '') + ' mo-' + (S.c.bg === 'photo' && !shown.video ? S.c.motion : 'still') + (syncPause() ? ' anim-paused' : '') + (nightActive() ? ' is-night nd-' + S.c.ndim : '') + (S.idleHidden && top().id === 'home' ? ' is-idle' : '')
+      + ' cs-' + S.c.csize + ' cw-' + S.c.cweight + ' tw-' + S.c.tweight + ' ts-' + S.c.tsize;
     if (!adaptive && shown.clockInk) stage.style.setProperty('--clock-ink', shown.clockInk);
     else stage.style.removeProperty('--clock-ink');
     if (!adaptive && shown.dockClockInk) stage.style.setProperty('--dock-clock-ink', shown.dockClockInk);
@@ -1212,8 +1256,11 @@
   }
 
   function clockText() {
-    var d = new Date(), h = d.getHours() % 12 || 12, m = d.getMinutes();
-    return h + ':' + (m < 10 ? '0' : '') + m;
+    var d = new Date(), h = S.c.cformat === '24' ? d.getHours() : d.getHours() % 12 || 12, m = d.getMinutes();
+    return (S.c.cformat === '24' && h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+  }
+  function dateText() {
+    try { return new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) { return new Date().toDateString(); }
   }
   function clockHtml() {
     var text = clockText(), metrics = fontMetrics[homeFont()];
@@ -1221,7 +1268,7 @@
     return text.replace(/[0-9]/g, function (digit) { return '<span class="clock-digit">' + digit + '</span>'; });
   }
   function renderCaption(t, hs) {
-    var html = '<span class="clock">' + clockHtml() + '</span>';
+    var html = '<span class="clock">' + clockHtml() + '</span>' + (S.c.cdate === 'on' ? '<span class="cap-date">' + esc(dateText()) + '</span>' : '');
     if (S.c.apps !== 'icons' && hs.items[hs.i] && (S.c.layout === 'list' ? photoLabel(hs.items[hs.i].id, false).size < 88 || photoLabel(hs.items[hs.i].id, false).ellipsis : hs.zone === 'apps' && reducedDockLabel(hs.items[hs.i].id))) html += '<span class="cap-line full-name">' + esc(app(hs.items[hs.i].id).name) + '</span>';
     setHTML(caption, html);
   }
@@ -1586,7 +1633,7 @@
         + command({ action: 'settings.retry', label: 'Try again' }, '<span>Try again</span>', 'setting-retry');
     }
     setHTML(appearanceStatus, status);
-    hint = selected.disabled ? '' : selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.more ? 'Show these sources' : 'Open on the TV';
+    hint = selected.disabled ? '' : selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : 'Open on the TV';
     setHTML(appearanceDesc, hint ? '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>' : '');
   }
   function renderWallpaper(t) {
@@ -1933,6 +1980,8 @@
   function updateClock() {
     clearTimeout(clockTimer);
     if (document.hidden) return;
+    if (S.night !== nightActive()) { S.night = nightActive(); render(); }
+    if (S.c.idle !== 'off' && !idleTimer && !S.idleHidden) idleReset();
     if (top().id === 'home' || isSettingsDetail(top())) renderCaption(top(), homeState(top()));
     clockTimer = setTimeout(updateClock, 60000 - (Date.now() % 60000) + 30);
   }
@@ -2004,6 +2053,8 @@
     if (code === 9) { ev.preventDefault(); return; }
     if (!k || ev.metaKey || ev.ctrlKey || ev.altKey) return;
     ev.preventDefault();
+    if (S.idleHidden) { idleReset(); return; } // the first press only brings the controls back
+    idleReset();
     if (k === 'ok' || k === 'back') { if (ev.repeat || heldKeys[code]) return; heldKeys[code] = true; }
     press(k);
   });

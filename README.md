@@ -20,8 +20,12 @@ CleanFrame-TCL is a port of [Nathan Clark's CleanFrame](https://github.com/nthnc
   - Wikimedia Commons Picture of the Day
   - Random photos (Picsum)
   - Unsplash themes: Nature and landscapes, Cities and architecture, Night sky and space *(API key)*
-- **Animated wallpapers**: bundled seamless loops, Pexels HD video loops *(API key)* and GIPHY *(API key)* with preset keywords.
+- **Animated wallpapers**: bundled seamless loops, Pexels HD video loops *(API key)* and Klipy GIFs *(API key)* with preset keywords.
 - **Drift motion**: a slow Ken Burns zoom where the photo and its glass move together.
+- **Night mode**: dims the wallpaper, video and glass together on a timer (21–07, 22–06 or 23–07) or always, in three strengths.
+- **Clock**: 12- or 24-hour, optional date, four sizes and weights.
+- **Text**: font, text weight and app-name size.
+- **Hide controls when idle**: after 1 or 5 minutes only the picture and clock stay; any button brings them back.
 - Animations pause automatically outside Home (Settings, All apps), so menus stay snappy.
 - **Rotation**: a new wallpaper every time Home opens, or every 5, 15 or 60 minutes.
 - **Eight fonts** (all Open Font License): Manrope, Geist, Newsreader, Inter, Outfit, Space Grotesk, Sora and Playfair Display, with matched metrics so the clock and labels never jump.
@@ -83,14 +87,14 @@ Inputs come from Android's TV Input Framework, using the TV's own state events: 
 
 *Settings → Background → Online wallpapers.* The TV downloads up to eight images or clips from the chosen source, then renders the same files the bundled gallery ships with (photo, thumbnail and four pre-blurred glass layers) **once, on download**. Nothing is blurred live, so Home stays smooth. New wallpapers arrive every few hours, and rotation then cycles through that source.
 
-Animated wallpapers play as muted MP4 loops behind the interface. Their glass is rendered from the first frame. GIPHY results use GIPHY's MP4 versions, which are far lighter than GIFs.
+Animated wallpapers play as muted MP4 loops behind the interface. Their glass is rendered from the first frame. Klipy GIFs are fetched as their MP4 versions, which are far lighter than GIF files.
 
-NASA (shared `DEMO_KEY`), Bing, Wikimedia, Picsum and the bundled loops work without keys. For Unsplash, Pexels and GIPHY, create free developer keys and put them in `android/local.properties` (ignored by git), or pass them as environment variables when building:
+NASA (shared `DEMO_KEY`), Bing, Wikimedia, Picsum and the bundled loops work without keys. For Unsplash, Pexels and Klipy, create free developer keys and put them in `android/local.properties` (ignored by git), or pass them as environment variables when building:
 
 ```properties
 unsplash.accessKey=...   # https://unsplash.com/developers
 pexels.apiKey=...        # https://www.pexels.com/api/
-giphy.apiKey=...         # https://developers.giphy.com/
+klipy.apiKey=...         # https://partner.klipy.com/ (KLIPY GIF API)
 nasa.apiKey=...          # optional, https://api.nasa.gov/ (default DEMO_KEY is rate limited)
 ```
 
@@ -149,5 +153,5 @@ Live TV, inputs, settings, the remote, AirPlay/Miracast, updates and Google TV i
 - **CleanFrame** by Nathan Clark: MIT. This fork keeps the original licence and notices ([LICENSE](LICENSE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)).
 - Android TV port, inputs, Home button, online/animated wallpapers and TCL tuning: CleanFrame-TCL contributors, MIT.
 - App logos: [Simple Icons](https://simpleicons.org) (CC0) and public-domain wordmarks from Wikimedia Commons. See `app/assets/icons/SOURCES.json`. Trademarks belong to their owners.
-- Online wallpapers belong to their authors and are shown under each provider's terms: [NASA APOD](https://apod.nasa.gov), [Bing](https://www.bing.com), [Wikimedia Commons](https://commons.wikimedia.org), [Lorem Picsum](https://picsum.photos), [Unsplash](https://unsplash.com), [Pexels](https://www.pexels.com), [GIPHY](https://giphy.com).
+- Online wallpapers belong to their authors and are shown under each provider's terms: [NASA APOD](https://apod.nasa.gov), [Bing](https://www.bing.com), [Wikimedia Commons](https://commons.wikimedia.org), [Lorem Picsum](https://picsum.photos), [Unsplash](https://unsplash.com), [Pexels](https://www.pexels.com), [KLIPY](https://klipy.com) ("Powered by KLIPY").
 - Bundled animated loops are generated procedurally for this project.

@@ -50,7 +50,7 @@ final class OnlineWallpapers {
     interface Listener { void changed(String entriesJson, String status); }
 
     static final String[] SOURCES = { "off", "nasa", "bing", "wikimedia", "picsum", "unsplash-nature", "unsplash-city", "unsplash-space",
-            "loops", "pexels-ocean", "pexels-rain", "pexels-clouds", "pexels-city", "giphy-lofi", "giphy-rain", "giphy-space" };
+            "loops", "pexels-ocean", "pexels-rain", "pexels-clouds", "pexels-city", "klipy-lofi", "klipy-rain", "klipy-space" };
     private static final int MAX_PHOTOS = 8, W = 1920, H = 1080;
     private static final long REFRESH_MS = 6L * 60 * 60 * 1000;
     private static final String UA = "CleanFrame-TCL/1.0 (Android TV home screen; https://github.com/taynotfound/CleanFrame-TCL)";
@@ -76,7 +76,14 @@ final class OnlineWallpapers {
 
     static boolean unsplashAvailable() { return !BuildConfig.UNSPLASH_ACCESS_KEY.isEmpty(); }
     static boolean pexelsAvailable() { return !BuildConfig.PEXELS_API_KEY.isEmpty(); }
-    static boolean giphyAvailable() { return !BuildConfig.GIPHY_API_KEY.isEmpty(); }
+    static boolean klipyAvailable() { return !BuildConfig.KLIPY_API_KEY.isEmpty(); }
+
+    /** Anonymous per-install id that Klipy's API requires; not linked to any account. */
+    private String customerId() {
+        String id = prefs.getString("klipy-customer", null);
+        if (id == null) { id = java.util.UUID.randomUUID().toString(); prefs.edit().putString("klipy-customer", id).apply(); }
+        return id;
+    }
 
     String source() { return prefs.getString("source", "off"); }
 
@@ -246,20 +253,24 @@ final class OnlineWallpapers {
                 if (name.length() > 60) name = name.substring(0, 57) + "…";
                 out.add(new Photo("pexels-" + v.getString("id"), name, best, v.getJSONObject("user").optString("name", "Pexels") + " · Pexels").loop());
             }
-        } else if (source.startsWith("giphy-") && giphyAvailable()) {
-            String query = source.equals("giphy-rain") ? "rain window cozy" : source.equals("giphy-space") ? "space stars loop" : "lofi aesthetic";
-            JSONArray data = new JSONObject(get("https://api.giphy.com/v1/gifs/search?rating=g&limit=25&api_key=" + BuildConfig.GIPHY_API_KEY
-                    + "&q=" + URLEncoder.encode(query, "UTF-8"))).getJSONArray("data");
+        } else if (source.startsWith("klipy-") && klipyAvailable()) {
+            String query = source.equals("klipy-rain") ? "rain window cozy" : source.equals("klipy-space") ? "space stars loop" : "lofi aesthetic";
+            JSONArray data = new JSONObject(get("https://api.klipy.com/api/v1/" + BuildConfig.KLIPY_API_KEY + "/gifs/search?per_page=30&content_filter=high&format_filter=mp4"
+                    + "&customer_id=" + customerId() + "&q=" + URLEncoder.encode(query, "UTF-8"))).getJSONObject("data").getJSONArray("data");
             for (int i = 0; i < data.length() && out.size() < MAX_PHOTOS; i++) {
-                JSONObject g = data.getJSONObject(i), orig = g.getJSONObject("images").getJSONObject("original");
-                int w = orig.optInt("width", 0), h = orig.optInt("height", 0);
-                String mp4 = orig.optString("mp4", "");
-                if (mp4.isEmpty() || w < h * 1.3 || w < 400) continue;
-                String title = g.optString("title", "GIF").replaceAll("(?i)\\s*GIF.*$", "").trim();
+                JSONObject g = data.getJSONObject(i), file = g.optJSONObject("file");
+                JSONObject mp4 = null;
+                if (file != null) for (String size : new String[] { "hd", "md" }) {
+                    JSONObject level = file.optJSONObject(size);
+                    if (level != null && level.optJSONObject("mp4") != null && !level.getJSONObject("mp4").optString("url").isEmpty()) { mp4 = level.getJSONObject("mp4"); break; }
+                }
+                if (mp4 == null) continue;
+                int w = mp4.optInt("width", 0), h = mp4.optInt("height", 0);
+                if (w < h * 1.3 || w < 400) continue;
+                String title = g.optString("title", "GIF").trim();
                 if (title.isEmpty()) title = "GIF";
                 if (title.length() > 60) title = title.substring(0, 57) + "…";
-                String user = g.optString("username", "");
-                out.add(new Photo("giphy-" + g.getString("id").replaceAll("[^A-Za-z0-9_-]", ""), title, mp4, (user.isEmpty() ? "GIPHY" : user + " · GIPHY")).loop());
+                out.add(new Photo("klipy-" + String.valueOf(g.opt("id")).replaceAll("[^A-Za-z0-9_-]", ""), title, mp4.getString("url"), "Powered by KLIPY").loop());
             }
         }
         return out;

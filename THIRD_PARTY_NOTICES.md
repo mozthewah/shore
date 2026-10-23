@@ -41,4 +41,4 @@ Development dependencies retain the licences in their npm packages. They are not
 | Joyn, arte and waipu.tv wordmarks | Public-domain logo files from Wikimedia Commons, recoloured white; sources in `app/assets/icons/SOURCES.json`. Trademarks remain with their owners. |
 | Twitch, ZDF and Das Erste (ARD) marks | Simple Icons, CC0. |
 | Bundled animated loops (`android/app/src/main/assets-android/loops/`) | Generated procedurally with ffmpeg for this project; MIT with the code. |
-| Online wallpapers (NASA, Bing, Wikimedia, Picsum, Unsplash, Pexels, GIPHY) | Downloaded on the TV at runtime, never redistributed; each provider's terms apply and credits appear in the gallery. |
+| Online wallpapers (NASA, Bing, Wikimedia, Picsum, Unsplash, Pexels, Klipy) | Downloaded on the TV at runtime, never redistributed; each provider's terms apply and credits appear in the gallery. |
