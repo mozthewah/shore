@@ -7,10 +7,10 @@ The root MIT licence covers CleanFrame's original code and documentation. Third-
 | Material | Terms and source record |
 | --- | --- |
 | Manrope | SIL Open Font License 1.1; `app/assets/manrope-OFL.txt` |
-| Geist and Newsreader | SIL Open Font License 1.1; licences beside the files in `app/assets/fonts/`, with exact sources and hashes in `app/assets/fonts/SOURCES.json` |
+| Geist, Newsreader, Inter, Outfit, Space Grotesk, Sora and Playfair Display | SIL Open Font License 1.1; licences beside the files in `app/assets/fonts/`, with exact sources and hashes in `app/assets/fonts/SOURCES.json` |
 | Optional PP Neue Montreal, PP Mori and PP Pangram Sans | Proprietary. Binaries stay in ignored `.local/` storage and are excluded from Git and public exports. The optional local overlay requires the user's own permission to use and embed those files. |
 
-The public app uses Manrope, Geist and Newsreader. A personal widget containing proprietary fonts must stay private. See [Pangram's licensing information](https://pangrampangram.com/pages/eula).
+The public app uses Manrope, Geist, Newsreader, Inter, Outfit, Space Grotesk, Sora and Playfair Display. A personal widget containing proprietary fonts must stay private. See [Pangram's licensing information](https://pangrampangram.com/pages/eula).
 
 ## Icons and trademarks
 
@@ -33,3 +33,12 @@ Photographers retain their rights. Wallpapers, thumbnails, panel backgrounds and
 Development dependencies retain the licences in their npm packages. They are not copied into the TV JavaScript runtime.
 
 `npm run export:public` excludes private fonts and includes this notice and the root MIT licence. Preserve the included font and icon licence texts. Review [public release preparation](docs/public-release.md) before publishing a repository or download.
+
+## CleanFrame-TCL additions
+
+| Material | Terms |
+| --- | --- |
+| Joyn, arte and waipu.tv wordmarks | Public-domain logo files from Wikimedia Commons, recoloured white; sources in `app/assets/icons/SOURCES.json`. Trademarks remain with their owners. |
+| Twitch, ZDF and Das Erste (ARD) marks | Simple Icons, CC0. |
+| Bundled animated loops (`android/app/src/main/assets-android/loops/`) | Generated procedurally with ffmpeg for this project; MIT with the code. |
+| Online wallpapers (NASA, Bing, Wikimedia, Picsum, Unsplash, Pexels, GIPHY) | Downloaded on the TV at runtime, never redistributed; each provider's terms apply and credits appear in the gallery. |
