@@ -75,6 +75,7 @@ try this; a factory reset also restores it. A gentler alternative is a key-remap
 - Home: `cmd role add-role-holder android.app.role.HOME` and `cmd package set-home-activity` are accepted but
   ignored (launcherx has system priority 2). `HomeButtonService` (accessibility, user-enabled) catches the Home key instead.
 - Remote buttons: `HomeButtonService` also applies `RemoteKeys` assignments (SharedPreferences `remote_keys`, keyCode → action). The learn step captures the next non-navigation key and logs every key to logcat tag `CleanFrameKeys` (`adb logcat -s CleanFrameKeys`). Key layout files are unreadable and `dumpsys input` shows no key codes on this build, so learning is the only way to find a button's code.
+- Language: the WebView reports the system locale as `navigator.language`; `app/i18n.js` translates through `esc()`/`T()` in `main.js`. English is the source text, so new UI strings need a dictionary entry per language.
 - Online wallpapers are downloaded and pre-rendered natively (`OnlineWallpapers.java`), then served at the same
   `assets/wallpapers` and `assets/materials` paths as bundled photos, so the runtime still never blurs.
 - WebView persists `localStorage` asynchronously: when editing it over DevTools, wait a few seconds before
