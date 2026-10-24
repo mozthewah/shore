@@ -49,7 +49,7 @@ import java.util.concurrent.Executors;
 final class OnlineWallpapers {
     interface Listener { void changed(String entriesJson, String status); }
 
-    static final String[] SOURCES = { "off", "nasa", "bing", "wikimedia", "picsum", "unsplash-nature", "unsplash-city", "unsplash-space",
+    static final String[] SOURCES = { "off", "nasa", "nasalib", "bing", "wikimedia", "picsum", "unsplash-nature", "unsplash-city", "unsplash-space",
             "loops", "pexels-ocean", "pexels-rain", "pexels-clouds", "pexels-city", "klipy-lofi", "klipy-rain", "klipy-space", "phone" };
     private static final int MAX_PHOTOS = 8, W = 1920, H = 1080;
     private static final long REFRESH_MS = 6L * 60 * 60 * 1000;
@@ -168,18 +168,61 @@ final class OnlineWallpapers {
     private List<Photo> fetch(String source) throws Exception {
         List<Photo> out = new ArrayList<>();
         if (source.equals("nasa")) {
-            Calendar from = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
-            from.add(Calendar.DAY_OF_YEAR, -20);
-            String start = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(from.getTime());
-            JSONArray days = new JSONArray(get("https://api.nasa.gov/planetary/apod?thumbs=false&api_key="
-                    + BuildConfig.NASA_API_KEY + "&start_date=" + start));
-            for (int i = days.length() - 1; i >= 0; i--) {
+            // Astronomy Picture of the Day from its new home on science.nasa.gov (the old api.nasa.gov feed now returns a placeholder).
+            // The image links carry their size (?w=…&h=…), so only wide pictures are downloaded, scaled to 1920 px by NASA's server.
+            JSONArray days = new JSONArray(get("https://science.nasa.gov/wp-json/wp/v2/apod-basic?per_page=30"));
+            for (int i = 0; i < days.length() && out.size() < MAX_PHOTOS; i++) {
                 JSONObject d = days.getJSONObject(i);
                 if (!"image".equals(d.optString("media_type"))) continue;
                 String url = d.optString("hdurl", d.optString("url"));
                 if (!url.startsWith("https://")) continue;
-                out.add(new Photo("nasa-" + d.getString("date"), d.optString("title", "Astronomy Picture"), url,
-                        d.has("copyright") ? "© " + d.getString("copyright").trim() + " · NASA APOD" : "NASA APOD"));
+                int w = queryInt(url, "w"), h = queryInt(url, "h");
+                if (w <= 0 || h <= 0 || w < h * 1.3) continue;
+                url = url.replaceAll("\\?.*$", "") + "?w=" + Math.min(w, W);
+                String credit = plain(d.optString("copyright", d.optString("credit")));
+                if (credit.length() > 80) credit = credit.substring(0, 77) + "…";
+                String title = plain(d.optString("title", "Astronomy Picture"));
+                out.add(new Photo("nasa-" + d.optString("date").replaceAll("[^0-9-]", ""), title, url,
+                        (credit.isEmpty() ? "" : credit + " · ") + "NASA APOD"));
+            }
+        } else if (source.equals("nasalib")) {
+            // NASA Image and Video Library: no key, wide photos only.
+            List<String> topics = new ArrayList<>(java.util.Arrays.asList("nebula", "galaxy", "hubble", "earth from space", "aurora",
+                    "milky way", "james webb", "earth at night", "saturn", "jupiter", "star cluster", "sunrise from space"));
+            java.util.Collections.shuffle(topics);
+            Set<String> seen = new HashSet<>();
+            for (int t = 0; t < topics.size() && out.size() < MAX_PHOTOS; t++) {
+                try {
+                    JSONArray items = new JSONObject(get("https://images-api.nasa.gov/search?media_type=image&page_size=60&q=" + URLEncoder.encode(topics.get(t), "UTF-8")))
+                            .getJSONObject("collection").getJSONArray("items");
+                    List<Integer> order = new ArrayList<>();
+                    for (int i = 0; i < items.length(); i++) order.add(i);
+                    java.util.Collections.shuffle(order);
+                    int taken = 0;
+                    for (int k = 0; k < order.size() && taken < 3 && out.size() < MAX_PHOTOS; k++) {
+                        JSONObject it = items.getJSONObject(order.get(k));
+                        JSONObject data = it.getJSONArray("data").getJSONObject(0);
+                        String nasaId = data.optString("nasa_id");
+                        JSONArray links = it.optJSONArray("links");
+                        if (nasaId.isEmpty() || links == null || !seen.add(nasaId)) continue;
+                        String best = null; int bestW = 0; double aspect = 0;
+                        for (int j = 0; j < links.length(); j++) {
+                            JSONObject l = links.getJSONObject(j);
+                            int w = l.optInt("width"), h = l.optInt("height");
+                            String href = l.optString("href");
+                            if (w > 0 && h > 0) aspect = (double) w / h;
+                            if (!href.startsWith("https://") || !href.toLowerCase(Locale.ROOT).endsWith(".jpg") || l.optLong("size", 0) > 20_000_000L) continue;
+                            if (w > bestW) { best = href; bestW = w; }
+                        }
+                        if (best == null || bestW < 1600 || aspect < 1.45) continue; // wide and sharp enough for the TV
+                        String title = data.optString("title", "NASA").trim();
+                        if (title.length() > 60) title = title.substring(0, 57) + "…";
+                        String who = data.optString("photographer", data.optString("center", "")).trim();
+                        out.add(new Photo("nasa-" + Integer.toHexString(nasaId.hashCode()), title, best.replace(" ", "%20"),
+                                (who.isEmpty() ? "NASA" : who) + " · NASA Image Library"));
+                        taken++;
+                    }
+                } catch (Exception ignored) { /* try the next topic */ }
             }
         } else if (source.equals("bing")) {
             JSONArray images = new JSONObject(get("https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&mkt=de-DE")).getJSONArray("images");
@@ -203,8 +246,10 @@ final class OnlineWallpapers {
                     JSONObject orig = im.getJSONObject("image");
                     if (orig.getInt("width") < orig.getInt("height") * 1.25) continue; // landscape only
                     JSONObject thumb = im.optJSONObject("thumbnail");
-                    String url = orig.getString("source");
-                    if (orig.getInt("width") > 4000 && thumb != null) url = url.replace("/commons/", "/commons/thumb/") + "/2560px-" + url.substring(url.lastIndexOf('/') + 1);
+                    // Wikimedia only serves fixed thumbnail widths (1920 is one) and adds tracking parameters to its links.
+                    String url = orig.getString("source").replaceAll("\\?.*$", "");
+                    if (orig.getInt("width") > 1920 && thumb != null)
+                        url = thumb.getString("source").replaceAll("\\?.*$", "").replaceAll("/\\d+px-", "/1920px-");
                     JSONObject artist = im.optJSONObject("artist");
                     String name = im.optJSONObject("description") != null ? im.getJSONObject("description").optString("text") : "";
                     if (name.isEmpty() || name.length() > 60) name = im.optString("title").replace("File:", "").replaceAll("\\.[A-Za-z]+$", "").replace('_', ' ');
@@ -547,6 +592,19 @@ final class OnlineWallpapers {
     }
 
     // ---------- Network ----------
+
+    /** A whole-number query parameter, or 0. */
+    private static int queryInt(String url, String name) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("[?&]" + name + "=(\\d{1,5})(&|$)").matcher(url);
+        return m.find() ? Integer.parseInt(m.group(1)) : 0;
+    }
+
+    /** Text without HTML tags or entities, on one line. */
+    private static String plain(String html) {
+        return html.replaceAll("<[^>]*>", "").replace("&amp;", "&").replace("&#8217;", "’").replace("&nbsp;", " ")
+                .replaceAll("&[a-z#0-9]+;", "").replaceAll("\\s+", " ").trim()
+                .replaceAll("^(Image )?(Credit|Copyright)( (&|and) (Copyright|Credit))?:\\s*", "");
+    }
 
     private static String get(String url) throws IOException { return get(url, null, null); }
 

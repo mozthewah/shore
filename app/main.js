@@ -36,7 +36,7 @@
     .concat(window.CleanFrameOnlineWallpapers || []);
   /* Online photo sources (Android shell only). Photos arrive pre-rendered, like the bundled gallery. */
   var ONLINE = window.FrameDevice && FrameDevice.online, ONLINE_INFO = ONLINE ? ONLINE.info() : { source: 'off', unsplash: false };
-  var SOURCES = [{ id: 'off', name: 'Off' }, { id: 'nasa', name: 'NASA Astronomy Picture' }, { id: 'bing', name: 'Bing Picture of the Day' },
+  var SOURCES = [{ id: 'off', name: 'Off' }, { id: 'nasa', name: 'NASA Astronomy Picture' }, { id: 'nasalib', name: 'NASA Image Library' }, { id: 'bing', name: 'Bing Picture of the Day' },
     { id: 'wikimedia', name: 'Wikimedia Picture of the Day' }, { id: 'picsum', name: 'Random photos (Picsum)' },
     { id: 'unsplash-nature', name: 'Unsplash · Nature and landscapes', unsplash: true }, { id: 'unsplash-city', name: 'Unsplash · Cities and architecture', unsplash: true },
     { id: 'unsplash-space', name: 'Unsplash · Night sky and space', unsplash: true },
