@@ -168,7 +168,7 @@ While Shore's screensaver is on and Shore is in front, Shore keeps the TV's own 
 The APK also contains Shore as a system screensaver (`ShoreDream`), for when the TV goes idle inside another app. Google TV doesn't list third-party screensavers in its settings, so it can only be picked over ADB. Note the current value first so you can restore it:
 
 ```bash
-adb shell settings get secure screensaver_components
+adb shell settings get secure screensaver_components # likely com.google.android.apps.tv.dreamx/.service.Backdrop
 adb shell settings put secure screensaver_components app.cleanframe.tv/.ShoreDream
 ```
 
@@ -198,6 +198,7 @@ To undo, run the same command with `disallow_listener`.
 - **Weather place**: the city for the weather under the clock.
 - **TV settings**: every setting from the TV's own Settings, grouped the same way (background and wallpaper, layout, text, clock, focus and colour, night and idle, screensaver), as buttons and switches. Changes apply on the TV at once, as if chosen with the remote, and *Start the screensaver now* is one tap. Shore must be open on the TV (in front or behind another app).
 - **Apps**: reorder Home with the arrows, remove an app, or add one of the other installed apps.
+- **Remote**: arrows, OK, Back and Home, play/pause and skip, and volume. Arrows and OK drive Shore directly; in other apps they need Android 13 or later and Shore's remote-button service (they use accessibility *global actions*, so no screen content is read). Home brings Shore to the front.
 - **Backup**: *Save backup* stores every TV setting (look, clock, Home apps and their order, wallpaper sources, screensaver) as a `.json` file on the phone. *Restore…* sends one back, after you confirm, to the same TV or another one running Shore. The TV checks the file like its own saved preferences, so a damaged or edited one can't break anything. Photos stay on the TV and are not part of the backup.
 - **Install it**: the QR code opens [taynotfound.github.io/shore/app](https://taynotfound.github.io/shore/app/), a tiny installable page (HTTPS, manifest, offline cache). It remembers your TV and opens it whenever you start the app. If your browser shows no install button, use its menu: *Install app* or *Add to Home screen*. On iPhone: *Share → Add to Home Screen*.
 
@@ -316,7 +317,7 @@ Live TV, inputs, settings, the remote, casting, updates and Google TV itself are
 Built since the last list: weather with °C/°F, Now playing with album art, Shore's own screensaver, cropping in the phone companion, HDMI-CEC names, and German, French, Spanish, Dutch and Polish. Next up:
 
 - A sleep timer on a remote button
-- Use the phone companion as a remote and keyboard
+- Typing from the phone into other apps (needs an extra accessibility permission, so it is opt-in only)
 - Calendar events under the clock (ICS link)
 - Italian and Turkish translations
 

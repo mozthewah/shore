@@ -32,6 +32,7 @@
       <button type="button" role="tab" data-tab="photos" aria-selected="true" data-t="Photos">Photos</button>
       <button type="button" role="tab" data-tab="tv" aria-selected="false" data-t="TV settings">TV settings</button>
       <button type="button" role="tab" data-tab="apps" aria-selected="false" data-t="Apps">Apps</button>
+      <button type="button" role="tab" data-tab="remote" aria-selected="false" data-t="Remote">Remote</button>
     </nav>
     <div id="tab-tv" class="tab" hidden>
       <p id="tvOffline" class="card quiet" hidden data-t="Open Shore on the TV to change its settings from here.">Open Shore on the TV to change its settings from here.</p>
@@ -43,6 +44,21 @@
           <button id="backupSave" type="button" class="button" data-t="Save backup">Save backup</button>
           <label class="button"><span data-t="Restore…">Restore…</span><input id="backupFile" type="file" accept="application/json,.json"></label>
         </div>
+      </section>
+    </div>
+    <div id="tab-remote" class="tab" hidden>
+      <section class="card remote">
+        <div class="dpad">
+          <button type="button" class="rk up" data-k="up" aria-label="Up">▲</button>
+          <button type="button" class="rk left" data-k="left" aria-label="Left">◀</button>
+          <button type="button" class="rk ok" data-k="ok" data-t="OK">OK</button>
+          <button type="button" class="rk right" data-k="right" aria-label="Right">▶</button>
+          <button type="button" class="rk down" data-k="down" aria-label="Down">▼</button>
+        </div>
+        <div class="rrow"><button type="button" class="rk" data-k="back" data-t="Back">Back</button><button type="button" class="rk" data-k="home" data-t="Home">Home</button></div>
+        <div class="rrow"><button type="button" class="rk" data-k="prev" aria-label="Previous">⏮</button><button type="button" class="rk" data-k="play" aria-label="Play or pause">⏯</button><button type="button" class="rk" data-k="next" aria-label="Next">⏭</button></div>
+        <div class="rrow"><button type="button" class="rk" data-k="voldown" aria-label="Volume down">🔉</button><button type="button" class="rk" data-k="mute" aria-label="Mute">🔇</button><button type="button" class="rk" data-k="volup" aria-label="Volume up">🔊</button></div>
+        <p class="quiet" data-t="Arrows and OK control Shore. In other apps they need Android 13 or later and Shore’s remote-button service.">Arrows and OK control Shore. In other apps they need Android 13 or later and Shore’s remote-button service.</p>
       </section>
     </div>
     <div id="tab-apps" class="tab" hidden>

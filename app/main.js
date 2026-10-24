@@ -1479,6 +1479,16 @@
   function backupOf() { return { shore: 'backup', format: 1, settings: serialise(S.c) }; }
   /* Restore from the companion. The backup goes through clean(), exactly like saved preferences at startup,
      so a damaged or edited file can only fall back to defaults. Shore then reloads with it. */
+  /* The phone remote while Shore is in front: the same path as a remote button, including waking the screensaver. */
+  window.CleanFrameRemoteKey = function (k) {
+    k = String(k);
+    if (k === 'home') { while (S.stack.length > 1) pop(); if (S.saver) stopSaver(); after(); return; }
+    if (['up', 'down', 'left', 'right', 'ok', 'back'].indexOf(k) < 0) return;
+    if (S.saver) { stopSaver(); return; }
+    saverReset();
+    if (S.idleHidden) { idleReset(); return; }
+    idleReset(); press(k);
+  };
   window.CleanFrameCompanionRestore = function (json) {
     var o, c;
     try { o = JSON.parse(String(json)); } catch (e) { return; }
