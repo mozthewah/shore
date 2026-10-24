@@ -16,6 +16,8 @@
 <link rel="apple-touch-icon" href="icon.png">
 <style>
 @font-face{font-family:Manrope;src:url(manrope.woff2) format("woff2");font-weight:200 800;font-display:swap}
+@font-face{font-family:Manrope;src:url(manrope-cyrillic.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Manrope;src:url(manrope-latin-ext.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
 :root{--bg:#0f161a;--bg2:#162026;--ink:#eef1ea;--muted:rgba(238,241,234,.66);--faint:rgba(238,241,234,.42);--line:rgba(255,255,255,.1);--glass:rgba(255,255,255,.055);--accent:#e3e6dc;--warm:#f2c58b}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -185,7 +187,7 @@ footer a{color:var(--muted)}
     <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="5"/><circle cx="12" cy="8" r="1.6"/><path d="M10 13h4M10 16h4"/></svg></div><h3>Your remote, your rules</h3><p>Home opens Shore. Reassign the app shortcut keys or the TV button to an app, an input or the screensaver.</p></div>
     <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></div><h3>Its own screensaver</h3><p>Your photos drift slowly by, alone or as a mosaic, with a big clock and the weather. Any button brings Home back. Night mode dims it all on a schedule.</p></div>
     <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h13"/></svg></div><h3>Eight open fonts</h3><p>Manrope, Inter, Geist, Sora, Outfit and more, with text weight and size, plus four clock sizes.</p></div>
-    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5Z"/></svg></div><h3>Speaks your language</h3><p>English, German, French, Spanish, Dutch and Polish, following the TV's system language.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5Z"/></svg></div><h3>Speaks your language</h3><p>English, German, French, Spanish, Dutch, Polish and Ukrainian, following the TV's system language.</p></div>
   </div>
 </div></section>
 
@@ -280,7 +282,7 @@ footer a{color:var(--muted)}
     <li data-reveal><h3>Make Home open Shore</h3><p>Turn on <i>Shore Home button</i> in <i>Settings › System › Accessibility</i>.</p></li>
   </ol>
   <p class="note" style="text-align:left;margin-top:24px">The <a href="https://github.com/taynotfound/shore#install">README</a> has the full guide, including Android 14 wireless debugging and an optional, reversible debloat list.</p>
-  <div class="langs"><span>English</span><span>Deutsch</span><span>Français</span><span>Español</span><span>Nederlands</span><span>Polski</span></div>
+  <div class="langs"><span>English</span><span>Deutsch</span><span>Français</span><span>Español</span><span>Nederlands</span><span>Polski</span><span lang="uk">Українська</span></div>
 </div></section>
 
 <footer><div class="wrap">

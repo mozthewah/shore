@@ -28,7 +28,7 @@ jobs:
           mkdir -p _site/images
           cp -r site/. _site/
           cp docs/images/tcl/*.jpg _site/images/
-          cp app/assets/manrope.woff2 _site/
+          cp app/assets/manrope.woff2 app/assets/manrope-cyrillic.woff2 app/assets/manrope-latin-ext.woff2 _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

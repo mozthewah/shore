@@ -314,7 +314,7 @@ Live TV, inputs, settings, the remote, casting, updates and Google TV itself are
 
 ## Ideas
 
-Built since the last list: weather with °C/°F, Now playing with album art, Shore's own screensaver, cropping in the phone companion, HDMI-CEC names, and German, French, Spanish, Dutch and Polish. Next up:
+Built since the last list: weather with °C/°F, Now playing with album art, Shore's own screensaver, cropping in the phone companion, HDMI-CEC names, and German, French, Spanish, Dutch, Polish and Ukrainian. Next up:
 
 - A sleep timer on a remote button
 - Typing from the phone into other apps (needs an extra accessibility permission, so it is opt-in only)
