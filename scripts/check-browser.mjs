@@ -919,6 +919,14 @@ try {
     check('Seconds show in the clock', /\d:\d\d:\d\d/.test(await current.evaluate(() => document.querySelector('.caption .clock').textContent)));
     check('Centred clock is centred', await current.evaluate(() => { const r = document.querySelector('.caption').getBoundingClientRect(), s = document.getElementById('stage').getBoundingClientRect(); return Math.abs((r.left + r.right) / 2 - (s.left + s.right) / 2) < 4; }));
   });
+  await run('Long OK opens quick actions; a short OK still launches', async () => {
+    await page();
+    await current.keyboard.down('Enter'); await current.waitForTimeout(800); await current.keyboard.up('Enter');
+    const view = (await state()).view;
+    check('Long OK on a Home tile opens quick actions', view === 'message' && /Quick actions/.test(await current.locator('#stage').innerText()), view);
+    await nav('right'); await nav('ok');
+    check('Move opens Apps on Home with the app lifted', (await state()).view === 'editor' && /editor\.move\./.test((await state()).focusAction), await state());
+  });
   await run('Favourite and hidden wallpapers', async () => {
     await page({ seed: baseline({ mode: 'open', hide: [walls[1].id] }) });
     check('Open rotation skips a hidden wallpaper', (await state()).wallpaper !== walls[1].id, (await state()).wallpaper);

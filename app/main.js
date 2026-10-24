@@ -628,6 +628,26 @@
     else openSettings();
   }
   function addAppsRoute() { openEditor('home'); }
+  /* ---------- Quick actions: a long OK on a Home app tile ---------- */
+  var LONG_OK = 600, longOk = { code: 0, timer: 0 };
+  function quickTarget() { var t = top(); return t.id === 'home' && t.f.zone === 'apps' && S.sel && S.c.home.indexOf(S.sel) >= 0 && !app(S.sel).input; }
+  function openQuick(id) {
+    var a = app(id);
+    if (!a || top().id !== 'home') return;
+    push({ id: 'message', content: { title: a.name, line: 'Quick actions', note: '',
+      actions: [['quick.open:' + id, 'Open'], ['quick.move:' + id, 'Move'], ['quick.remove:' + id, 'Remove']].concat(FrameDevice.appInfo ? [['quick.info:' + id, 'App info']] : []) }, f: { b: 0 } });
+    render();
+  }
+  function quickAction(a) {
+    var kind = a.slice(6, a.indexOf(':')), id = a.slice(a.indexOf(':') + 1), t;
+    if (!app(id)) return;
+    if (kind === 'open') { launch(id); return; }
+    if (kind === 'info') { perform('App info', function (done) { FrameDevice.appInfo(app(id).appId, done); }); return; }
+    // Move and Remove use Apps on Home, which already has undo, so nothing here is final.
+    S.sel = id; openEditor('home'); t = top(); t.f.zone = 'home'; t.f.i = Math.max(0, S.c.home.indexOf(id));
+    if (kind === 'move') { t.f.part = 'name'; t.lifted = { id: id, from: t.f.i, order: S.c.home.slice(), snap: snap() }; }
+    else { t.f.part = 'remove'; editorRemove(t, id); }
+  }
   function openSettings() { push({ id: 'settings', f: { id: S.settingsFocus } }); }
   function openAppearance(group) {
     var axis = { background: 'bg', layout: 'layout', typography: 'tweight', fonts: 'font', focus: 'focus', clock: 'cformat', display: 'night' }[group];
@@ -1738,7 +1758,7 @@
       if (k === 'left') t.f.b = Math.max(0, t.f.b - 1);
       else if (k === 'right') t.f.b = Math.min(A.length - 1, t.f.b + 1);
       else if (k === 'back') pop();
-      else if (k === 'ok') { a = A[t.f.b][0]; pop(); if (a.indexOf('input:') === 0) { clearTimeout(askTimer); launch(a.slice(6)); } else if (a === 'setup') openHealth(); else if (a === 'samsung') perform(TV.home, FrameDevice.home); else if (a === 'clearphotos' && PHONE) { PHONE.clear(); S.phone.count = 0; render(); } }
+      else if (k === 'ok') { a = A[t.f.b][0]; pop(); if (a.indexOf('quick.') === 0) quickAction(a); else if (a.indexOf('input:') === 0) { clearTimeout(askTimer); launch(a.slice(6)); } else if (a === 'setup') openHealth(); else if (a === 'samsung') perform(TV.home, FrameDevice.home); else if (a === 'clearphotos' && PHONE) { PHONE.clear(); S.phone.count = 0; render(); } }
     },
     point: function (t, z, i) { if (z === 'act') { t.f.b = i; this.key(t, 'ok'); } }
   };
@@ -2825,9 +2845,14 @@
     if (S.idleHidden) { idleReset(); return; } // the first press only brings the controls back
     idleReset();
     if (k === 'ok' || k === 'back') { if (ev.repeat || heldKeys[code]) return; heldKeys[code] = true; }
+    // On a Home app tile, OK acts on release: held for LONG_OK it opens the tile's quick actions instead.
+    if (k === 'ok' && quickTarget()) { var id = S.sel; clearTimeout(longOk.timer); longOk = { code: code, timer: setTimeout(function () { longOk.timer = 0; openQuick(id); }, LONG_OK) }; return; }
     press(k);
   });
-  document.addEventListener('keyup', function (ev) { delete heldKeys[ev.keyCode]; });
+  document.addEventListener('keyup', function (ev) {
+    delete heldKeys[ev.keyCode];
+    if (longOk.timer && ev.keyCode === longOk.code) { clearTimeout(longOk.timer); longOk.timer = 0; press('ok'); }
+  });
   window.addEventListener('blur', function () { heldKeys = {}; });
   window.addEventListener('focus', function () { release(); focusStage(); after(); updateClock(); });
   document.addEventListener('visibilitychange', function () {

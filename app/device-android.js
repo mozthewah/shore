@@ -49,6 +49,13 @@
     if (!ok && FALLBACK[brand]) ok = ask('launch', FALLBACK[brand]);
     reply(ok, done, 'This app isn’t installed on this TV.');
   }
+  /* Android's App info page for the app behind a Home entry. */
+  function appInfo(id, done) {
+    var pkg = TIZEN[id] ? PACKAGES[TIZEN[id]] : PACKAGES[id] || id, brand = BRAND[pkg];
+    if (FALLBACK[brand] && !isInstalled(pkg)) pkg = FALLBACK[brand];
+    if (!pkg || !/^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$/.test(pkg)) { reply(false, done, 'App info isn’t available for this app.'); return; }
+    reply(ask('appInfo', pkg), done, 'App info could not open.');
+  }
   function launch(brand, done) {
     if (!PACKAGES[brand]) { reply(false, done, 'This app has no launch target.'); return; }
     launchApp(PACKAGES[brand], done);
@@ -191,7 +198,7 @@
   };
   window.FrameDevice = {
     platform: 'android', phone: phone, nowPlaying: nowPlaying, saver: saver, update: update,
-    launch: launch, launchApp: launchApp, apps: apps,
+    launch: launch, launchApp: launchApp, apps: apps, appInfo: appInfo,
     inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */
     packageOf: function (id) { var brand = TIZEN[id] || BRAND[id] || (PACKAGES[id] ? id : ''), pkg = brand === 'youtube' ? FALLBACK.youtube : TIZEN[id] ? PACKAGES[TIZEN[id]] : PACKAGES[id] || id; // YouTube tile shows YouTube's banner

@@ -138,6 +138,13 @@ final class DeviceBridge {
         return intent != null && start(intent);
     }
 
+    /** Opens Android's App info page for an installed package (quick actions on a Home tile). */
+    @JavascriptInterface
+    public boolean appInfo(String pkg) {
+        if (pkg == null || !pkg.matches("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)+")) return false;
+        return start(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:" + pkg)));
+    }
+
     /** JSON array of {appId, name} for every app the TV can launch. */
     @JavascriptInterface
     public String apps() {
