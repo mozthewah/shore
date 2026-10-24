@@ -87,7 +87,7 @@ You need a computer on the same Wi-Fi with [Android platform tools](https://deve
 
 Shore now appears in your apps. Open it once; it remembers everything on the TV.
 
-**Updating:** after the first install you don't need a computer again. *Settings → Google TV → Shore updates* checks the public releases (automatically every few hours, or on demand), downloads the new APK, checks that it is Shore, newer and signed with the same key, and opens Android's installer. Android asks you to confirm, and the first time it asks you to allow Shore to install apps. Settings and photos stay. If you build Shore with your own keys, the page warns you that the public update has none.
+**Updating:** after the first install you don't need a computer again. *Settings → Google TV → Shore updates* checks the public releases (automatically every few hours, or on demand), downloads the new APK, checks that it is Shore, newer and signed with the same key, and opens Android's installer. Android asks you to confirm, and the first time it asks you to allow Shore to install apps. Settings and photos stay. Only release APKs update themselves: a copy you built yourself just tells you when a new version is out, so you can pull the latest source and rebuild it with your keys.
 
 > [!NOTE]
 > **Release APKs carry no API keys.** Every push to `main` builds one automatically (version `0.8.<commit count>`), so updates are frequent and small. Weather, NASA, Bing, Wikimedia and Picsum wallpapers, album art lookups and everything else work as they are. Unsplash, Pexels and Klipy wallpapers and Top Shelf recommendations need your own keys: [build from source](#build-from-source) with them in `android/local.properties`.

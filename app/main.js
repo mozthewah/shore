@@ -92,7 +92,8 @@
   VALUE_NAMES.off = 'Off'; VALUE_NAMES.light = VALUE_NAMES.light || 'Light';
   var UTIL = { art: [TV.art, 'art'], apps: ['All apps', 'apps'], arrange: ['Arrange', 'arrange'], settings: ['Settings', 'settings'] };
   var MSG = {
-    leave: { title: 'Leave Home?', line: 'Open ' + TV.home + '?', note: '', actions: [['stay', 'Stay'], ['samsung', TV.home]] }
+    leave: { title: 'Leave Home?', line: 'Open ' + TV.home + '?', note: '', actions: [['stay', 'Stay'], ['samsung', TV.home]] },
+    clearphotos: { title: 'Remove all my photos?', line: 'They are deleted from the TV. Your phone keeps its own copies.', note: '', actions: [['stay', 'Keep them'], ['clearphotos', 'Remove']] }
   };
   var SVG = {
     input: '<path d="M4.5 6.5h15a1.5 1.5 0 0 1 1.5 1.5v4l-3 4.5H6L3 12V8a1.5 1.5 0 0 1 1.5-1.5Z"/><path d="M7.5 10.5h9"/>',
@@ -1291,11 +1292,12 @@
     var u = S.update, main;
     if (u.status === 'downloading') main = { action: 'update.wait', label: 'Downloading Shore ' + u.latest, description: u.progress + '%' };
     else if (u.status === 'installing') main = { action: 'update.wait', label: 'Opening the installer…', description: 'Android asks you to confirm' };
+    else if (updateReady() && u.personal) main = { action: 'update.check', label: 'Shore ' + u.latest + ' is out', description: 'Rebuild Shore to update' };
     else if (updateReady()) main = { action: 'update.install', label: 'Install Shore ' + u.latest, description: u.title || (u.size ? (u.size / 1048576).toFixed(1) + ' MB' : '') };
     else main = { action: 'update.check', label: u.status === 'checking' ? 'Checking…' : 'Check for updates', description: u.status === 'current' ? 'Shore ' + u.current + ' is the latest version' : 'You have Shore ' + u.current };
     return [{ id: 'update', title: '', items: [main, { action: 'update.auto', label: 'Check automatically', description: 'Every few hours, when Shore opens', tick: true, applied: u.auto }],
       reason: u.status === 'error' ? u.error
-        : updateReady() && u.personal ? 'This copy was built with your own keys. The public update has none, so Unsplash, Pexels, Klipy and Top Shelf stop until you build Shore again.'
+        : u.personal ? (updateReady() ? 'You built this copy of Shore yourself, so it doesn’t replace itself with the public APK. Pull the latest source, then build and install the new APK.' : 'You built this copy of Shore yourself. Shore tells you when a new version is out; then rebuild it from the latest source.')
         : updateReady() && !u.canInstall ? 'First, Shore asks for permission to install apps. Allow it, then come back and press OK again.'
         : 'Updates come from Shore’s public releases. Android asks you to confirm, and your settings and photos stay.' }];
   }
@@ -1592,7 +1594,7 @@
     else if (item.action === 'saver.start') startSaver();
     else if (item.action === 'phone.toggle') { PHONE.enable(!S.phone.enabled); S.phone = PHONE.info(); }
     else if (item.action === 'phone.forget') { PHONE.forget(); S.phone = PHONE.info(); S.note = 'Paired phones forgotten. Scan the new code.'; }
-    else if (item.action === 'phone.clear') { PHONE.clear(); S.phone.count = 0; }
+    else if (item.action === 'phone.clear') openMessage('clearphotos'); // never delete photos on a single press
     else if (item.action === 'nowplaying.access') perform('Notification access', NOWPLAYING.openSettings);
     else if (item.action === 'samsung.home') perform(TV.home, FrameDevice.home);
     else if (item.action === 'samsung.settings') perform('TV settings', FrameDevice.settings);
@@ -1605,7 +1607,8 @@
         if (item.action === t.f.action) exists = true;
         if (axis ? item.axis === axis && item.value === S.c[axis] : item.applied) applied = item;
       }); });
-      if (!exists) detailFocus(t, applied || (rows[1] || rows[0])[0], 0);
+      // Updates: the top row changes action (check, install, wait), so focus stays on it rather than on the toggle.
+      if (!exists) detailFocus(t, t.group === 'updates' ? (rows[1] || rows[0])[0] : applied || (rows[1] || rows[0])[0], 0);
       if (t.f.column === undefined) t.f.column = detailLocation(t).column;
     },
     key: function (t, k) {
@@ -1638,7 +1641,7 @@
       if (k === 'left') t.f.b = Math.max(0, t.f.b - 1);
       else if (k === 'right') t.f.b = Math.min(A.length - 1, t.f.b + 1);
       else if (k === 'back') pop();
-      else if (k === 'ok') { a = A[t.f.b][0]; pop(); if (a === 'samsung') perform(TV.home, FrameDevice.home); }
+      else if (k === 'ok') { a = A[t.f.b][0]; pop(); if (a === 'samsung') perform(TV.home, FrameDevice.home); else if (a === 'clearphotos' && PHONE) { PHONE.clear(); S.phone.count = 0; render(); } }
     },
     point: function (t, z, i) { if (z === 'act') { t.f.b = i; this.key(t, 'ok'); } }
   };

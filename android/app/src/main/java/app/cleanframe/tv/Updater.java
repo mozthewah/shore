@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
  * Checks the latest release, downloads its APK into the app's cache, checks that it is Shore,
  * newer and signed with the same key as the installed copy, then hands it to Android's
  * package installer, which asks the owner to confirm. Nothing installs silently.
+ * Only public builds install updates; a self-built copy is told about new versions and rebuilt by its owner.
  */
 final class Updater {
     interface Listener { void changed(); }
@@ -119,6 +120,8 @@ final class Updater {
 
     /** Downloads (if needed), verifies and opens the installer. */
     void install() {
+        // A copy built with the owner's own keys is never replaced by the keyless public APK: they rebuild instead.
+        if (!BuildConfig.PUBLIC_BUILD) return;
         if (latestCode() <= BuildConfig.VERSION_CODE) { check(); return; }
         if (Build.VERSION.SDK_INT >= 26 && !context.getPackageManager().canRequestPackageInstalls()) {
             Intent i = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + context.getPackageName()));
