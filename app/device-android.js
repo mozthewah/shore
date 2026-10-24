@@ -167,10 +167,12 @@
       var r;
       try { r = JSON.parse(bridge.nowPlayingWith ? bridge.nowPlayingWith(!!lookup) : bridge.nowPlaying()); } catch (e) { r = {}; }
       var img = /^\/nowplaying\/[0-9a-f]+(-b)?\.jpg$/, wide = /^\/nowplaying\/a\/[0-9a-f]+\.jpg$/;
-      return { access: !!r.access, playing: !!r.playing && typeof r.title === 'string', title: String(r.title || ''), artist: String(r.artist || ''), app: String(r.app || ''),
+      return { access: !!r.access, playing: !!r.playing && typeof r.title === 'string', title: String(r.title || ''), artist: String(r.artist || ''), app: String(r.app || ''), pkg: /^[A-Za-z][A-Za-z0-9_.]{0,160}$/.test(r.pkg || '') ? r.pkg : '',
         art: img.test(r.art || '') ? r.art : '', back: img.test(r.back || '') ? r.back : '', wide: wide.test(r.wide || '') ? r.wide : '' };
     },
-    openSettings: function (done) { reply(ask('nowPlayingSettings'), done, 'Notification access could not open.'); }
+    openSettings: function (done) { reply(ask('nowPlayingSettings'), done, 'Notification access could not open.'); },
+    /* toggle, next or prev; pkg finds the session again once it is paused. */
+    control: bridge.nowPlayingControl ? function (pkg, action) { try { return !!bridge.nowPlayingControl(String(pkg || ''), String(action)); } catch (e) { return false; } } : null
   };
   /* In-app updates: the native side checks the public releases, verifies the APK and opens Android's installer. */
   var updateListeners = [];

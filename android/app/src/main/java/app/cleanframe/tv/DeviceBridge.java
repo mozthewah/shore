@@ -69,6 +69,10 @@ final class DeviceBridge {
     @JavascriptInterface
     public String nowPlayingWith(boolean lookup) { return NowPlayingService.info(context, lookup); }
 
+    /** Media keys for what is playing: toggle, next or prev. */
+    @JavascriptInterface
+    public boolean nowPlayingControl(String pkg, String action) { return action != null && action.matches("toggle|next|prev") && NowPlayingService.control(context, pkg, action); }
+
     /** Opens the screen where the user allows CleanFrame to read what is playing. */
     @JavascriptInterface
     public boolean nowPlayingSettings() {

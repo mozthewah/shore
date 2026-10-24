@@ -61,6 +61,30 @@ public class NowPlayingService extends NotificationListenerService {
      *  sending only the artist, title and album; results arrive on a later call. */
     static String info(Context context) { return info(context, false); }
 
+    /** Play/pause, next or previous for the playing session, or for pkg's session once it is paused. */
+    static boolean control(Context context, String pkg, String action) {
+        try {
+            MediaSessionManager msm = (MediaSessionManager) context.getSystemService(Context.MEDIA_SESSION_SERVICE);
+            if (msm == null) return false;
+            MediaController target = null;
+            for (MediaController c : msm.getActiveSessions(new ComponentName(context, NowPlayingService.class))) {
+                PlaybackState s = c.getPlaybackState();
+                if (s != null && s.getState() == PlaybackState.STATE_PLAYING) { target = c; break; }
+                if (target == null && pkg != null && pkg.equals(c.getPackageName())) target = c;
+            }
+            if (target == null) return false;
+            MediaController.TransportControls t = target.getTransportControls();
+            PlaybackState s = target.getPlaybackState();
+            boolean playing = s != null && s.getState() == PlaybackState.STATE_PLAYING;
+            switch (action) {
+                case "toggle": if (playing) t.pause(); else t.play(); return true;
+                case "next": t.skipToNext(); return true;
+                case "prev": t.skipToPrevious(); return true;
+                default: return false;
+            }
+        } catch (Exception e) { return false; }
+    }
+
     static String info(Context context, boolean lookup) {
         JSONObject out = new JSONObject();
         try {

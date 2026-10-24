@@ -24,6 +24,7 @@ Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://githu
 **Home, your way**
 - **Three layouts.** *Dock* and *List* draw every app logo in one consistent style. *Shelf* is an Apple TV–style row of each app's colourful banner, with a [Top Shelf](#top-shelf) above it.
 - **Your apps, found automatically.** Pick and order up to nine for Home.
+- **Music controls:** while something plays, a ♪ *Music* button joins the top-right row on Home. OK shows the song with *Previous*, *Pause/Play* and *Next*; after a pause it stays for 10 minutes so you can resume. Needs Notification access, like Now playing.
 - **Quick actions:** hold OK on an app on Home for *Open*, *Move*, *Remove* or *App info*. A normal press still opens the app; Move and Remove go through *Apps on Home*, so they can be undone.
 - **HDMI devices appear by themselves**, named by HDMI-CEC ("PlayStation 5" instead of "HDMI 1"). Switch on a console or set-top box and its tile shows up; switch it off and it disappears. Show inputs first on Home or in their own row, and Shore offers to switch when one turns on.
 - **Speaks your language.** The launcher follows the TV's system language (*Settings → System → Language*). German, French, Spanish, Dutch and Polish are included; anything else falls back to English.
@@ -314,7 +315,6 @@ Live TV, inputs, settings, the remote, casting, updates and Google TV itself are
 
 Built since the last list: weather with °C/°F, Now playing with album art, Shore's own screensaver, cropping in the phone companion, HDMI-CEC names, and German, French, Spanish, Dutch and Polish. Next up:
 
-- Play/pause and skip for Now playing
 - A sleep timer on a remote button
 - Use the phone companion as a remote and keyboard
 - Calendar events under the clock (ICS link)

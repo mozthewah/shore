@@ -90,7 +90,7 @@
     like: 'Like Home', every: 'Everything', builtin: 'Built-in', mix: 'Mixed', single: 'One photo', mosaic: 'Mosaics',
     left: 'Left', center: 'Centred', none: 'None', warm: 'Warm', cool: 'Cool', rose: 'Rose', green: 'Green', clear: 'Clear', solid: 'Solid', move: 'Moving', fixed: 'Fixed' };
   VALUE_NAMES.off = 'Off'; VALUE_NAMES.light = VALUE_NAMES.light || 'Light';
-  var UTIL = { art: [TV.art, 'art'], apps: ['All apps', 'apps'], arrange: ['Arrange', 'arrange'], settings: ['Settings', 'settings'] };
+  var UTIL = { music: ['Music', 'music'], art: [TV.art, 'art'], apps: ['All apps', 'apps'], arrange: ['Arrange', 'arrange'], settings: ['Settings', 'settings'] };
   var MSG = {
     leave: { title: 'Leave Home?', line: 'Open ' + TV.home + '?', note: '', actions: [['stay', 'Stay'], ['samsung', TV.home]] },
     welcome: { title: 'Welcome to Shore', line: 'A few quick steps make Shore feel at home: the Home button, what’s playing, wallpapers and your phone.', note: '', actions: [['setup', 'Set up'], ['stay', 'Later']] },
@@ -118,6 +118,7 @@
     undo: '<path d="M9 6 5 10l4 4"/><path d="M5 10h9.5a4.5 4.5 0 0 1 0 9H11"/>',
     check: '<path d="m5.5 12.5 4 4 9-9"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
+    music: '<path d="M9 17.5V6l10-2v11.5"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/>',
     left: '<path d="m14.5 5-7 7 7 7"/>',
     right: '<path d="m9.5 5 7 7-7 7"/>',
     up: '<path d="m5 15.5 7-7 7 7"/>',
@@ -616,14 +617,33 @@
   }
 
   /* ---------- Navigation targets ---------- */
-  function utils() { return ['art', 'apps', 'settings']; }
+  function utils() { return ['art', 'apps', 'settings'].concat(musicAvailable() ? ['music'] : []); } // music last, so the other buttons keep their places
+  /* ---------- Music controls: a Home button while something plays (and for 10 minutes after a pause) ---------- */
+  var musicPaused = null;
+  function musicAvailable() { return !!(NOWPLAYING && NOWPLAYING.control && S.playing && S.playing.access && (S.playing.playing || (musicPaused && Date.now() < musicPaused.until))); }
+  function openMusic(b) {
+    var p = S.playing.playing ? S.playing : musicPaused || {}, paused = !S.playing.playing;
+    if (!S.playing.playing && !musicPaused) return;
+    push({ id: 'message', content: { title: p.title || 'Music', line: (p.artist || '') + (p.artist && p.app ? ' — ' : '') + (p.app || ''), note: '',
+      actions: [['np.prev', 'Previous'], ['np.toggle', paused ? 'Play' : 'Pause'], ['np.next', 'Next']] }, f: { b: b === undefined ? 1 : b } });
+    render();
+  }
+  function musicAction(a, b) {
+    var p = S.playing.playing ? S.playing : musicPaused || {}, action = a.slice(3);
+    if (!NOWPLAYING.control(p.pkg, action)) { S.note = 'Couldn’t control the music.'; render(); return; }
+    if (action === 'toggle' && S.playing.playing) { musicPaused = { title: p.title, artist: p.artist, app: p.app, pkg: p.pkg, until: Date.now() + 600000 }; S.playing.playing = false; }
+    else if (action === 'toggle') { S.playing.playing = true; S.playing.title = p.title; S.playing.artist = p.artist; S.playing.app = p.app; S.playing.pkg = p.pkg; }
+    openMusic(b);
+    setTimeout(pollPlaying, 900); // the session reports the new state (or the next title) shortly after
+  }
   /* prev/next run along the apps; out goes to the controls, inn comes back (or to a per-app action). */
   function axes() {
     var v = S.c.layout === 'list';
     return { prev: v ? 'up' : 'left', next: v ? 'down' : 'right', out: v ? 'right' : 'up', inn: v ? 'left' : 'down' };
   }
   function utilAction(u) {
-    if (u === 'art') { if (ANDROID) startSaver(); else perform(TV.art, FrameDevice.art); }
+    if (u === 'music') openMusic();
+    else if (u === 'art') { if (ANDROID) startSaver(); else perform(TV.art, FrameDevice.art); }
     else if (u === 'apps') openApps();
     else openSettings();
   }
@@ -1185,6 +1205,9 @@
     if (!NOWPLAYING || document.hidden || S.c.cplaying !== 'on' && S.c.cart !== 'on' && !S.saver) return;
     info = NOWPLAYING.info(S.c.clook === 'on'); key = info.access + '|' + (info.playing ? info.title + '|' + info.artist + '|' + info.art + '|' + info.wide : '');
     if (key === S.playing.key) return;
+    // Paused anywhere: keep the music button for a while so it can be resumed.
+    if (S.playing.playing && !info.playing && S.playing.pkg) musicPaused = { title: S.playing.title, artist: S.playing.artist, app: S.playing.app, pkg: S.playing.pkg, until: Date.now() + 600000 };
+    if (info.playing) musicPaused = null;
     info.key = key; S.playing = info;
     if (S.saver) renderSaver();
     if (top().id === 'home' || isSettingsDetail(top())) render();
@@ -1763,7 +1786,7 @@
       if (k === 'left') t.f.b = Math.max(0, t.f.b - 1);
       else if (k === 'right') t.f.b = Math.min(A.length - 1, t.f.b + 1);
       else if (k === 'back') pop();
-      else if (k === 'ok') { a = A[t.f.b][0]; pop(); if (a.indexOf('quick.') === 0) quickAction(a); else if (a.indexOf('input:') === 0) { clearTimeout(askTimer); launch(a.slice(6)); } else if (a === 'setup') openHealth(); else if (a === 'samsung') perform(TV.home, FrameDevice.home); else if (a === 'clearphotos' && PHONE) { PHONE.clear(); S.phone.count = 0; render(); } }
+      else if (k === 'ok') { a = A[t.f.b][0]; pop(); if (a.indexOf('np.') === 0) musicAction(a, t.f.b); else if (a.indexOf('quick.') === 0) quickAction(a); else if (a.indexOf('input:') === 0) { clearTimeout(askTimer); launch(a.slice(6)); } else if (a === 'setup') openHealth(); else if (a === 'samsung') perform(TV.home, FrameDevice.home); else if (a === 'clearphotos' && PHONE) { PHONE.clear(); S.phone.count = 0; render(); } }
     },
     point: function (t, z, i) { if (z === 'act') { t.f.b = i; this.key(t, 'ok'); } }
   };
