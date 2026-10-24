@@ -74,15 +74,15 @@
   var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], inputs: ['front', 'row'], lstyle: ['glass', 'shelf'], motion: ['still', 'drift'], tweight: ['auto', 'light', 'regular', 'bold'], tsize: ['small', 'default', 'large'],
     cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], clook: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'],
-    svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
+    svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], ncalm: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
     cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'] };
   /* Newer axes with their defaults: stored, migrated and validated like the others. */
-  var MORE_LOOK = { iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move' };
+  var MORE_LOOK = { ncalm: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move' };
   /* On/off settings that OK flips. */
-  var TOGGLES = ['iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec'];
+  var TOGGLES = ['ncalm', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec'];
   var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', clook: 'Artist pictures', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material',
-    iask: 'Ask to switch', svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
+    ncalm: 'Calmer photos at night', iask: 'Ask to switch', svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
     cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
@@ -147,7 +147,7 @@
   }
   function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, clook: c.clook, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material, svsrc: c.svsrc, svlay: c.svlay, svtime: c.svtime,
-      svmotion: c.svmotion, iask: c.iask, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
+      svmotion: c.svmotion, iask: c.iask, ncalm: c.ncalm, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
       cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
   function derivedTheme() { return S.c.layout === 'list' ? 'list' : 'shore'; }
@@ -1063,7 +1063,7 @@
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
+      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
   /* "Seconds" in the Format row, abbreviated where the word is long. */
   /* "Ask" (to switch inputs), short enough to share the Inputs row in every language. */
@@ -1421,7 +1421,7 @@
     ['Text', ['font', 'tweight', 'tsize']],
     ['Clock', ['cformat', 'csec', 'cdate', 'csize', 'cweight', 'cpos', 'cweather', 'wunit', 'wicon', 'cplaying', 'cwave']],
     ['Focus', ['focus', 'material', 'tint', 'dglass', 'motion']],
-    ['Night and idle', ['night', 'nhours', 'ndim', 'idle', 'saver']],
+    ['Night and idle', ['night', 'nhours', 'ndim', 'ncalm', 'idle', 'saver']],
     ['Screensaver', ['svsrc', 'svlay', 'svtime', 'svmotion', 'svpos', 'svclock', 'svdate', 'svmusic']]];
   var companionTimer = 0, companionLast = '';
   function companionAxis(axis) {
@@ -1540,6 +1540,7 @@
       { id: 'night', title: 'Night mode', horizontal: true, items: options('night', ['off', 'scheduled', 'always']) },
       { id: 'nhours', title: 'Night hours', horizontal: true, items: options('nhours', ['21-7', '22-6', '23-7'], S.c.night !== 'scheduled') },
       { id: 'ndim', title: 'Night dimming', horizontal: true, items: options('ndim', ['soft', 'medium', 'strong'], S.c.night === 'off') },
+      { id: 'ncalm', title: '', items: options('ncalm', ['on'], S.c.night === 'off' || S.c.bg !== 'photo') },
       { id: 'whenidle', title: 'When idle', items: [{ action: 'open.idle', label: idleSummary(), more: true }] }];
     if (t.group === 'idle') return [
       { id: 'saver', title: 'Screensaver', horizontal: true, items: options('saver', ['off', '5', '10', '15']),
@@ -1666,7 +1667,9 @@
   }
   /* The photos that rotate: those from the chosen sources. While online photos are still downloading, Shore's own fill in. */
   function rotationPool() {
-    var pool = WALLS.filter(inRotation), builtin = WALLS.filter(function (w) { return !w.online; });
+    var pool = WALLS.filter(inRotation), builtin = WALLS.filter(function (w) { return !w.online; }), dark;
+    // Calmer photos at night: only dark photos while night mode is on, when there are any.
+    if (calmNight()) { dark = pool.filter(function (w) { return w.tone === 'dark'; }); if (dark.length) pool = dark; }
     return pool.length ? pool : builtin.filter(function (w) { return !isHidden(w); }).length ? builtin.filter(function (w) { return !isHidden(w); }) : builtin;
   }
   function detailBack() { cancelLook(); S.err = null; pop(); }
@@ -1822,6 +1825,7 @@
   /* Animations run only on Home: Settings and other panels freeze them to keep the TV responsive.
      Drift uses a virtual clock that stops while paused, so layers created meanwhile stay in phase. */
   /* Night mode: dims the photo, video and glass together (one brightness filter) and softens the text. */
+  function calmNight() { return S.c.ncalm === 'on' && S.c.bg === 'photo' && nightActive(); }
   function nightActive() {
     if (S.c.night === 'always') return true;
     if (S.c.night !== 'scheduled') return false;
@@ -2762,7 +2766,11 @@
   function updateClock() {
     clearTimeout(clockTimer);
     if (document.hidden) return;
-    if (S.night !== nightActive()) { S.night = nightActive(); render(); }
+    if (S.night !== nightActive()) {
+      S.night = nightActive(); render();
+      // Night begins with a bright photo on: move to a dark one in rotation.
+      if (calmNight() && wall(S.c.wall).tone !== 'dark' && !S.pending) { var dark = rotationPool().filter(function (w) { return w.tone === 'dark'; }); if (dark.length) setLook({ wall: dark[0].id }, { row: 'bg' }); }
+    }
     if (S.c.idle !== 'off' && !idleTimer && !S.idleHidden) idleReset();
     if (WEATHER && S.c.cweather === 'on') WEATHER.refresh(false);
     if (top().id === 'home' || isSettingsDetail(top())) renderCaption(top(), homeState(top()));

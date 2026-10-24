@@ -34,7 +34,7 @@ Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://githu
 - **[Phone companion](#phone-companion)**: scan a QR code and send photos, GIFs and short videos to the TV, from a web app styled like the launcher.
 - **Drift**: a slow Ken Burns zoom where the photo and its glass move together.
 - **Rotation**: a new picture each time Home opens, or every 5, 15 or 60 minutes.
-- **Night mode** dims everything on a timer (21–07, 22–06, 23–07) or all the time, in three strengths.
+- **Night mode** dims everything on a timer (21–07, 22–06, 23–07) or all the time, in three strengths. With *Calmer photos at night*, rotation sticks to dark photos while it is on, and a bright wallpaper gives way to a dark one when night begins.
 
 **Make it yours**
 - **Eight open-licence fonts**, with text weight and app-name size.

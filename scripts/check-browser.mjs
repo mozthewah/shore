@@ -927,6 +927,15 @@ try {
     await nav('right'); await nav('ok');
     check('Move opens Apps on Home with the app lifted', (await state()).view === 'editor' && /editor\.move\./.test((await state()).focusAction), await state());
   });
+  await run('Calmer photos at night', async () => {
+    const tones = Object.fromEntries(walls.map(w => [w.id, w.tone]));
+    for (let i = 0; i < 3; i++) {
+      await page({ seed: baseline({ mode: 'open', wallpaper: walls[i].id, bg: 'photo', night: 'always', ncalm: 'on' }) });
+      const id = (await state()).wallpaper;
+      check('Night rotation picks a dark photo (start ' + walls[i].id + ')', tones[id] === 'dark', { id, tone: tones[id] });
+      await closePage();
+    }
+  });
   await run('Favourite and hidden wallpapers', async () => {
     await page({ seed: baseline({ mode: 'open', hide: [walls[1].id] }) });
     check('Open rotation skips a hidden wallpaper', (await state()).wallpaper !== walls[1].id, (await state()).wallpaper);
