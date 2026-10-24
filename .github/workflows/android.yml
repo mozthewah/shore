@@ -63,6 +63,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          notes=$(git log -1 --pretty=%B | sed '/^Co-Authored-By/d')
-          printf '%s\n\nKeyless build: NASA, Bing, Wikimedia and Picsum wallpapers, weather and everything else work; Unsplash, Pexels, Klipy and Top Shelf recommendations need your own keys and a build from source.\n' "$notes" > notes.md
+          node scripts/release-notes.mjs "$VERSION" "shore-$VERSION.apk" > notes.md
           gh release create "v$VERSION" "shore-$VERSION.apk" --title "Shore $VERSION" --notes-file notes.md --target "$GITHUB_SHA" --latest
