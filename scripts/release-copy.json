@@ -1,0 +1,14 @@
+{
+  "39e9db2": {
+    "title": "Mix your wallpaper sources",
+    "notes": [
+      "**Pick as many sources as you like.** Shore’s own wallpapers, your photos, NASA, Bing, Wikimedia and Picsum can all rotate together, and only the ones you tick are used.",
+      "**See what’s rotating.** The sources page counts the photos in the mix, and the wallpaper gallery marks every photo that isn’t.",
+      "**Clear buttons.** OK on a source says *Add to rotation* or *Remove from rotation*.",
+      "**Honest about outages.** If a source can’t be reached, Shore names it and tries again later.",
+      "**On your phone too.** The companion picks sources the same way.",
+      "Long photo titles no longer run into the preview."
+    ],
+    "image": "docs/images/tcl/online.jpg"
+  }
+}

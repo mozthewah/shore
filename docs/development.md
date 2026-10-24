@@ -78,3 +78,7 @@ DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1 DOTNET_CLI_HOM
 ```
 
 The helper's output is not packaged inside the web app. Keep the original values, compiler, runtime output and all device diagnostics ignored.
+
+## Release notes
+
+Every push to `main` publishes a keyless APK whose notes come from `scripts/release-notes.mjs`. Write them for people installing Shore: add `Release-title:`, `Release:` (one line per user-visible change) and optionally `Release-image:` lines to the commit message. To fix the wording of a commit that is already pushed, add it to `scripts/release-copy.json` under its short hash instead of rewriting history. Commits without app changes only appear in the folded changelog.
