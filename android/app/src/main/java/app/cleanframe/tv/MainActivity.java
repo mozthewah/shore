@@ -159,11 +159,17 @@ public class MainActivity extends Activity {
             case "next": case "prev": return NowPlayingService.control(this, null, key);
             case "home":
                 if (inFront) { runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFrameRemoteKey&&window.CleanFrameRemoteKey('home')", null); }); return true; }
-                return HomeButtonService.remote("home");
+                return atvPress("home") || HomeButtonService.remote("home");
             default:
                 if (inFront) { runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFrameRemoteKey&&window.CleanFrameRemoteKey(" + org.json.JSONObject.quote(key) + ")", null); }); return true; }
-                return HomeButtonService.remote(key);
+                return atvPress(key) || HomeButtonService.remote(key);
         }
+    }
+
+    /** In another app: a real remote key through the TV's remote service, once the phone has paired Shore with it. */
+    private boolean atvPress(String key) {
+        AtvRemote r = AtvRemote.get(this);
+        return r.paired() && r.press(key);
     }
 
     private void inputsChanged() {

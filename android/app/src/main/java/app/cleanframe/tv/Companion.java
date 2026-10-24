@@ -255,7 +255,18 @@ final class Companion {
                 Keys handler = keys;
                 if (!k.matches("up|down|left|right|ok|back|home|play|next|prev|volup|voldown|mute")) { send(out, 400, "application/json", "{\"error\":\"bad\"}"); return; }
                 if (handler == null) { send(out, 503, "application/json", "{\"offline\":true}"); return; }
-                send(out, 200, "application/json", "{\"ok\":" + handler.press(k) + ",\"sdk\":" + android.os.Build.VERSION.SDK_INT + "}");
+                send(out, 200, "application/json", "{\"ok\":" + handler.press(k) + ",\"sdk\":" + android.os.Build.VERSION.SDK_INT + ",\"atv\":" + JSONObject.quote(AtvRemote.get(context).status()) + "}");
+                return;
+            }
+            // Pairing with the TV's own remote service, so the arrows work in every app (see AtvRemote).
+            if (api.startsWith("remote/")) {
+                AtvRemote r = AtvRemote.get(context);
+                boolean ok = true;
+                if (method.equals("POST") && api.equals("remote/pair")) ok = r.startPairing();
+                else if (method.equals("POST") && api.equals("remote/code")) ok = r.finishPairing(param(query, "c"));
+                else if (method.equals("POST") && api.equals("remote/forget")) r.forget();
+                else if (!(method.equals("GET") && api.equals("remote/status"))) { send(out, 404, "text/plain", "Not found"); return; }
+                send(out, 200, "application/json", new JSONObject().put("ok", ok).put("atv", r.status()).put("sdk", android.os.Build.VERSION.SDK_INT).toString());
                 return;
             }
             if (method.equals("GET") && api.equals("backup")) {
