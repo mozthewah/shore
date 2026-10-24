@@ -109,10 +109,39 @@ final class OnlineWallpapers {
         String normal = chosen.isEmpty() ? "off" : android.text.TextUtils.join(",", chosen);
         boolean changed = !normal.equals(source());
         prefs.edit().putString("source", normal).apply();
-        if (!downloads(chosen)) { worker.execute(() -> { writeIndex(new JSONArray()); clean(new HashSet<>()); prefs.edit().remove("failed").apply(); notifyChanged("off"); }); return; }
+        if (!downloads(chosen)) { worker.execute(() -> { Set<String> keep = new HashSet<>(); writeIndex(addKept(new JSONArray(), keep)); clean(keep); prefs.edit().remove("failed").apply(); notifyChanged("off"); }); return; }
         if (chosen.contains("phone") && changed) { refresh(); return; }
         long age = System.currentTimeMillis() - prefs.getLong("refreshed", 0);
         if (changed || force || age > REFRESH_MS) refresh();
+    }
+
+    /** Favourite online photos: their index entries are stored here so refreshes keep them and their files. */
+    void keep(String id, boolean on) {
+        worker.execute(() -> {
+            try {
+                JSONObject kept = new JSONObject(prefs.getString("kept", "{}"));
+                if (!on) kept.remove(id);
+                else {
+                    JSONArray all = readIndex();
+                    for (int i = 0; i < all.length(); i++) if (id.equals(all.getJSONObject(i).optString("id"))) kept.put(id, all.getJSONObject(i));
+                }
+                prefs.edit().putString("kept", kept.toString()).apply();
+            } catch (Exception ignored) { }
+        });
+    }
+
+    /** Adds kept favourites that are not already listed and still have their files. */
+    private JSONArray addKept(JSONArray entries, Set<String> keep) {
+        try {
+            JSONObject kept = new JSONObject(prefs.getString("kept", "{}"));
+            for (java.util.Iterator<String> it = kept.keys(); it.hasNext(); ) {
+                String id = it.next();
+                if (keep.contains(id) || !new File(wallDir, id + ".jpg").exists()) continue;
+                entries.put(kept.getJSONObject(id));
+                keep.add(id);
+            }
+        } catch (Exception ignored) { }
+        return entries;
     }
 
     /** Sources that could not be reached on the last refresh, as a comma list. */
@@ -156,8 +185,10 @@ final class OnlineWallpapers {
                     }
                     if (got == 0 && !source.equals("phone")) failedNow.add(source);
                 }
+                int fetched = entries.length(); // decided before favourites are added, so an outage keeps the old photos
+                addKept(entries, keep); // favourites stay, whatever the feeds return now
                 prefs.edit().putString("failed", android.text.TextUtils.join(",", failedNow)).apply();
-                if (entries.length() == 0) {
+                if (fetched == 0) {
                     status = failedNow.isEmpty() ? "empty" : "error";
                     if (list(csv).contains("phone")) { writeIndex(entries); clean(keep); }
                 } else {

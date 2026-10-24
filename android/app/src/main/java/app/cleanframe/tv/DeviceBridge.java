@@ -44,6 +44,10 @@ final class DeviceBridge {
         this.phone = phone;
     }
 
+    /** Keeps (or releases) a favourite online photo across refreshes. */
+    @JavascriptInterface
+    public void onlineKeep(String id, boolean on) { if (online != null && id != null && id.matches("[A-Za-z0-9._-]{1,160}")) online.keep(id, on); }
+
     /** In-app updates from the public releases (Updater). Only the activity offers them. */
     @JavascriptInterface
     public String updateInfo() { return activity == null ? "{}" : Updater.get(context).info(); }

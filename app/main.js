@@ -396,6 +396,8 @@
     }
     return null;
   }
+  /* Favourite and hidden wallpapers: ids only, unique, capped. */
+  function idList(v) { var out = []; (Array.isArray(v) ? v : []).forEach(function (id) { if (safeId(id) && out.indexOf(id) < 0 && out.length < 300) out.push(id); }); return out; }
   function clean(saved) {
     var s = saved && typeof saved === 'object' ? saved : {}, modern = s.look && typeof s.look === 'object' ? s.look : s;
     var legacyList = s.theme === 'list', h = [], recent = [], records = Array.isArray(s.appRecords) ? s.appRecords : [];
@@ -424,7 +426,8 @@
       font: pick(modern.font, LOOK_VALUES.font, 'manrope'), wall: wall(modern.wall || s.wallpaper) ? modern.wall || s.wallpaper : WALLS[0].id,
       home: h, recent: recent, lastApp: h.indexOf(s.lastApp) >= 0 ? s.lastApp : h[0],
       mode: pick(s.mode, MODES.map(function (m) { return m.id; }), 'fixed'),
-      source: sourceCsv(ONLINE ? ONLINE_INFO.source : 'builtin')
+      source: sourceCsv(ONLINE ? ONLINE_INFO.source : 'builtin'),
+      fav: idList(s.fav), hide: idList(s.hide)
     };
     Object.keys(MORE_LOOK).forEach(function (k) { out[k] = pick(modern[k], LOOK_VALUES[k], MORE_LOOK[k]); });
     return out;
@@ -465,13 +468,14 @@
     initial = next(S.c.home.slice(), S.c.recent.slice());
     S.stack = [{ id: 'home', f: { zone: 'apps', u: 0 } }];
     S.sel = S.c.lastApp; S.selIdx = S.c.home.indexOf(S.sel);
-    if (saved && initial.mode === 'open') initial.wall = WALLS[(wallIndex(initial.wall) + 1) % WALLS.length].id;
+    // Each time Home opens: the next photo in rotation (chosen sources, favourites, never hidden ones).
+    if (saved && initial.mode === 'open') { var pool = rotationPool(), at = pool.indexOf(wall(initial.wall)); initial.wall = pool[(at + 1) % pool.length].id; }
     // Keep the old schema keys alongside the builder values for in-place updates.
     try { localStorage.setItem(KEY, JSON.stringify(serialise(initial))); S.c = initial; storageOk = true; } catch (e) { storageOk = false; }
   }
   function clearSession() { S.undo = []; S.removedAt = {}; S.note = null; S.err = null; }
   function begin() { S.note = null; }
-  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; c.source = S.c.source; return c; }
+  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; c.source = S.c.source; c.fav = S.c.fav.slice(); c.hide = S.c.hide.slice(); return c; }
   function snap() { return { home: S.c.home.slice(), recent: S.c.recent.slice() }; }
   function pushRecent(list, id) { return [id].concat(without(list, id)).slice(0, 5); }
   function write(c, label) {
@@ -769,6 +773,16 @@
     t.previewDue = id;
     t.previewTimer = setTimeout(function () { if (top() === t && WALLS[t.i].id === id) loadWallpaperPreview(t); }, WALL_DELAY);
   }
+  /* Favourite or hide one wallpaper. Online favourites are kept by the native side, so a refresh never deletes them. */
+  function markWallpaper(w, kind) {
+    var c = next(S.c.home.slice(), S.c.recent.slice()), list = kind === 'fav' ? c.fav : c.hide, other = kind === 'fav' ? c.hide : c.fav, i = list.indexOf(w.id), on = i < 0;
+    if (on) { list.push(w.id); if (other.indexOf(w.id) >= 0) other.splice(other.indexOf(w.id), 1); } else list.splice(i, 1);
+    if (!write(c, kind === 'fav' ? 'Favourite' : 'Hide')) return;
+    S.c = c;
+    if (w.online && ONLINE && ONLINE.keep) ONLINE.keep(w.id, S.c.fav.indexOf(w.id) >= 0);
+    S.note = on ? (kind === 'fav' ? w.name + ' is a favourite.' : w.name + ' is hidden.') : null;
+    syncRotation();
+  }
   function retryWallpaper(t) {
     var apply = t.failedApply, bundle = t.retryBundle;
     t.f.zone = 'photo';
@@ -799,15 +813,25 @@
         else if (k === 'up' || k === 'left') t.f.zone = 'photo';
         return;
       }
+      // Favourite and Hide sit under the preview; up and down keep stepping through photos so several can be marked quickly.
+      if (t.f.zone === 'fav' || t.f.zone === 'hide') {
+        if (k === 'ok') markWallpaper(WALLS[t.i], t.f.zone);
+        else if (k === 'left') t.f.zone = t.f.zone === 'hide' ? 'fav' : 'photo';
+        else if (k === 'right' && t.f.zone === 'fav') t.f.zone = 'hide';
+        else if ((k === 'up' && t.i > 0) || (k === 'down' && t.i < WALLS.length - 1)) { var zone = t.f.zone; previewWallpaper(t, t.i + (k === 'up' ? -1 : 1), false); t.f.zone = zone; }
+        return;
+      }
       if (k === 'left' || k === 'up' && t.i === 0) { t.f.zone = 'back'; t.applyPending = null; }
       else if (k === 'up' && t.i > 0) previewWallpaper(t, t.i - 1, false);
       else if (k === 'down' && t.i < WALLS.length - 1) previewWallpaper(t, t.i + 1, false);
       else if ((k === 'right' || k === 'down') && t.failedId) t.f.zone = 'retry';
+      else if (k === 'right') t.f.zone = 'fav';
       else if (k === 'ok') { if (t.retryBundle) applyWallpaper(t, t.retryBundle); else applyWallpaper(t); }
     },
     point: function (t, z, i) {
       if (z === 'wall-back') closeWallpaper(t);
       else if (z === 'wall-retry') retryWallpaper(t);
+      else if (z === 'wall-fav' || z === 'wall-hide') { t.f.zone = z.slice(5); markWallpaper(WALLS[t.i], t.f.zone); }
       else if (z === 'wall-choice' && i >= 0 && i < WALLS.length) {
         if (i === t.i) { t.f.zone = 'photo'; this.key(t, 'ok'); }
         else previewWallpaper(t, i, true);
@@ -964,7 +988,10 @@
   function sourceShort() { var l = sourceList().map(function (id) { return T(sourceName(id)); }); return l.length > 1 ? l[0] + ' +' + (l.length - 1) : l[0]; }
   function sourceSummary() { return sourceList().map(function (id) { return T(sourceName(id)); }).join(', '); }
   /* A wallpaper rotates when its source is chosen. Online and phone photos carry their source; older entries count as online. */
-  function inRotation(w) { return w.online ? !w.source || sourceOn(w.source) : sourceOn('builtin'); }
+  function isFav(w) { return S.c.fav.indexOf(w.id) >= 0; }
+  function isHidden(w) { return S.c.hide.indexOf(w.id) >= 0; }
+  /* Hidden photos never rotate; favourites always do, whatever their source. */
+  function inRotation(w) { return isHidden(w) ? false : isFav(w) || (w.online ? !w.source || sourceOn(w.source) : sourceOn('builtin')); }
   function source() { for (var i = 0; i < SOURCES.length; i++) if (SOURCES[i].id === S.c.source) return SOURCES[i]; return SOURCES[0]; }
   function mode() { for (var i = 0; i < MODES.length; i++) if (MODES[i].id === S.c.mode) return MODES[i]; return MODES[0]; }
   function settingsRows() {
@@ -1602,8 +1629,8 @@
   }
   /* The photos that rotate: those from the chosen sources. While online photos are still downloading, Shore's own fill in. */
   function rotationPool() {
-    var pool = WALLS.filter(inRotation);
-    return pool.length ? pool : WALLS.filter(function (w) { return !w.online; });
+    var pool = WALLS.filter(inRotation), builtin = WALLS.filter(function (w) { return !w.online; });
+    return pool.length ? pool : builtin.filter(function (w) { return !isHidden(w); }).length ? builtin.filter(function (w) { return !isHidden(w); }) : builtin;
   }
   function detailBack() { cancelLook(); S.err = null; pop(); }
   function detailOk(t, item) {
@@ -2360,7 +2387,7 @@
     var rows = appearanceRows.querySelector('.wallpaper-rows'), shown = wall(S.wallShown) || wall(S.c.wall), candidate = WALLS[t.i], status, note, hint;
     keyed(rows, WALLS.map(function (w) { return { key: w.id, wall: w }; }), function (row, item, i) {
       var visible = i >= t.top && i < t.top + WALL_VISIBLE, w = item.wall, image;
-      setContent(row, w.id + '|' + visible + '|' + inRotation(w), '<span class="wallpaper-thumb">' + (visible ? '<img src="' + WP + w.id + '-thumb.jpg" alt="">' : '') + '</span><span class="setting-copy"><span class="setting-name">' + esc(w.name) + '</span>' + (!inRotation(w) ? '<span class="setting-credit not-rotating">' + esc(T('Not in rotation')) + '</span>' : w.credit ? '<span class="setting-credit">' + esc(w.credit) + '</span>' : '') + '</span><span class="setting-tick" aria-hidden="true"></span>');
+      setContent(row, w.id + '|' + visible + '|' + inRotation(w) + '|' + isFav(w) + '|' + isHidden(w), '<span class="wallpaper-thumb">' + (visible ? '<img src="' + WP + w.id + '-thumb.jpg" alt="">' : '') + '</span><span class="setting-copy"><span class="setting-name">' + esc(w.name) + '</span>' + (isHidden(w) ? '<span class="setting-credit not-rotating">' + esc(T('Hidden')) + '</span>' : !inRotation(w) ? '<span class="setting-credit not-rotating">' + esc(T('Not in rotation')) + '</span>' : isFav(w) ? '<span class="setting-credit is-fav">' + esc(T('Favourite')) + (w.credit ? ' · ' + esc(w.credit) : '') + '</span>' : w.credit ? '<span class="setting-credit">' + esc(w.credit) + '</span>' : '') + '</span><span class="setting-tick" aria-hidden="true"></span>');
       row.className = 'setting-choice wallpaper-choice' + (t.f.zone === 'photo' && t.i === i ? ' is-focus' : '') + (w.id === S.c.wall ? ' is-applied' : '');
       row.style.transform = 'translate3d(0,' + (i * WALL_ROW) + 'px,0)'; row.style.visibility = visible ? 'visible' : 'hidden';
       row.setAttribute('role', 'radio'); row.setAttribute('tabindex', '-1'); row.setAttribute('aria-label', w.name);
@@ -2381,9 +2408,13 @@
     note = t.previewDue ? 'Preparing ' + candidate.name + '…' : S.wallPending ? (t.applyPending ? 'Applying ' : 'Loading ') + candidate.name + '…' : shown.id === S.c.wall ? 'Applied' : 'Preview';
     if (t.failedId) note = S.err ? 'Couldn’t save ' + wall(t.failedId).name + '.' : 'Couldn’t load ' + wall(t.failedId).name + '.';
     status = '<p class="wallpaper-preview-name"><span>' + esc(shown.name) + '</span><span class="wallpaper-count">' + (wallIndex(shown.id) + 1) + ' of ' + WALLS.length + '</span></p><p class="wallpaper-preview-state' + (t.failedId ? ' setting-error' : '') + '">' + esc(note) + '</p>';
+    if (!t.failedId) status += '<div class="wallpaper-marks"><button type="button" tabindex="-1" class="setting-choice setting-retry wallpaper-mark' + (t.f.zone === 'fav' ? ' is-focus' : '') + (isFav(candidate) ? ' is-on' : '') + '" data-z="wall-fav" data-action="wallpaper.fav">' + icon(isFav(candidate) ? 'check' : 'plus') + '<span>' + esc('Favourite') + '</span></button>'
+      + '<button type="button" tabindex="-1" class="setting-choice setting-retry wallpaper-mark' + (t.f.zone === 'hide' ? ' is-focus' : '') + (isHidden(candidate) ? ' is-on' : '') + '" data-z="wall-hide" data-action="wallpaper.hide">' + (isHidden(candidate) ? icon('check') : '') + '<span>' + esc('Hide') + '</span></button></div>';
     if (t.failedId) status += '<button type="button" tabindex="-1" class="setting-choice setting-retry' + (t.f.zone === 'retry' ? ' is-focus' : '') + '" data-z="wall-retry" data-action="wallpaper.retry">Try again</button>';
     setHTML(appearanceStatus, status);
-    hint = t.f.zone === 'back' ? 'Return to Background' : t.f.zone === 'retry' ? 'Retry this photo' : 'Apply selected photo';
+    hint = t.f.zone === 'back' ? 'Return to Background' : t.f.zone === 'retry' ? 'Retry this photo'
+      : t.f.zone === 'fav' ? (isFav(candidate) ? 'Remove from favourites' : 'Always keep this photo in rotation')
+      : t.f.zone === 'hide' ? (isHidden(candidate) ? 'Show this photo again' : 'Never show this photo') : 'Apply selected photo';
     if (t.f.zone === 'photo' && candidate.id === S.c.wall && !S.pending && !t.failedId) hint = '';
     setHTML(appearanceDesc, hint ? '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>' : '');
   }

@@ -919,6 +919,18 @@ try {
     check('Seconds show in the clock', /\d:\d\d:\d\d/.test(await current.evaluate(() => document.querySelector('.caption .clock').textContent)));
     check('Centred clock is centred', await current.evaluate(() => { const r = document.querySelector('.caption').getBoundingClientRect(), s = document.getElementById('stage').getBoundingClientRect(); return Math.abs((r.left + r.right) / 2 - (s.left + s.right) / 2) < 4; }));
   });
+  await run('Favourite and hidden wallpapers', async () => {
+    await page({ seed: baseline({ mode: 'open', hide: [walls[1].id] }) });
+    check('Open rotation skips a hidden wallpaper', (await state()).wallpaper !== walls[1].id, (await state()).wallpaper);
+    await group('background'); await act('background.wallpaper');
+    await nav('right'); check('Right from the list reaches Favourite', (await current.evaluate(() => ShoreQA.where())).zone === 'fav');
+    await nav('ok'); const fav = (await stored()).fav;
+    check('Favourite is saved', Array.isArray(fav) && fav.length === 1, fav);
+    await nav('down', 'right'); check('Hide stays reachable while stepping photos', (await current.evaluate(() => ShoreQA.where())).zone === 'hide');
+    await nav('ok'); const saved = await stored();
+    check('Hidden list grows and favourites stay separate', saved.hide.length === 2 && !saved.hide.some(id => saved.fav.includes(id)), saved);
+    check('Gallery rows say Favourite and Hidden', await current.evaluate(() => /Favourite/.test(document.querySelector('.wallpaper-rows').textContent) && /Hidden/.test(document.querySelector('.wallpaper-rows').textContent)));
+  });
   await run('Open rotation and browser fallback', async () => {
     await page({ seed: baseline({ mode: 'open' }) }); check('Open mode advances at cold start', (await state()).wallpaper === walls[1].id);
     const first = (await state()).wallpaper;

@@ -81,6 +81,7 @@
   var online = {
     info: function () { try { return JSON.parse(bridge.onlineInfo()); } catch (e) { return { source: 'off', unsplash: false }; } },
     select: function (source, force) { try { bridge.onlineSource(source, !!force); } catch (e) { } },
+    keep: function (id, on) { try { bridge.onlineKeep(String(id), !!on); } catch (e) { } },
     onChange: function (fn) { onlineListeners.push(fn); }
   };
   window.CleanFrameInputsChanged = function () { inputListeners.forEach(function (fn) { try { fn(); } catch (e) { } }); };
