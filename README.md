@@ -27,7 +27,7 @@ Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://githu
 - **Music controls:** while something plays, a ♪ *Music* button joins the top-right row on Home. OK shows the song with *Previous*, *Pause/Play* and *Next*; after a pause it stays for 10 minutes so you can resume. Needs Notification access, like Now playing.
 - **Quick actions:** hold OK on an app on Home for *Open*, *Move*, *Remove* or *App info*. A normal press still opens the app; Move and Remove go through *Apps on Home*, so they can be undone.
 - **HDMI devices appear by themselves**, named by HDMI-CEC ("PlayStation 5" instead of "HDMI 1"). Switch on a console or set-top box and its tile shows up; switch it off and it disappears. Show inputs first on Home or in their own row, and Shore offers to switch when one turns on.
-- **Speaks your language.** The launcher follows the TV's system language (*Settings → System → Language*). German, French, Spanish, Dutch and Polish are included; anything else falls back to English.
+- **Speaks your language.** The launcher follows the TV's system language (*Settings → System → Language*). German, French, Spanish, Dutch, Polish and Ukrainian are included; anything else falls back to English.
 
 **The picture**
 - **15 photographs** with pre-rendered glass, plus **online wallpapers** from NASA, Bing, Wikimedia, Picsum and Unsplash.
@@ -142,7 +142,7 @@ Inputs come from Android's TV Input Framework. A device that is **plugged in and
 
 ### Language
 
-Shore uses the TV's system language: German, French, Spanish, Dutch and Polish are built in, and anything else shows English. Change it in *Settings → System → Language* on the TV, then reopen Shore. Translations live in [`app/i18n.js`](app/i18n.js): one dictionary per language, keyed by the English text, so adding a language means adding one block. In the browser preview, `?lang=de` picks a language.
+Shore uses the TV's system language: German, French, Spanish, Dutch, Polish and Ukrainian are built in, and anything else shows English. Change it in *Settings → System → Language* on the TV, then reopen Shore. Translations live in [`app/i18n.js`](app/i18n.js): one dictionary per language, keyed by the English text, so adding a language means adding one block. In the browser preview, `?lang=de` picks a language.
 
 ### Under the clock: weather and Now playing
 

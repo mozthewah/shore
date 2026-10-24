@@ -32,7 +32,10 @@ def forbidden(name):
             or path.name in {'certificate-password.txt', 'profiles.xml', '.env', 'session.json'})
 
 
-public_fonts = {'app/assets/manrope.woff2': 'e310b55a7fd9677f5e3555e6c6c4d064fa1f1d24393f0ddbe217cea12a8c432f'}
+public_fonts = {'app/assets/manrope.woff2': 'e310b55a7fd9677f5e3555e6c6c4d064fa1f1d24393f0ddbe217cea12a8c432f',
+                # Google Fonts Manrope v20 subsets (SIL OFL), loaded only for Cyrillic and extended Latin letters.
+                'app/assets/manrope-cyrillic.woff2': 'c268b459a9329e59fecf39a17618efd44c71735532048d60b12aab76a8c14914',
+                'app/assets/manrope-latin-ext.woff2': '3911b66d9f2e005a4b989223405d0e5032619c668597ba467cc76a23c8fffcfb'}
 for record in json.loads((ROOT / 'app/assets/fonts/SOURCES.json').read_text()):
     if Path(record['file']).suffix.lower() in font_suffixes:
         public_fonts['app/assets/fonts/' + record['file']] = record['sha256']

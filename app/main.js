@@ -1610,7 +1610,7 @@
     if (t.group === 'updates') return updateSections();
     if (t.group === 'health') return healthSections();
     if (t.group === 'online' || t.group === 'unsplash' || t.group === 'animated') {
-      var items = SOURCES.filter(function (o) { return o.page === t.group; }).map(function (o) { return choice('source', o.id, flat || o.key && !ONLINE_INFO[o.key]); });
+      var items = SOURCES.filter(function (o) { return o.page === t.group; }).map(function (o) { var c = choice('source', o.id, flat || o.key && !ONLINE_INFO[o.key]); if (o.unsplash) c.label = T(c.label).replace(/^Unsplash · /, ''); return c; });
       var missing = SOURCES.filter(function (o) { return o.page === t.group && o.key && !ONLINE_INFO[o.key]; }).map(function (o) { return o.key; });
       if (t.group === 'online') items = items.filter(function (item) { return item.value !== 'phone' || PHONE; }).concat([
         { action: 'open.unsplash', label: pageCount('unsplash', 'Unsplash themes'), more: true, disabled: flat },

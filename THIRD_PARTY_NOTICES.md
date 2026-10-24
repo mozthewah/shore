@@ -6,7 +6,7 @@ The root MIT licence covers CleanFrame's original code and documentation. Third-
 
 | Material | Terms and source record |
 | --- | --- |
-| Manrope | SIL Open Font License 1.1; `app/assets/manrope-OFL.txt` |
+| Manrope (`manrope.woff2`, plus the Google Fonts v20 Cyrillic and Latin Extended subsets `manrope-cyrillic.woff2` and `manrope-latin-ext.woff2`) | SIL Open Font License 1.1; `app/assets/manrope-OFL.txt` |
 | Geist, Newsreader, Inter, Outfit, Space Grotesk, Sora and Playfair Display | SIL Open Font License 1.1; licences beside the files in `app/assets/fonts/`, with exact sources and hashes in `app/assets/fonts/SOURCES.json` |
 | Optional PP Neue Montreal, PP Mori and PP Pangram Sans | Proprietary. Binaries stay in ignored `.local/` storage and are excluded from Git and public exports. The optional local overlay requires the user's own permission to use and embed those files. |
 

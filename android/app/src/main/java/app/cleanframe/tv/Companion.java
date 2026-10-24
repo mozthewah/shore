@@ -206,6 +206,7 @@ final class Companion {
         STATIC.put("/", "index.html"); STATIC.put("/index.html", "index.html"); STATIC.put("/app.css", "app.css"); STATIC.put("/app.js", "app.js");
         STATIC.put("/manifest.webmanifest", "manifest.webmanifest"); STATIC.put("/sw.js", "sw.js");
         STATIC.put("/icon-192.png", "icon-192.png"); STATIC.put("/icon-512.png", "icon-512.png"); STATIC.put("/manrope.woff2", "../assets/manrope.woff2");
+        STATIC.put("/manrope-cyrillic.woff2", "../assets/manrope-cyrillic.woff2"); STATIC.put("/manrope-latin-ext.woff2", "../assets/manrope-latin-ext.woff2");
     }
 
     private void serve(Socket socket) {
