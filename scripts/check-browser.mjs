@@ -118,6 +118,14 @@ async function group(name) {
   await scene('settings'); await act('settings.group.' + name);
   await current.waitForFunction(expected => ShoreQA.state().settingsGroup === expected, name);
 }
+// Font choices live on a Fonts page inside Typography; Back from it returns to the Font row.
+async function fontPage() {
+  await group('typography'); await act('typography.fonts');
+  await current.waitForFunction(() => ShoreQA.state().settingsGroup === 'fonts');
+}
+async function leaveFontPage() {
+  await nav('back'); await current.waitForFunction(() => ShoreQA.state().settingsGroup === 'typography');
+}
 const settingsSnapshot = () => current.evaluate(() => {
   const s = ShoreQA.state();
   const rendered = [...document.getElementById('stage').classList].filter(c => /^(bg|l|a|u|f|m|font)-/.test(c)).sort();
@@ -365,12 +373,12 @@ try {
     check('Overview has all six settings groups', same((await call('actions')).filter(a => expected.includes(a)).sort(), expected.slice().sort()));
     const specs = {
       background: { bg: ['dark', 'light', 'photo'] },
-      layout: { layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], controls: ['icons', 'both', 'text'] },
+      layout: { layout: ['list', 'dock', 'shelf'], apps: ['icons', 'both', 'text'], controls: ['icons', 'both', 'text'] },
       typography: { font: (await state()).fonts.available },
       focus: { focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'] }
     };
     for (const [name, axes] of Object.entries(specs)) {
-      await group(name);
+      if (name === 'typography') await fontPage(); else await group(name);
       const options = await radios(), committed = (await state()).committed;
       for (const [axis, values] of Object.entries(axes)) {
         const rows = options.filter(r => r.action?.startsWith('choice.' + axis + '.'));
@@ -378,6 +386,7 @@ try {
         check(axis + ' checked state identifies only the applied choice', same(rows.filter(r => r.checked === 'true').map(r => r.action), ['choice.' + axis + '.' + committed[axis]]), rows);
       }
       check(name + ' detail has no persistent category rail', !(await call('actions')).some(a => a.startsWith('settings.group.')));
+      if (name === 'typography') await leaveFontPage();
       await nav('back');
       check(name + ' Back restores overview category focus', (await state()).view === 'settings' && (await state()).focusAction === 'settings.group.' + name, await call('where'));
     }
@@ -385,7 +394,7 @@ try {
     const backgroundActions = await call('actions');
     check('Photo tools are reachable from Background', backgroundActions.includes('background.wallpaper') && backgroundActions.includes('background.rotation'), backgroundActions);
     await act('background.rotation');
-    const rotationRows = await radios();
+    const rotationRows = (await radios()).filter(r => r.action.startsWith('rotation.'));
     check('All five rotation modes are visible together', same(rotationRows.map(r => r.action).sort(), ['fixed', 'open', '5', '15', '60'].map(v => 'rotation.' + v).sort()), rotationRows);
     await nav('back');
     check('Rotation Back restores its Background row', (await state()).settingsGroup === 'background' && (await state()).focusAction === 'background.rotation', await call('where'));
@@ -442,7 +451,7 @@ try {
       ['focus', 'material', ['frost', 'tint', 'soft']]
     ];
     for (const [name, axis, values] of specs) {
-      await group(name);
+      if (axis === 'font') await fontPage(); else await group(name);
       const selected = await settingsSnapshot(); await choice(axis, selected.committed[axis]); await ready();
       check(axis + ' OK on applied choice does not write again', same(await settingsSnapshot(), selected));
       for (const value of values) {
@@ -454,9 +463,18 @@ try {
         const shown = !Object.hasOwn(after.shown, axis) || after.shown[axis] === value;
         check(axis + ' OK applies ' + value + ' once', after.committed[axis] === value && shown && after.rendered.includes(prefix + '-' + value) && same(untouched, before.committed) && expectedWrites === after.writes && after.storageAttempts - before.storageAttempts === expectedWrites - before.writes && rows.some(r => r.action === 'choice.' + axis + '.' + value && r.checked === 'true'), { before, after, rows });
       }
-      const applied = await settingsSnapshot(); await nav('back');
+      const applied = await settingsSnapshot();
+      if (axis === 'font') await leaveFontPage();
+      await nav('back');
       check(axis + ' applied choice survives Back', same(await settingsSnapshot(), applied) && (await state()).focusAction === 'settings.group.' + name);
     }
+    // Shelf is a Dock style: it stores layout dock with lstyle shelf, and Dock switches back to glass.
+    await group('layout'); let shelfBefore = await settingsSnapshot(); await choice('layout', 'shelf'); await ready();
+    let shelfAfter = await state();
+    check('layout OK applies shelf once', shelfAfter.committed.layout === 'dock' && shelfAfter.look.lstyle === 'shelf' && shelfAfter.writes === shelfBefore.writes + 1 && (await radios()).some(r => r.action === 'choice.layout.shelf' && r.checked === 'true'), shelfAfter.look);
+    await choice('layout', 'dock'); await ready(); shelfAfter = await state();
+    check('Dock after Shelf restores the glass dock', shelfAfter.committed.layout === 'dock' && shelfAfter.look.lstyle === 'glass' && (await radios()).some(r => r.action === 'choice.layout.dock' && r.checked === 'true'), shelfAfter.look);
+    await nav('back');
     await group('background'); await act('background.rotation');
     const selected = await settingsSnapshot(); await act('rotation.' + selected.committed.mode);
     check('Rotation OK on applied mode does not write again', same(await settingsSnapshot(), selected));
@@ -467,7 +485,8 @@ try {
     await group('layout'); const before = await settingsSnapshot(), candidate = await unselectedChoice();
     const [, axis, value] = candidate.action.split('.');
     await current.keyboard.down('Enter'); await current.keyboard.down('Enter'); await ready();
-    check('Held physical OK applies the focused choice once', (await state()).committed[axis] === value && (await state()).writes === before.writes + 1);
+    const held = await state(), heldOk = value === 'shelf' ? held.committed.layout === 'dock' && held.look.lstyle === 'shelf' : held.committed[axis] === value;
+    check('Held physical OK applies the focused choice once', heldOk && held.writes === before.writes + 1);
     await current.keyboard.up('Enter');
     await current.keyboard.down('Escape'); await current.keyboard.down('Escape');
     check('Held physical Back closes one settings layer', (await state()).view === 'settings' && (await state()).focusAction === 'settings.group.layout');
@@ -542,7 +561,7 @@ try {
     } finally { releaseImages(); await current.unroute(pattern); }
   });
   await run('Settings Back cancels a delayed font choice', async () => {
-    await page(); await group('typography'); const before = await settingsSnapshot();
+    await page(); await fontPage(); const before = await settingsSnapshot();
     const held = [], pattern = '**/fonts/newsreader/*';
     let releaseFont;
     const blocked = new Promise(resolve => { releaseFont = resolve; });
@@ -551,10 +570,10 @@ try {
       await choice('font', 'newsreader'); await current.waitForFunction(() => !!ShoreQA.state().pending);
       check('Loading a font keeps applied typography and its checked choice', same(await settingsSnapshot(), before) && (await radios()).some(r => r.action === 'choice.font.manrope' && r.checked === 'true'));
       await nav('back'); await ready();
-      check('Back cancels the font choice and restores Typography focus', same(await settingsSnapshot(), before) && (await state()).focusAction === 'settings.group.typography');
+      check('Back cancels the font choice and returns to Typography', same(await settingsSnapshot(), before) && (await state()).settingsGroup === 'typography' && (await state()).focusAction === 'typography.fonts');
       releaseFont(); await current.waitForLoadState('networkidle');
       check('Late font completion cannot apply the cancelled choice', held.length > 0 && same(await settingsSnapshot(), before) && !(await state()).pending);
-      await group('typography'); await choice('font', 'newsreader'); await ready();
+      await fontPage(); await choice('font', 'newsreader'); await ready();
       check('Cancelled font remains available for a fresh explicit apply', (await state()).look.font === 'newsreader' && (await state()).shown.font === 'newsreader' && (await state()).writes === before.writes + 1);
     } finally { releaseFont(); await current.unroute(pattern); }
   });
