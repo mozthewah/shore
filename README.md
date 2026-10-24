@@ -79,13 +79,16 @@ You need a computer on the same Wi-Fi with [Android platform tools](https://deve
    ```
 
    The TV asks "Allow debugging?". Tick **Always allow from this computer** and press OK.
-4. **Install** the APK from [Releases](https://github.com/taynotfound/shore/releases) or [build it](#build-from-source):
+4. **Install** the APK from the [latest release](https://github.com/taynotfound/shore/releases/latest) or [build it](#build-from-source):
 
    ```sh
    adb install -r Shore.apk
    ```
 
 Shore now appears in your apps. Open it once; it remembers everything on the TV.
+
+> [!NOTE]
+> **Release APKs carry no API keys.** Every push to `main` builds one automatically (version `0.8.<commit count>`), so updates are frequent and small. Weather, NASA, Bing, Wikimedia and Picsum wallpapers, album art lookups and everything else work as they are. Unsplash, Pexels and Klipy wallpapers and Top Shelf recommendations need your own keys: [build from source](#build-from-source) with them in `android/local.properties`.
 
 <details>
 <summary>Android 14 builds with "Wireless debugging"</summary>
@@ -189,6 +192,8 @@ To undo, run the same command with `disallow_listener`.
 - **Send to your TV**: pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. Each photo first opens in a 16:9 frame, the TV's shape: drag to move it, pinch or use the slider to zoom, then **Send**. *Whole photo* sends it uncropped, *Skip* leaves it out. The crop is made on the phone at the photo's own resolution (up to 3840 px wide). They appear under **My photos**, a wallpaper source like the others. Glass is rendered once, rotation cycles through them, and GIFs and clips play animated. Choose *Settings → Phone → My photos* to use them.
 - **My photos**: see what's stored and delete single photos or all of them. Shore keeps the newest 30, in its private storage on the TV.
 - **Weather place**: the city for the weather under the clock.
+- **TV settings**: every setting from the TV's own Settings, grouped the same way (background and wallpaper, layout, text, clock, focus and colour, night and idle, screensaver), as buttons and switches. Changes apply on the TV at once, as if chosen with the remote, and *Start the screensaver now* is one tap. Shore must be open on the TV (in front or behind another app).
+- **Apps**: reorder Home with the arrows, remove an app, or add one of the other installed apps.
 - **Install it**: the QR code opens [taynotfound.github.io/shore/app](https://taynotfound.github.io/shore/app/), a tiny installable page (HTTPS, manifest, offline cache). It remembers your TV and opens it whenever you start the app. If your browser shows no install button, use its menu: *Install app* or *Add to Home screen*. On iPhone: *Share → Add to Home Screen*.
 
 **Privacy and limits**
@@ -271,7 +276,9 @@ gradle -p android assembleRelease
 adb install -r android/app/build/outputs/apk/release/app-release.apk
 ```
 
-Without signing secrets, the APK is signed with your computer's debug key. Keep using the same key so updates install in place and keep your settings. GitHub Actions builds the APK on every push.
+Without signing secrets, the APK is signed with your computer's debug key. Keep using the same key so updates install in place and keep your settings. A self-built APK and a release APK are signed differently, so switching between them means uninstalling first.
+
+GitHub Actions ([`android.yml`](.github/workflows/android.yml)) builds a keyless APK on every push to `main` and publishes it as a release. It needs the signing key as repository secrets (`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`) so every release can update the last one; `SHORE_PUBLIC_BUILD=1` makes sure no key from `local.properties` or the environment gets in.
 
 The interface also runs in a desktop browser for design work: `npm ci && npm run dev:public`, then open [localhost:4795/home/](http://localhost:4795/home/). Run `npm run check` and `npm run check:browser` after changing `app/`.
 

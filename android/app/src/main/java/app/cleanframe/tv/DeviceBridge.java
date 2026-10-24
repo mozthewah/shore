@@ -66,6 +66,10 @@ final class DeviceBridge {
     @JavascriptInterface
     public void phoneEnable(boolean on) { if (phone != null) phone.setEnabled(on); }
 
+    /** The settings model for the companion's settings screens (JSON, built by the page). */
+    @JavascriptInterface
+    public void companionState(String json) { if (phone != null) phone.setState(json); }
+
     /** New pairing key; phones have to scan the code again. */
     @JavascriptInterface
     public void phoneForget() { if (phone != null) phone.forget(); }

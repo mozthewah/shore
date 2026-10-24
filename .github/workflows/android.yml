@@ -1,22 +1,33 @@
 name: Android TV APK
 
+# Every push to main builds a keyless APK and publishes it as a GitHub release (v0.8.<commit count>).
+# The public APK never contains API keys: online sources that need one stay off, and people who want
+# them build Shore themselves (see the README).
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'app/**'
-      - 'android/**'
-      - '.github/workflows/android.yml'
+    branches: [main]
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   apk:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the commit count is the version
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check the app
+        run: npm run check
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -25,34 +36,33 @@ jobs:
         with:
           gradle-version: '8.11.1'
 
-      # Optional: a stable signing key lets you update in place without losing settings.
-      # Add repository secrets KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD.
+      # Releases must always carry the same certificate, or installed copies can't update.
+      # Repository secrets: KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD.
       - name: Restore signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        if: env.KEYSTORE_BASE64 != ''
         run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/cleanframe.jks"
-          echo "CLEANFRAME_KEYSTORE=$RUNNER_TEMP/cleanframe.jks" >> "$GITHUB_ENV"
+          if [ -z "$KEYSTORE_BASE64" ]; then echo "::error::Add the signing key secrets before releases can be published."; exit 1; fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/shore.jks"
+          echo "CLEANFRAME_KEYSTORE=$RUNNER_TEMP/shore.jks" >> "$GITHUB_ENV"
 
-      - name: Build
+      - name: Build without keys
         env:
+          SHORE_PUBLIC_BUILD: '1'
           CLEANFRAME_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           CLEANFRAME_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           CLEANFRAME_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          # Optional online wallpaper keys (repository secrets). Empty keys simply disable those sources.
-          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-          KLIPY_API_KEY: ${{ secrets.KLIPY_API_KEY }}
-          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
-          # Optional Top Shelf keys; empty keys leave only the banner fallback.
-          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
-          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
-        run: gradle -p android assembleRelease
+        run: |
+          gradle -p android assembleRelease
+          count=$(git rev-list --count HEAD)
+          echo "VERSION=0.8.$count" >> "$GITHUB_ENV"
+          cp android/app/build/outputs/apk/release/app-release.apk "shore-0.8.$count.apk"
+          rm -f "$RUNNER_TEMP/shore.jks"
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Shore
-          path: android/app/build/outputs/apk/release/*.apk
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=$(git log -1 --pretty=%B | sed '/^Co-Authored-By/d')
+          printf '%s\n\nKeyless build: NASA, Bing, Wikimedia and Picsum wallpapers, weather and everything else work; Unsplash, Pexels, Klipy and Top Shelf recommendations need your own keys and a build from source.\n' "$notes" > notes.md
+          gh release create "v$VERSION" "shore-$VERSION.apk" --title "Shore $VERSION" --notes-file notes.md --target "$GITHUB_SHA" --latest

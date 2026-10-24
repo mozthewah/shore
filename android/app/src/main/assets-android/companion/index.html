@@ -28,6 +28,26 @@
   </section>
 
   <div id="paired" hidden>
+    <nav class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="photos" aria-selected="true" data-t="Photos">Photos</button>
+      <button type="button" role="tab" data-tab="tv" aria-selected="false" data-t="TV settings">TV settings</button>
+      <button type="button" role="tab" data-tab="apps" aria-selected="false" data-t="Apps">Apps</button>
+    </nav>
+    <div id="tab-tv" class="tab" hidden>
+      <p id="tvOffline" class="card quiet" hidden data-t="Open Shore on the TV to change its settings from here.">Open Shore on the TV to change its settings from here.</p>
+      <div id="tvGroups"></div>
+    </div>
+    <div id="tab-apps" class="tab" hidden>
+      <section class="card">
+        <div class="row"><h2 id="appsTitle" data-t="Apps on Home">Apps on Home</h2><span id="appsCount" class="count"></span></div>
+        <ol id="homeList" class="applist"></ol>
+      </section>
+      <section class="card">
+        <h2 id="othersTitle" data-t="Other installed apps">Other installed apps</h2>
+        <ul id="otherList" class="applist"></ul>
+      </section>
+    </div>
+    <div id="tab-photos" class="tab">
     <section class="card">
       <h2 data-t="Send to your TV">Send to your TV</h2>
       <p data-t="Photos, GIFs and short videos become wallpapers under My photos. Landscape fills the screen best.">Photos, GIFs and short videos become wallpapers under My photos. Landscape fills the screen best.</p>
@@ -47,6 +67,7 @@
       <p data-t="The clock shows the weather for this city. Leave it empty to use the TV’s time zone.">The clock shows the weather for this city. Leave it empty to use the TV’s time zone.</p>
       <form id="placeForm" class="inline"><input id="place" type="text" autocomplete="address-level2" placeholder="Berlin"><button class="button" type="submit" data-t="Save">Save</button></form>
     </section>
+    </div>
   </div>
   <a id="installLink" class="install-link" hidden data-t="Install as an app">Install as an app</a>
   <footer><span data-t="Works on your home Wi-Fi only. Nothing leaves your network.">Works on your home Wi-Fi only. Nothing leaves your network.</span></footer>

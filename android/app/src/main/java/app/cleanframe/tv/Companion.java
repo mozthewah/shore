@@ -47,6 +47,8 @@ import java.util.concurrent.Executors;
  */
 final class Companion {
     interface Listener { void changed(int count); }
+    /** Applies a setting chosen on the phone; MainActivity hands it to the page. */
+    interface Commands { void set(String axis, String value); }
 
     static final int MAX_FILES = 30, MAX_BYTES = 60 * 1024 * 1024;
     private static final int[] PORTS = { 8642, 8643, 8644, 8645 };
@@ -65,6 +67,9 @@ final class Companion {
     private volatile ServerSocket server;
     private volatile String url = "", wallpaper = "";
     private volatile Listener listener;
+    private volatile Commands commands;
+    /** The settings model Shore's page last published, or empty while Shore is not running. */
+    private volatile String state = "";
 
     Companion(Context context) {
         this.context = context.getApplicationContext();
@@ -75,6 +80,8 @@ final class Companion {
     }
 
     void setListener(Listener l) { listener = l; }
+    void setCommands(Commands c) { commands = c; if (c == null) state = ""; }
+    void setState(String json) { state = json == null || json.length() > 512 * 1024 ? "" : json; }
 
     boolean enabled() { return prefs.getBoolean("enabled", false); }
 
@@ -220,6 +227,17 @@ final class Companion {
             String api = path.substring(5);
             if (method.equals("GET") && api.equals("info")) { send(out, 200, "application/json", apiInfo()); return; }
             if (method.equals("GET") && api.equals("wallpaper")) { wallpaper(out); return; }
+            if (method.equals("GET") && api.equals("settings")) { send(out, 200, "application/json", state.isEmpty() ? "{\"offline\":true}" : state); return; }
+            if (method.equals("GET") && api.startsWith("thumb/") && api.substring(6).matches("[A-Za-z0-9_-]{1,80}")) { thumb(out, api.substring(6)); return; }
+            if (method.equals("POST") && api.equals("set")) {
+                String axis = param(query, "axis"), value = param(query, "value");
+                Commands c = commands;
+                if (!axis.matches("[a-z][a-z.]{0,15}") || !value.matches("[A-Za-z0-9._:-]{1,120}")) { send(out, 400, "application/json", "{\"error\":\"bad\"}"); return; }
+                if (c == null || state.isEmpty()) { send(out, 503, "application/json", "{\"offline\":true}"); return; }
+                c.set(axis, value);
+                send(out, 200, "application/json", "{\"ok\":true}");
+                return;
+            }
             if (method.equals("GET") && api.startsWith("photo/") && api.substring(6).matches(NAME)) { file(out, new File(dir, api.substring(6))); return; }
             if (method.equals("POST") && api.equals("upload")) { upload(in, out, length); return; }
             if (method.equals("POST") && api.equals("clear")) { clear(); send(out, 200, "application/json", apiInfo()); return; }
@@ -261,8 +279,10 @@ final class Companion {
         try (InputStream in = context.getAssets().open(path)) { send(out, 200, type, OnlineWallpapers.readAll(in, 4 * 1024 * 1024)); }
     }
 
-    private void wallpaper(OutputStream out) throws IOException {
-        String id = wallpaper.isEmpty() ? "misty" : wallpaper;
+    private void wallpaper(OutputStream out) throws IOException { thumb(out, wallpaper.isEmpty() ? "misty" : wallpaper); }
+
+    /** A wallpaper's small preview: online and My photos thumbnails first, then the bundled ones. */
+    private void thumb(OutputStream out, String id) throws IOException {
         File online = new File(onlineDir, "wallpapers/" + id + "-thumb.jpg");
         if (online.exists()) { file(out, online); return; }
         try (InputStream in = context.getAssets().open("assets/wallpapers/" + id + "-thumb.jpg")) { send(out, 200, "image/jpeg", OnlineWallpapers.readAll(in, 4 * 1024 * 1024)); }
@@ -333,7 +353,7 @@ final class Companion {
     private static void send(OutputStream out, int code, String type, String body) throws IOException { send(out, code, type, body.getBytes(StandardCharsets.UTF_8)); }
 
     private static void send(OutputStream out, int code, String type, byte[] data) throws IOException {
-        String status = code == 200 ? "OK" : code == 401 ? "Unauthorized" : code == 404 ? "Not Found" : code == 413 ? "Too Large" : code == 415 ? "Unsupported" : "Error";
+        String status = code == 200 ? "OK" : code == 400 ? "Bad Request" : code == 503 ? "Unavailable" : code == 401 ? "Unauthorized" : code == 404 ? "Not Found" : code == 413 ? "Too Large" : code == 415 ? "Unsupported" : "Error";
         out.write(("HTTP/1.1 " + code + " " + status + "\r\nContent-Type: " + type + "\r\nContent-Length: " + data.length
                 + "\r\nCache-Control: no-cache\r\nX-Content-Type-Options: nosniff\r\nReferrer-Policy: no-referrer\r\nConnection: close\r\n\r\n").getBytes(StandardCharsets.ISO_8859_1));
         out.write(data);

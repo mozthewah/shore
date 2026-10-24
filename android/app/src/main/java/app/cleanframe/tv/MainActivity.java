@@ -75,6 +75,9 @@ public class MainActivity extends Activity {
         }));
         phone = new Companion(this);
         online.setPhone(phone);
+        phone.setCommands((axis, value) -> runOnUiThread(() -> {
+            if (web != null) web.evaluateJavascript("window.CleanFrameCompanionSet&&window.CleanFrameCompanionSet(" + org.json.JSONObject.quote(axis) + "," + org.json.JSONObject.quote(value) + ")", null);
+        }));
         phone.setListener(count -> {
             online.phoneChanged();
             runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFramePhoneChanged&&window.CleanFramePhoneChanged(" + count + ")", null); });
@@ -176,7 +179,7 @@ public class MainActivity extends Activity {
         if (tvInputs != null) tvInputs.unregisterCallback(inputCallback);
         if (online != null) online.setListener(null);
         if (topShelf != null) topShelf.setListener(null);
-        if (phone != null) { phone.setListener(null); phone.stop(); }
+        if (phone != null) { phone.setListener(null); phone.setCommands(null); phone.stop(); }
         if (RemoteKeys.listener == remoteListener) { RemoteKeys.listener = null; RemoteKeys.learn(false); }
         if (web != null) { web.removeJavascriptInterface("CleanFrameAndroid"); web.destroy(); web = null; }
         super.onDestroy();

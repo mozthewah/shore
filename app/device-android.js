@@ -146,6 +146,8 @@
         count: +r.count || 0, place: typeof r.place === 'string' ? r.place : '' };
     },
     enable: function (on) { try { bridge.phoneEnable(!!on); } catch (e) { } },
+    /* Settings model for the companion's settings screens; the companion sends choices back through CleanFrameCompanionSet. */
+    publish: function (json) { try { bridge.companionState(String(json)); } catch (e) { } },
     forget: function () { try { bridge.phoneForget(); } catch (e) { } },
     wallpaper: function (id) { try { bridge.phoneWallpaper(String(id)); } catch (e) { } },
     clear: function () { try { bridge.phoneClear(); } catch (e) { } },

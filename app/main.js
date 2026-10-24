@@ -1275,6 +1275,73 @@
       reason: flat ? 'Choose Photo in Background to use online wallpapers.' : !n ? 'Send a photo from your phone first.' : S.c.source === 'phone' && S.onlineStatus ? ONLINE_STATUS[S.onlineStatus] || '' : '' });
     return sections;
   }
+  /* ---------- Phone companion: every setting from the phone ----------
+     Shore publishes what each setting can be and what it is now; the companion sends a choice back and
+     Shore applies it exactly as if it was chosen with the remote. */
+  var COMPANION_GROUPS = [
+    ['Background', ['bg', 'wall', 'mode', 'source', 'cart', 'npdim', 'clook']],
+    ['Layout', ['layout', 'apps', 'controls', 'inputs', 'isize']],
+    ['Text', ['font', 'tweight', 'tsize']],
+    ['Clock', ['cformat', 'csec', 'cdate', 'csize', 'cweight', 'cpos', 'cweather', 'wunit', 'wicon', 'cplaying', 'cwave']],
+    ['Focus', ['focus', 'material', 'tint', 'dglass', 'motion']],
+    ['Night and idle', ['night', 'nhours', 'ndim', 'idle', 'saver']],
+    ['Screensaver', ['svsrc', 'svlay', 'svtime', 'svmotion', 'svpos', 'svclock', 'svdate', 'svmusic']]];
+  var companionTimer = 0, companionLast = '';
+  function companionAxis(axis) {
+    var out;
+    if (axis === 'wall') return { id: 'wall', name: T('Wallpaper'), kind: 'wall', value: S.c.wall,
+      options: WALLS.map(function (w) { return { value: w.id, label: T(w.name), mine: /^file:/.test(w.src || '') }; }) };
+    if (axis === 'mode') return { id: 'mode', name: T('Rotation'), kind: 'list', value: S.c.mode, options: MODES.map(function (m) { return { value: m.id, label: T(m.name) }; }) };
+    if (axis === 'source') return ONLINE ? { id: 'source', name: T('Online wallpapers'), kind: 'list', value: S.c.source,
+      options: SOURCES.filter(function (o) { return !o.key || ONLINE_INFO[o.key]; }).filter(function (o) { return o.id !== 'phone' || PHONE; }).map(function (o) { return { value: o.id, label: T(o.name) }; }) } : null;
+    if (axis === 'layout') return { id: 'layout', name: T('Layout'), kind: 'choice', value: isShelf() ? 'shelf' : S.c.layout,
+      options: [{ value: 'list', label: T('List') }, { value: 'dock', label: T('Dock') }, { value: 'shelf', label: T('Shelf') }] };
+    if ((axis === 'cart' || axis === 'npdim' || axis === 'clook' || axis === 'cplaying' || axis === 'cwave' || axis === 'svmusic') && !NOWPLAYING) return null;
+    if (!LOOK_VALUES[axis]) return null;
+    if (TOGGLES.indexOf(axis) >= 0) return { id: axis, name: T(LOOK_NAMES[axis]), kind: 'toggle', value: S.c[axis] };
+    out = { id: axis, name: T(LOOK_NAMES[axis] || axis), kind: 'choice', value: S.c[axis], options: LOOK_VALUES[axis].map(function (v) { return { value: v, label: T(choice(axis, v).label) }; }) };
+    return out;
+  }
+  function companionModel() {
+    var home = S.c.home.map(function (id) { var a = app(id); return a ? { id: id, name: a.name } : null; }).filter(Boolean);
+    var others = APPS.filter(function (a) { return !a.input && a.appId && S.c.home.indexOf(a.id) < 0 && installedApp(a); }).slice(0, 80).map(function (a) { return { id: a.id, name: a.name }; });
+    return { version: 1, lang: (window.CleanFrameI18n && CleanFrameI18n.lang) || 'en', saver: !!S.saver, cap: CAP,
+      groups: COMPANION_GROUPS.map(function (g) { return { name: T(g[0]), items: g[1].map(companionAxis).filter(Boolean) }; }),
+      home: home, others: others,
+      labels: { start: T('Start the screensaver now'), apps: T('Apps on Home'), more: T('Other installed apps'), full: T(FULL) } };
+  }
+  function installedApp(a) { return !!a; }
+  function publishCompanion(now) {
+    if (!PHONE || !PHONE.publish) return;
+    clearTimeout(companionTimer);
+    if (!now) { companionTimer = setTimeout(function () { publishCompanion(true); }, 400); return; }
+    var text;
+    try { text = JSON.stringify(companionModel()); } catch (e) { return; }
+    if (text === companionLast) return;
+    companionLast = text; PHONE.publish(text);
+  }
+  window.CleanFrameCompanionSet = function (axis, value) {
+    var patch = {}, i, order;
+    axis = String(axis); value = String(value);
+    try {
+      if (axis === 'mode') { if (MODES.some(function (m) { return m.id === value; })) applyRotation(value); }
+      else if (axis === 'source') { if (SOURCES.some(function (o) { return o.id === value; })) applySource(value); }
+      else if (axis === 'layout') { if (/^(list|dock|shelf)$/.test(value)) setLook({ layout: value === 'list' ? 'list' : 'dock', lstyle: value === 'shelf' ? 'shelf' : 'glass' }, { row: 'layout' }); }
+      else if (axis === 'action') { if (value === 'saver') startSaver(); }
+      else if (axis === 'home.add') { if (app(value)) homeAdd(value); }
+      else if (axis === 'home.remove') { if (app(value)) homeRemove(value); }
+      else if (axis === 'home.up' || axis === 'home.down') {
+        i = S.c.home.indexOf(value); order = S.c.home.slice();
+        if (i >= 0 && (axis === 'home.up' ? i > 0 : i < order.length - 1)) {
+          order.splice(i, 1); order.splice(axis === 'home.up' ? i - 1 : i + 1, 0, value);
+          homeMove(order, value, snap());
+        }
+      }
+      else if (axis === 'wall') { if (wall(value)) setLook({ wall: value }, { row: 'bg' }); }
+      else if (LOOK_VALUES[axis] && LOOK_VALUES[axis].indexOf(value) >= 0) { patch[axis] = value; setLook(patch, { row: axis }); }
+    } catch (e) { log('Companion: ' + e.message); }
+    S.note = ''; render(); publishCompanion(true);
+  };
   function detailSections(t) {
     var flat = S.c.bg !== 'photo', inactive = !materialApplies();
     function options(axis, values, disabled) { return values.map(function (value) { return choice(axis, value, disabled); }); }
@@ -1652,6 +1719,7 @@
     syncVideo(shown);
     syncNpArt();
     if (!S.saver && !saverTimer !== !saverDelay() && !document.hidden) saverReset(); // the delay was switched on or off
+    publishCompanion();
   }
 
   function applyHomeFont() {

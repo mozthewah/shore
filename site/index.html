@@ -109,13 +109,48 @@ footer a{color:var(--muted)}
   .tv{margin-top:44px;padding:8px 8px 0;border-radius:16px 16px 0 0}
   h1{letter-spacing:-1.4px}
 }
+
+/* Motion: everything below is decoration and switches off with reduced motion. */
+.js [data-reveal]{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0) * 70ms)}
+.js [data-reveal].in{opacity:1;transform:none}
+.hero::before{animation:glow 14s ease-in-out infinite alternate}
+@keyframes glow{from{opacity:.75;transform:scale(1)}to{opacity:1;transform:scale(1.08)}}
+.hero .mark{animation:rise 1.2s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.92)}to{opacity:1;transform:none}}
+.hero h1,.hero .lede,.hero .ctas,.hero .note,.hero .pill{animation:rise 1s cubic-bezier(.2,.7,.2,1) both}
+.hero .pill{animation-delay:.1s}.hero h1{animation-delay:.18s}.hero .lede{animation-delay:.28s}.hero .ctas{animation-delay:.38s}.hero .note{animation-delay:.46s}
+.tv{animation:tv-in 1.4s .3s cubic-bezier(.2,.7,.2,1) both}
+@keyframes tv-in{from{opacity:0;transform:translateY(80px) scale(.96)}to{opacity:1;transform:none}}
+.tv-screens{position:relative;aspect-ratio:16/9;border-radius:14px 14px 0 0;overflow:hidden;background:#0b1013}
+.tv-screens img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:0;opacity:0;animation:screen 24s infinite}
+.tv-screens img:nth-child(1){animation-delay:0s}.tv-screens img:nth-child(2){animation-delay:6s}.tv-screens img:nth-child(3){animation-delay:12s}.tv-screens img:nth-child(4){animation-delay:18s}
+@keyframes screen{0%{opacity:0;transform:scale(1.04)}4%{opacity:1}25%{opacity:1}29%{opacity:0;transform:scale(1)}100%{opacity:0}}
+.tv-caption{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);padding:8px 16px;border-radius:999px;background:rgba(10,14,18,.55);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:14px;color:var(--ink);white-space:nowrap}
+.tv-caption span{position:absolute;left:0;right:0;text-align:center;opacity:0;animation:screen 24s infinite}
+.tv-caption span:nth-child(2){animation-delay:6s}.tv-caption span:nth-child(3){animation-delay:12s}.tv-caption span:nth-child(4){animation-delay:18s}
+.tv-caption i{visibility:hidden;font-style:normal}
+.phones .phone{animation:float 7s ease-in-out infinite alternate}
+.phones .phone+.phone{animation-delay:-3.5s}
+@keyframes float{from{translate:0 0}to{translate:0 -12px}}
+.stack .shot:nth-child(2){animation:float 8s ease-in-out infinite alternate}
+.card{transition:transform .25s,border-color .25s,background .25s}
+.card:hover{transform:translateY(-4px);border-color:rgba(242,197,139,.35);background:rgba(255,255,255,.075)}
+.shot img{transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.shot:hover img{transform:scale(1.03)}
+@media (prefers-reduced-motion:reduce){
+  .js [data-reveal]{opacity:1;transform:none;transition:none}
+  .hero::before,.hero .mark,.hero h1,.hero .lede,.hero .ctas,.hero .note,.hero .pill,.tv,.phones .phone,.stack .shot:nth-child(2){animation:none}
+  .tv-screens img,.tv-caption span{animation:none}.tv-screens img:first-child,.tv-caption span:first-child{opacity:1}
+  .card:hover,.shot:hover img{transform:none}
+}
 </style>
+<script>document.documentElement.className+=' js'</script>
 </head>
 <body>
 <nav><div class="wrap">
   <a class="brand" href="#"><img src="icon.png" alt="">Shore</a>
   <ul><li><a href="#features">Features</a></li><li><a href="#music">Music</a></li><li><a href="#screensaver">Screensaver</a></li><li><a href="#companion">Phone companion</a></li><li><a href="#install">Install</a></li><li><a href="https://github.com/taynotfound/shore">GitHub</a></li></ul>
-  <a class="btn primary small" href="https://github.com/taynotfound/shore/releases">Download</a>
+  <a class="btn primary small" href="https://github.com/taynotfound/shore/releases/latest">Download</a>
 </div></nav>
 
 <header class="hero"><div class="wrap">
@@ -124,54 +159,60 @@ footer a{color:var(--muted)}
   <h1>A calm home screen<br>for Google TV.</h1>
   <p class="lede">Shore swaps the busy Google TV home screen for the things you actually use: your apps, your HDMI devices, a beautiful picture and the time. Nothing else.</p>
   <div class="ctas">
-    <a class="btn primary" href="https://github.com/taynotfound/shore/releases">Download the APK</a>
+    <a class="btn primary" href="https://github.com/taynotfound/shore/releases/latest">Download the APK</a>
     <a class="btn ghost" href="https://github.com/taynotfound/shore">View on GitHub</a>
   </div>
   <p class="note">Free and open source (MIT) · No account · No ads · Tested on a TCL 55C6KS</p>
-  <div class="tv"><img src="images/home.jpg" alt="Shore on a TCL Google TV: a coastal photo, the time and a dock of app logos"></div>
+  <div class="tv"><div class="tv-screens">
+    <img src="shots/home-weather.jpg" alt="Shore on a TCL Google TV: Sydney Harbour, the time with the weather and a dock of app logos">
+    <img src="shots/screensaver-mosaic.jpg" alt="" loading="lazy">
+    <img src="shots/nowplaying.jpg" alt="" loading="lazy">
+    <img src="shots/screensaver.jpg" alt="" loading="lazy">
+    <div class="tv-caption" aria-hidden="true"><span>Home</span><span>Screensaver mosaic</span><span>Album art while music plays</span><span>Screensaver</span><i>Album art while music plays</i></div>
+  </div></div>
 </div></header>
 
 <section id="features"><div class="wrap">
   <p class="eyebrow">Features</p>
-  <h2>Everything on one quiet screen.</h2>
-  <p class="intro">Every logo drawn in one style. A picture you choose. Your remote's Home button takes you straight there, and holding it still opens Google TV when you need it.</p>
+  <h2 data-reveal>Everything on one quiet screen.</h2>
+  <p class="intro" data-reveal>Every logo drawn in one style. A picture you choose. Your remote's Home button takes you straight there, and holding it still opens Google TV when you need it.</p>
   <div class="grid">
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10"/></svg></div><h3>Three layouts</h3><p>Dock and List draw every logo in one consistent style. Shelf is an Apple TV–style row of banners with a Top Shelf of what's trending.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M4.5 7h15a1.5 1.5 0 0 1 1.5 1.5V12l-3 4.5H6L3 12V8.5A1.5 1.5 0 0 1 4.5 7Z"/><path d="M7.5 11h9"/></svg></div><h3>HDMI devices, by name</h3><p>Switch on a console and "PlayStation 5" appears, named over HDMI-CEC. Switch it off and the tile goes away.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="9.8" r="1.5"/><path d="m4.5 17.5 4.5-4.5 3 3 2.5-2.5 5 5"/></svg></div><h3>Beautiful wallpapers</h3><p>Fifteen photographs with pre-rendered glass, NASA, Bing and Unsplash online, animated loops, and your own photos from your phone.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></div><h3>Under the clock</h3><p>The weather with a little icon, in °C or °F, with no key or account. And what's playing in Spotify, YouTube or any other app, with a small moving level meter.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/></svg></div><h3>Phone companion</h3><p>Scan a code, frame a photo for the TV right on your phone, and send it. GIFs and clips work too, from an app that looks like the launcher.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="5"/><circle cx="12" cy="8" r="1.6"/><path d="M10 13h4M10 16h4"/></svg></div><h3>Your remote, your rules</h3><p>Home opens Shore. Reassign the app shortcut keys or the TV button to an app, an input or the screensaver.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></div><h3>Its own screensaver</h3><p>Your photos drift slowly by, alone or as a mosaic, with a big clock and the weather. Any button brings Home back. Night mode dims it all on a schedule.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h13"/></svg></div><h3>Eight open fonts</h3><p>Manrope, Inter, Geist, Sora, Outfit and more, with text weight and size, plus four clock sizes.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5Z"/></svg></div><h3>Speaks your language</h3><p>English, German, French, Spanish, Dutch and Polish, following the TV's system language.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10"/></svg></div><h3>Three layouts</h3><p>Dock and List draw every logo in one consistent style. Shelf is an Apple TV–style row of banners with a Top Shelf of what's trending.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><path d="M4.5 7h15a1.5 1.5 0 0 1 1.5 1.5V12l-3 4.5H6L3 12V8.5A1.5 1.5 0 0 1 4.5 7Z"/><path d="M7.5 11h9"/></svg></div><h3>HDMI devices, by name</h3><p>Switch on a console and "PlayStation 5" appears, named over HDMI-CEC. Switch it off and the tile goes away.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="9.8" r="1.5"/><path d="m4.5 17.5 4.5-4.5 3 3 2.5-2.5 5 5"/></svg></div><h3>Beautiful wallpapers</h3><p>Fifteen photographs with pre-rendered glass, NASA, Bing and Unsplash online, animated loops, and your own photos from your phone.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></div><h3>Under the clock</h3><p>The weather with a little icon, in °C or °F, with no key or account. And what's playing in Spotify, YouTube or any other app, with a small moving level meter.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/></svg></div><h3>Phone companion</h3><p>Scan a code, frame a photo for the TV right on your phone, and send it. GIFs and clips work too, from an app that looks like the launcher.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="5"/><circle cx="12" cy="8" r="1.6"/><path d="M10 13h4M10 16h4"/></svg></div><h3>Your remote, your rules</h3><p>Home opens Shore. Reassign the app shortcut keys or the TV button to an app, an input or the screensaver.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></div><h3>Its own screensaver</h3><p>Your photos drift slowly by, alone or as a mosaic, with a big clock and the weather. Any button brings Home back. Night mode dims it all on a schedule.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h13"/></svg></div><h3>Eight open fonts</h3><p>Manrope, Inter, Geist, Sora, Outfit and more, with text weight and size, plus four clock sizes.</p></div>
+    <div class="card" data-reveal><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5Z"/></svg></div><h3>Speaks your language</h3><p>English, German, French, Spanish, Dutch and Polish, following the TV's system language.</p></div>
   </div>
 </div></section>
 
 <section id="music" class="alt"><div class="wrap split">
   <div class="text">
     <p class="eyebrow">Now playing</p>
-    <h2>The music sets the scene.</h2>
-    <p class="intro" style="margin-bottom:0">Play something in Spotify or any music app and Shore notices. <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>The title shows under the clock, and the album art becomes the background until the music stops.</p>
-    <ul class="ticks">
+    <h2 data-reveal>The music sets the scene.</h2>
+    <p class="intro" data-reveal style="margin-bottom:0">Play something in Spotify or any music app and Shore notices. <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>The title shows under the clock, and the album art becomes the background until the music stops.</p>
+    <ul class="ticks" data-reveal>
       <li><b>Wide artist photos.</b> When TheAudioDB has one, Shore shows a full-screen picture of the artist instead of the cover.</li>
       <li><b>Sharp covers.</b> Small covers are swapped for 1000-pixel artwork from iTunes. Only the artist, title and album are sent, and you can switch it off.</li>
       <li><b>Your choice.</b> <i>Settings › Background › Online and album art</i> turns the cover background off, and your wallpaper stays.</li>
     </ul>
   </div>
-  <div class="shot"><img src="shots/nowplaying.jpg" alt="Shore with a song's album art as the background and the title under the clock" loading="lazy"></div>
+  <div class="shot" data-reveal><img src="shots/nowplaying.jpg" alt="Shore with a song's album art as the background and the title under the clock" loading="lazy"></div>
 </div></section>
 
 <section id="screensaver"><div class="wrap split flip">
   <div class="stack">
-    <div class="shot"><img src="shots/screensaver-mosaic.jpg" alt="Shore's screensaver on a TCL TV: three mountain photos as a mosaic with a large clock and the weather" loading="lazy"></div>
-    <div class="shot"><img src="shots/screensaver.jpg" alt="Shore's screensaver on a TCL TV: the Golden Gate Bridge with the clock in the corner" loading="lazy"></div>
+    <div class="shot" data-reveal><img src="shots/screensaver-mosaic.jpg" alt="Shore's screensaver on a TCL TV: three mountain photos as a mosaic with a large clock and the weather" loading="lazy"></div>
+    <div class="shot" data-reveal><img src="shots/screensaver.jpg" alt="Shore's screensaver on a TCL TV: the Golden Gate Bridge with the clock in the corner" loading="lazy"></div>
   </div>
   <div class="text">
     <p class="eyebrow">Screensaver</p>
-    <h2>When nobody's watching.</h2>
-    <p class="intro" style="margin-bottom:0">After a few quiet minutes, Shore fades to its own screensaver instead of Google's.</p>
-    <ul class="ticks">
+    <h2 data-reveal>When nobody's watching.</h2>
+    <p class="intro" data-reveal style="margin-bottom:0">After a few quiet minutes, Shore fades to its own screensaver instead of Google's.</p>
+    <ul class="ticks" data-reveal>
       <li><b>Always moving.</b> Every photo slowly pans and zooms, sometimes alone, sometimes as a mosaic of two or three.</li>
       <li><b>Your photos.</b> It uses your wallpapers, online sources and the photos you sent from your phone.</li>
       <li><b>The clock, the weather and the song.</b> They move to another corner every few minutes, so nothing burns in.</li>
@@ -184,15 +225,15 @@ footer a{color:var(--muted)}
 <section class="alt"><div class="wrap split">
   <div class="text">
     <p class="eyebrow">Top Shelf</p>
-    <h2>What's on, before you open the app.</h2>
-    <p class="intro" style="margin-bottom:0">In the Shelf layout, the focused app fills the screen with what's trending there. Press down for a row of picks, then OK to jump straight in.</p>
-    <ul class="ticks">
+    <h2 data-reveal>What's on, before you open the app.</h2>
+    <p class="intro" data-reveal style="margin-bottom:0">In the Shelf layout, the focused app fills the screen with what's trending there. Press down for a row of picks, then OK to jump straight in.</p>
+    <ul class="ticks" data-reveal>
       <li><b>YouTube, Twitch, ARD, ZDF and ARTE</b> open the exact video or stream</li>
       <li><b>Netflix, Disney+, Prime Video</b> and more show trending titles from TMDB</li>
       <li>Fetched about once an hour, over HTTPS only</li>
     </ul>
   </div>
-  <div class="shot"><img src="images/shelf.jpg" alt="Shelf layout with large app banners and a trending row" loading="lazy"></div>
+  <div class="shot" data-reveal><img src="images/shelf.jpg" alt="Shelf layout with large app banners and a trending row" loading="lazy"></div>
 </div></section>
 
 <section id="companion"><div class="wrap split flip">
@@ -202,9 +243,9 @@ footer a{color:var(--muted)}
   </div>
   <div class="text">
     <p class="eyebrow">Phone companion</p>
-    <h2>Your photos on the big screen.</h2>
-    <p class="intro" style="margin-bottom:0">Turn on <i>Settings › Phone</i> and scan the code. A small web app opens on your phone, served by the TV itself.</p>
-    <ul class="ticks">
+    <h2 data-reveal>Your photos on the big screen.</h2>
+    <p class="intro" data-reveal style="margin-bottom:0">Turn on <i>Settings › Phone</i> and scan the code. A small web app opens on your phone, served by the TV itself.</p>
+    <ul class="ticks" data-reveal>
       <li><b>Send photos, GIFs and short videos.</b> They become wallpapers, with the same frosted glass as the built-in ones.</li>
       <li><b>Frame it first.</b> Each photo opens in the TV's 16:9 shape. Drag and pinch, then send the crop at full resolution.</li>
       <li><b>Set the weather place</b> without typing on the remote.</li>
@@ -216,27 +257,27 @@ footer a{color:var(--muted)}
 
 <section class="alt"><div class="wrap">
   <p class="eyebrow">A closer look</p>
-  <h2>Made for the sofa.</h2>
-  <p class="intro">Big type, clear focus and calm motion. Every screen works with the remote's arrows, OK and Back.</p>
+  <h2 data-reveal>Made for the sofa.</h2>
+  <p class="intro" data-reveal>Big type, clear focus and calm motion. Every screen works with the remote's arrows, OK and Back.</p>
   <div class="gallery">
-    <figure><img src="images/gallery.jpg" alt="Wallpaper gallery" loading="lazy"><figcaption>Wallpaper gallery</figcaption></figure>
-    <figure><img src="images/animated.jpg" alt="Animated wallpapers" loading="lazy"><figcaption>Animated wallpapers</figcaption></figure>
-    <figure><img src="images/inputs-row.jpg" alt="HDMI inputs in their own row" loading="lazy"><figcaption>HDMI devices in their own row</figcaption></figure>
-    <figure><img src="images/layout.jpg" alt="Layout settings" loading="lazy"><figcaption>Layout settings</figcaption></figure>
-    <figure><img src="images/online.jpg" alt="Online wallpaper sources" loading="lazy"><figcaption>Online wallpapers</figcaption></figure>
-    <figure><img src="images/settings.jpg" alt="Settings" loading="lazy"><figcaption>Settings</figcaption></figure>
+    <figure data-reveal><img src="images/gallery.jpg" alt="Wallpaper gallery" loading="lazy"><figcaption>Wallpaper gallery</figcaption></figure>
+    <figure data-reveal><img src="images/animated.jpg" alt="Animated wallpapers" loading="lazy"><figcaption>Animated wallpapers</figcaption></figure>
+    <figure data-reveal><img src="images/inputs-row.jpg" alt="HDMI inputs in their own row" loading="lazy"><figcaption>HDMI devices in their own row</figcaption></figure>
+    <figure data-reveal><img src="images/layout.jpg" alt="Layout settings" loading="lazy"><figcaption>Layout settings</figcaption></figure>
+    <figure data-reveal><img src="images/online.jpg" alt="Online wallpaper sources" loading="lazy"><figcaption>Online wallpapers</figcaption></figure>
+    <figure data-reveal><img src="images/settings.jpg" alt="Settings" loading="lazy"><figcaption>Settings</figcaption></figure>
   </div>
 </div></section>
 
 <section id="install"><div class="wrap">
   <p class="eyebrow">Install</p>
-  <h2>Ten minutes, fully reversible.</h2>
-  <p class="intro">Shore installs next to Google TV, not instead of it. Uninstall it and your TV is exactly as before.</p>
+  <h2 data-reveal>Ten minutes, fully reversible.</h2>
+  <p class="intro" data-reveal>Shore installs next to Google TV, not instead of it. Uninstall it and your TV is exactly as before.</p>
   <ol class="steps">
-    <li><h3>Turn on developer mode</h3><p><i>Settings › System › About</i>, then press OK on <i>Android TV OS build</i> seven times.</p></li>
-    <li><h3>Allow USB or network debugging</h3><p>In <i>Developer options</i>, then connect from a computer with <code>adb connect &lt;tv-ip&gt;</code>.</p></li>
-    <li><h3>Install the APK</h3><p>Download it from Releases and run <code>adb install -r</code> with the file.</p></li>
-    <li><h3>Make Home open Shore</h3><p>Turn on <i>Shore Home button</i> in <i>Settings › System › Accessibility</i>.</p></li>
+    <li data-reveal><h3>Turn on developer mode</h3><p><i>Settings › System › About</i>, then press OK on <i>Android TV OS build</i> seven times.</p></li>
+    <li data-reveal><h3>Allow USB or network debugging</h3><p>In <i>Developer options</i>, then connect from a computer with <code>adb connect &lt;tv-ip&gt;</code>.</p></li>
+    <li data-reveal><h3>Install the APK</h3><p>Download it from Releases and run <code>adb install -r</code> with the file.</p></li>
+    <li data-reveal><h3>Make Home open Shore</h3><p>Turn on <i>Shore Home button</i> in <i>Settings › System › Accessibility</i>.</p></li>
   </ol>
   <p class="note" style="text-align:left;margin-top:24px">The <a href="https://github.com/taynotfound/shore#install">README</a> has the full guide, including Android 14 wireless debugging and an optional, reversible debloat list.</p>
   <div class="langs"><span>English</span><span>Deutsch</span><span>Français</span><span>Español</span><span>Nederlands</span><span>Polski</span></div>
@@ -246,5 +287,20 @@ footer a{color:var(--muted)}
   <div>Shore is based on <a href="https://github.com/nthnclrk/CleanFrame">CleanFrame</a> by Nathan Clark (MIT).<br>Unofficial. Not affiliated with TCL, Google, Samsung or any streaming service.</div>
   <div><a href="https://github.com/taynotfound/shore">Source code</a> · <a href="https://github.com/taynotfound/shore/blob/main/THIRD_PARTY_NOTICES.md">Licences</a></div>
 </div></footer>
+<script>
+/* Reveal on scroll; cards in a row arrive one after another. */
+(function () {
+  var items = document.querySelectorAll('[data-reveal]');
+  if (!('IntersectionObserver' in window)) { for (var k = 0; k < items.length; k++) items[k].classList.add('in'); return; }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+  for (var i = 0; i < items.length; i++) {
+    var el = items[i], sib = el.parentNode ? Array.prototype.indexOf.call(el.parentNode.children, el) : 0;
+    if (/card|steps|gallery/.test(el.parentNode.className + ' ' + el.parentNode.tagName.toLowerCase())) el.style.setProperty('--i', sib % 6);
+    io.observe(el);
+  }
+})();
+</script>
 </body>
 </html>
