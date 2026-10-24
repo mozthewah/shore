@@ -161,13 +161,13 @@
     clear: function () { try { bridge.phoneClear(); } catch (e) { } },
     onChange: function (fn) { phoneListeners.push(fn); }
   };
-  /* Headlines for the clock and the screensaver (News.java): Google News for the TV's language, or the companion's feed. */
+  /* Headlines for the clock and the screensaver (News.java): Google News for the TV's language, a chosen outlet or the companion's feed. */
   var news = bridge.newsInfo ? {
     info: function () {
       var r;
       try { r = JSON.parse(bridge.newsInfo()); } catch (e) { r = {}; }
       var items = (r.items instanceof Array ? r.items : []).filter(function (i) { return i && typeof i.t === 'string' && i.t; }).map(function (i) { return { title: i.t, source: String(i.s || ''), time: +i.d || 0 }; });
-      return { at: +r.at || 0, items: items, error: !!r.error };
+      return { at: +r.at || 0, feed: String(r.feed || ''), items: items, error: !!r.error };
     },
     refresh: function (feed, force) { try { bridge.newsRefresh(String(feed || ''), !!force); } catch (e) { } }
   } : null;

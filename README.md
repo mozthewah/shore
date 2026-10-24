@@ -40,7 +40,7 @@ Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://githu
 **Make it yours**
 - **Eight open-licence fonts**, with text weight and app-name size.
 - **Clock**: 12- or 24-hour, optional date, four sizes and weights.
-- **[Under the clock](#under-the-clock-weather-and-now-playing)**: the current weather in °C or °F (Open-Meteo, no key) and what's playing in Spotify, YouTube or any other app.
+- **[Under the clock](#under-the-clock-weather-music-and-news)**: the current weather in °C or °F (Open-Meteo, no key), what's playing in Spotify, YouTube or any other app, and news headlines from Google News, an outlet you pick or your own feed.
 - **Hide controls when idle**: after 1 or 5 minutes only the picture and clock stay.
 - Focus style and glass materials.
 
@@ -138,29 +138,33 @@ Assignments work everywhere, including inside other apps.
 
 ### HDMI inputs
 
-Inputs come from Android's TV Input Framework. A device that is **plugged in and switched on** gets a tile; standby or unplugged devices are hidden. OK switches the TV to that input, and inputs you rename in the TV settings keep their name. Otherwise a tile uses the name the device announces over HDMI-CEC, such as *PlayStation 5* or *Apple TV*. CEC must be on in the TV settings (TCL calls it *T-Link*); without it the port name, such as *HDMI 1*, is shown. Choose *Settings → Layout → Inputs → First in Home* or *Own row*. When a device switches on while Home is showing (or the screensaver runs), Shore asks *PlayStation 5 is on · Switch / Stay*; OK switches to it, and the question goes away after 20 seconds. Turn this off with *Ask* in the same row.
+Inputs come from Android's TV Input Framework. A device that is **plugged in and switched on** gets a tile; standby or unplugged devices are hidden. OK switches the TV to that input, and inputs you rename in the TV settings keep their name. Otherwise a tile uses the name the device announces over HDMI-CEC, such as *PlayStation 5* or *Apple TV*. CEC must be on in the TV settings (TCL calls it *T-Link*); without it the port name, such as *HDMI 1*, is shown. Choose *Settings → Home screen → Inputs → First in Home* or *Own row*. When a device switches on while Home is showing (or the screensaver runs), Shore asks *PlayStation 5 is on · Switch / Stay*; OK switches to it, and the question goes away after 20 seconds. Turn this off with *Ask* in the same row.
 
 ### Language
 
 Shore uses the TV's system language: German, French, Spanish, Dutch, Polish and Ukrainian are built in, and anything else shows English. Change it in *Settings → System → Language* on the TV, then reopen Shore. Translations live in [`app/i18n.js`](app/i18n.js): one dictionary per language, keyed by the English text, so adding a language means adding one block. In the browser preview, `?lang=de` picks a language.
 
-### Under the clock: weather and Now playing
+### Settings
 
-*Settings → Clock → Under the clock.*
+Shore's settings are two columns of short pages. **Look**: Wallpaper (background type, photo, sources, rotation, motion, calmer photos at night), Home screen, Apps on Home, Style (focus, material, accent, glass) and Text and icons. **When you're away**: Night (night mode, hours, dimming, hiding the controls when idle) and Screensaver. **Clock and info**: Clock, Weather, Music and News. **Shore**: Phone and Google TV (Home, TV settings, remote buttons, setup and updates). Up and Down move within a column, Left and Right cross to the other one. The phone companion lists the same groups.
+
+### Under the clock: weather, music and news
+
+*Settings → Weather, Music and News.*
 
 - **Weather** shows the temperature and sky, such as *12 °C Cloudy*, next to the date. It comes from [Open-Meteo](https://open-meteo.com), which needs no key or account. The place is the city of the TV's time zone (*Europe/Berlin* → Berlin), or the place you type in the [phone companion](#phone-companion). Choose **°C or °F** under *Temperature*. Shore refreshes the weather every 30 minutes, and it is off until you turn it on.
-- **Weather effects** (*Under the clock › Details*) draw the current weather over the photo: rain, a light drizzle, snow, drifting fog, or a storm with the odd flash of lightning. Clear and cloudy skies leave the photo alone. They need Weather on and a Photo background, follow night dimming, and pause whenever Home is not on screen. The layers are pre-drawn and only slide, so the TV never redraws or blurs the photo for them.
-- **Headlines** (*Settings › Clock*) show one news headline under the clock and on the screensaver, with its source, changing every 20 seconds. They are Google News top stories for the TV's language and country, or any RSS or Atom feed you set under *News feed* in the [phone companion](#phone-companion). The TV fetches the feed at most every 30 minutes and keeps only titles, sources and times; nothing else is sent. Off until you turn it on.
-- **Now playing** shows a small moving level meter and *Title · Artist — App* while something plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings → Apps → Special app access → Notification access*; the Clock page has a shortcut. Shore reads only the active media session and ignores notifications themselves. The level meter is decoration: Shore never hears the audio.
-- **Album art** (*Background*): while music with a cover plays, the cover becomes the background, softly blurred and dimmed, and the glass shows it through. It needs a Photo background and goes back to your wallpaper when the music stops. The blur is made once per track on the TV's CPU, not live in the page. Turn it off in *Settings → Background → Online and album art*.
+- **Weather effects** (*Weather › Details*) draw the current weather over the photo: rain, a light drizzle, snow, drifting fog, or a storm with the odd flash of lightning. Clear and cloudy skies leave the photo alone. They need Weather on and a Photo background, follow night dimming, and pause whenever Home is not on screen. The layers are pre-drawn and only slide, so the TV never redraws or blurs the photo for them.
+- **Headlines** (*Settings → News*) show one news headline under the clock and on the screensaver, with its source, changing every 20 seconds. Choose the **source**: Google News top stories for the TV's language and country, a news outlet for the TV's language (for example tagesschau, DER SPIEGEL, ZEIT ONLINE and DW in German, BBC News, The Guardian, NPR and Al Jazeera in English; BBC News is offered in every language), or **Your own feed**, any RSS or Atom feed you save under *News feed* in the [phone companion](#phone-companion). Saving a feed there switches to it. The TV fetches the feed at most every 30 minutes and keeps only titles, sources and times; nothing else is sent. Off until you turn it on.
+- **Now playing** shows a small moving level meter and *Title · Artist — App* while something plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings → Apps → Special app access → Notification access*; the Music page has a shortcut. Shore reads only the active media session and ignores notifications themselves. The level meter is decoration: Shore never hears the audio.
+- **Album art** (*Music*): while music with a cover plays, the cover becomes the background, softly blurred and dimmed, and the glass shows it through. It needs a Photo background and goes back to your wallpaper when the music stops. The blur is made once per track on the TV's CPU, not live in the page. Turn it off in *Settings → Music*.
 - **Sharper pictures** (same page, on by default): media apps often share only a small cover, which looks soft at TV size. Shore then looks up a wide artist picture on [TheAudioDB](https://www.theaudiodb.com) and, if none fits, a 1000-pixel cover from the [iTunes Search API](https://performance-partners.apple.com/search-api). Only the artist name (and title for iTunes) is sent, once per track; results are cached on the TV for 30 days. Turn it off to keep everything on the TV.
-- **Weather icons** next to the temperature follow the sky and switch to night versions after sunset. *Under the clock → Details* hides the icon or the level meter.
+- **Weather icons** next to the temperature follow the sky and switch to night versions after sunset. *Weather → Details* hides the icon; *Music* hides the level meter.
 
 ### Screensaver
 
-*Settings → Night and idle → When idle.* Shore has its own screensaver instead of the TV's: after 5, 10 (default) or 15 minutes without a button press it fades to a slow slideshow of your wallpapers (the sources in rotation, including My photos). Photos drift slowly, and every few slides it shows a mosaic of two or three photos at once. A large clock, the date and the weather sit on top. Turn on *Photo title* (Screensaver options › Motion and clock) to see each photo's name and credit underneath. While music plays it adds a small card with the cover, title and artist; the album art never replaces the photos. The clock moves to another corner every few minutes so nothing sits on the same pixels for hours. Any button wakes Shore without doing anything else. *Start the screensaver now* is on the same page, and the **Screensaver** button on Home and the *Screensaver* remote-button action start it too.
+*Settings → Screensaver.* Shore has its own screensaver instead of the TV's: after 5, 10 (default) or 15 minutes without a button press it fades to a slow slideshow of your wallpapers (the sources in rotation, including My photos). Photos drift slowly, and every few slides it shows a mosaic of two or three photos at once. A large clock, the date and the weather sit on top. Turn on *Photo title* (*Screensaver → Arrangement and clock*) to see each photo's name and credit underneath. While music plays it adds a small card with the cover, title and artist; the album art never replaces the photos. The clock moves to another corner every few minutes so nothing sits on the same pixels for hours. Any button wakes Shore without doing anything else. *Start the screensaver now* is on the same page, and the **Screensaver** button on Home and the *Screensaver* remote-button action start it too.
 
-*Screensaver options* on the same page choose the photos (*Like Home*, which adds Shore's wallpapers when your rotation has only a few; *Everything*; or *Built-in*), the arrangement (mixed, one photo or mosaics) and 15, 30 or 60 seconds per slide. *Motion and clock* switches the slow pan off and hides the clock, the date and weather or the music card.
+The same page chooses when it starts, the photos (*Like Home*, which adds Shore's wallpapers when your rotation has only a few; *Everything*; or *Built-in*) and 15, 30 or 60 seconds per slide. *Arrangement and clock* chooses mixed, one photo or mosaics, switches the slow pan off, fixes or hides the clock, and hides the date and weather or the music card.
 
 While Shore's screensaver is on and Shore is in front, Shore keeps the TV's own screensaver away. After four hours of screensaver it lets go, so the TV's usual sleep timer still turns the TV off. Choose *Off* to leave everything to the TV.
 
@@ -198,7 +202,7 @@ To undo, run the same command with `disallow_listener`.
 - **Send to your TV**: pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. Each photo first opens in a 16:9 frame, the TV's shape: drag to move it, pinch or use the slider to zoom, then **Send**. *Whole photo* sends it uncropped, *Skip* leaves it out. The crop is made on the phone at the photo's own resolution (up to 3840 px wide). They appear under **My photos**, a wallpaper source like the others. Glass is rendered once, rotation cycles through them, and GIFs and clips play animated. Choose *Settings → Phone → My photos* to use them.
 - **My photos**: see what's stored and delete single photos or all of them. Shore keeps the newest 30, in its private storage on the TV.
 - **Weather place**: the city for the weather under the clock.
-- **News feed**: an RSS or Atom address for the headlines; empty means Google News for the TV's language.
+- **News feed**: an RSS or Atom address for the headlines. Saving one makes it the news source (*Your own feed* in *Settings → News*); clearing it goes back to Google News.
 - **TV settings**: every setting from the TV's own Settings, grouped the same way (background and wallpaper, layout, text, clock, focus and colour, night and idle, screensaver), as buttons and switches. Changes apply on the TV at once, as if chosen with the remote, and *Start the screensaver now* is one tap. Shore must be open on the TV (in front or behind another app).
 - **Apps**: reorder Home with the arrows, remove an app, or add one of the other installed apps.
 - **Backup**: *Save backup* stores every TV setting (look, clock, Home apps and their order, wallpaper sources, screensaver) as a `.json` file on the phone. *Restore…* sends one back, after you confirm, to the same TV or another one running Shore. The TV checks the file like its own saved preferences, so a damaged or edited one can't break anything. Photos stay on the TV and are not part of the backup.
@@ -214,7 +218,7 @@ To undo, run the same command with `disallow_listener`.
 
 ## Online and animated wallpapers
 
-*Settings → Background → Online and album art → Wallpaper sources.* Tick as many sources as you like: Shore wallpapers (the bundled gallery), My photos, NASA Astronomy Picture, NASA Image Library, Bing, Wikimedia, Picsum, Unsplash themes and animated loops. Only ticked sources rotate. The page says how many photos are in rotation (or which source couldn't be reached), OK on a row says *Add to rotation* or *Remove from rotation*, and the wallpaper gallery marks every photo that isn't in rotation.
+*Settings → Wallpaper → Sources.* Tick as many sources as you like: Shore wallpapers (the bundled gallery), My photos, NASA Astronomy Picture, NASA Image Library, Bing, Wikimedia, Picsum, Unsplash themes and animated loops. Only ticked sources rotate. The page says how many photos are in rotation (or which source couldn't be reached), OK on a row says *Add to rotation* or *Remove from rotation*, and the wallpaper gallery marks every photo that isn't in rotation.
 
 **Favourites and hiding:** in the wallpaper gallery, press Right to reach **Favourite** and **Hide** under the preview; Up and Down keep stepping through photos, so you can sort several quickly. Favourites always rotate, whatever their source, and favourite online photos are kept on the TV even after their source moves on. Hidden photos never show up in rotation or the screensaver.
 
@@ -237,7 +241,7 @@ Credits for each picture appear in the wallpaper gallery, as the sources' terms 
 
 ## Top Shelf
 
-*Settings → Layout → Shelf.* As on Apple TV, the focused app fills the screen with what is trending there. **Down** opens a row of recommendations. **OK** opens an item directly in YouTube, Twitch, ZDF or ARTE, and opens the app itself for the others. **Up** or **Back** returns to the apps.
+*Settings → Home screen → Layout → Shelf.* As on Apple TV, the focused app fills the screen with what is trending there. **Down** opens a row of recommendations. **OK** opens an item directly in YouTube, Twitch, ZDF or ARTE, and opens the app itself for the others. **Up** or **Back** returns to the apps.
 
 Google TV doesn't share its recommendations with other launchers, so Shore reads public catalogues about once an hour, over HTTPS only:
 

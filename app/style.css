@@ -303,7 +303,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .f-type .sheet .sc.is-lifted .panel-content,.f-type .sheet .er.is-lifted .panel-content{transform:none}
 
 /* Settings overview: each group carries one short, committed summary. */
-.settings-overview{position:absolute;left:112px;top:212px;width:1056px}
+.settings-overview{position:absolute;left:112px;top:196px;width:1696px;display:flex;gap:48px}
+.settings-col{flex:1;min-width:0}
+.settings-head{height:36px;margin:0 28px 10px;font-size:26px;line-height:36px;font-weight:500;letter-spacing:.2px;color:var(--mute)}
+.settings-group+.settings-head{margin-top:30px}
 .settings-group{width:100%;height:112px;padding:12px 32px 12px 28px;border-radius:20px;display:flex;align-items:center;justify-content:space-between;gap:32px;color:var(--ink);transition:background-color 140ms linear,color 140ms linear}
 .settings-group+.settings-group{margin-top:8px}
 .settings-group-copy{min-width:0;display:flex;flex-direction:column;gap:4px}
@@ -511,11 +514,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .is-horizontal .setting-tick .ico{width:26px;height:26px}
 .is-horizontal.is-many .setting-options{gap:2px}.is-horizontal.is-many .setting-choice{padding:12px 12px;gap:8px;font-size:31px}.is-horizontal.is-five .setting-choice{padding:12px 9px;gap:6px;font-size:29px}
 .section-material .setting-choice:last-child{flex:1.4}
-.detail-background .section-rotation .setting-choice{padding-left:128px}
-.detail-focus .setting-section+.setting-section{margin-top:64px}
 .detail-layout .setting-section+.setting-section{margin-top:28px}
-.detail-typography .setting-choice,.detail-rotation .setting-choice{min-height:88px}
-.detail-typography .appearance-rows,.detail-rotation .appearance-rows,.detail-samsung .appearance-rows{top:260px}
+.detail-rotation .setting-choice{min-height:88px}
+.detail-rotation .appearance-rows,.detail-samsung .appearance-rows{top:260px}
 .detail-online .setting-choice,.detail-unsplash .setting-choice,.detail-animated .setting-choice{min-height:72px;padding-top:8px;padding-bottom:8px}
 .setting-choice.has-description{min-height:120px}
 .setting-description{font-size:26px;line-height:36px;font-weight:400;letter-spacing:0;color:var(--mute);white-space:normal}
@@ -646,13 +647,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 /* Idle: controls fade away, the clock and picture stay. */
 .home .dock,.home .utils,.home .input-row,.home .app-focus-name,.home .util-focus-label,.home .ut-lens,.home .focus-status{transition:opacity 900ms ease}
 .is-idle .home .recs,.is-idle .home .hero-text,.is-idle .home .dock,.is-idle .home .utils,.is-idle .home .input-row,.is-idle .home .app-focus-name,.is-idle .home .util-focus-label,.is-idle .ut-lens,.is-idle .focus-status{opacity:0!important}
-/* Settings groups are one line each (name left, current value right) so up to ten fit with even padding. */
+/* Settings groups are one line each (name left, current value right), in two headed columns. */
 .settings-group{height:72px;padding:0 28px 0 28px;gap:24px}
 .settings-group+.settings-group{margin-top:6px}
 .settings-group-copy{flex:1;flex-direction:row;align-items:baseline;justify-content:space-between;gap:32px}
 .settings-group-name{flex:none;font-size:38px;line-height:46px}
 .settings-group-value{min-width:0;overflow:hidden;text-overflow:ellipsis;text-align:right;font-size:28px;line-height:36px}
-.detail-clock .setting-section+.setting-section,.detail-display .setting-section+.setting-section{margin-top:20px}
+/* The fuller pages use tighter section gaps so they fit above the OK hint without scrolling. */
+.detail-background .setting-section+.setting-section,.detail-focus .setting-section+.setting-section,.detail-typography .setting-section+.setting-section,.detail-clock .setting-section+.setting-section,.detail-display .setting-section+.setting-section,
+.detail-music .setting-section+.setting-section,.detail-news .setting-section+.setting-section,.detail-screensaver .setting-section+.setting-section,.detail-saverlook .setting-section+.setting-section{margin-top:20px}
+.detail-background .is-horizontal .setting-choice,.detail-saverlook .is-horizontal .setting-choice{min-height:84px}
+.section-nsrc .setting-choice,.section-svshow .setting-choice{min-height:60px;padding-top:4px;padding-bottom:4px}
 /* Shelf layout (tvOS-inspired): Android TV banner cards without the glass dock; the focused card lifts.
    Slots are 288x250: the 260x146 card sits 40px down so its lift and growth stay inside the clipped shelf. */
 .ls-shelf .dock .mat,.ls-shelf .dock .plate,.ls-shelf .dock-action,.ls-shelf .tile .nudge{display:none}
@@ -689,6 +694,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .recs-sub{font-size:24px;line-height:30px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .detail-remote .setting-choice,.detail-remotepick .setting-choice,.detail-remoteapp .setting-choice{min-height:64px;padding-top:6px;padding-bottom:6px;font-size:34px;line-height:44px}
 .detail-remotepick .setting-section+.setting-section{margin-top:20px}
+.setting-choice.is-pair .setting-name{flex:none}
 .setting-choice.is-pair .setting-copy{flex:1;flex-direction:row;align-items:baseline;justify-content:space-between;gap:24px}
 .setting-choice.is-pair .setting-description{font-size:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Under the clock: now playing; My photos: QR code for the phone page */

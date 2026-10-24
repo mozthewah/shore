@@ -369,8 +369,17 @@ try {
   });
   await run('Settings overview and visible choices', async () => {
     await page(); await scene('settings');
-    const expected = ['settings.group.background', 'settings.group.layout', 'settings.group.typography', 'settings.group.focus', 'settings.editor', 'settings.group.samsung'];
-    check('Overview has all six settings groups', same((await call('actions')).filter(a => expected.includes(a)).sort(), expected.slice().sort()));
+    const expected = ['settings.group.background', 'settings.group.layout', 'settings.editor', 'settings.group.focus', 'settings.group.typography', 'settings.group.display', 'settings.group.screensaver',
+      'settings.group.clock', 'settings.group.weather', 'settings.group.samsung'];
+    check('Overview has every settings group', same((await call('actions')).filter(a => a.startsWith('settings.')).sort(), expected.slice().sort()), await call('actions'));
+    check('Overview starts on Wallpaper', (await state()).focusAction === 'settings.group.background');
+    await nav('down', 'down', 'down', 'down', 'down');
+    check('Down moves through the Look column into When you’re away', (await state()).focusAction === 'settings.group.display', await state());
+    await nav('right');
+    check('Right crosses to the nearest row of the other column', (await state()).focusAction === 'settings.group.samsung', await state());
+    await nav('left');
+    check('Left returns to the nearest row of the Look column', (await state()).focusAction === 'settings.group.focus', await state());
+    await nav('back'); await scene('settings');
     const specs = {
       background: { bg: ['dark', 'light', 'photo'] },
       layout: { layout: ['list', 'dock', 'shelf'], apps: ['icons', 'both', 'text'], controls: ['icons', 'both', 'text'] },
@@ -514,12 +523,7 @@ try {
     await page();
     for (const bg of ['dark', 'light']) {
       await look({ bg }); await group('background'); const before = await settingsSnapshot();
-      for (const action of ['background.wallpaper', 'background.rotation']) {
-        check(bg + ' marks ' + action + ' inactive', await current.locator('[data-action="' + action + '"]').getAttribute('aria-disabled') === 'true');
-        const focusBefore = (await state()).focusAction;
-        await current.locator('[data-action="' + action + '"]').click({ force: true });
-        check('Inactive ' + action + ' ignores pointer focus and keeps preferences', same(await settingsSnapshot(), before) && (await state()).settingsGroup === 'background' && (await state()).focusAction === focusBefore);
-      }
+      for (const action of ['background.wallpaper', 'background.rotation']) check(bg + ' hides ' + action, await current.locator('[data-action="' + action + '"]').count() === 0);
       await walkEnabledChoices();
       check(bg + ' remote navigation skips inactive photo tools', same(await settingsSnapshot(), before));
       const reason = await current.locator('.setting-reason:visible').allTextContents();
@@ -858,12 +862,11 @@ try {
     check('Live 12-hour clock has no AM/PM', /^\s*\d{1,2}:\d{2}\s*$/.test(clock), clock);
   });
   await run('Clock weather toggle and browser-only extras', async () => {
-    await page(); await group('clock');
-    check('Clock links to Under the clock', await current.locator('[data-action="open.clockextra"]').count() === 1);
-    await act('open.clockextra');
-    check('Under the clock offers weather', await current.locator('[data-action="choice.cweather.on"]').count() === 1);
+    await page(); await scene('settings');
+    check('Music settings are Android-only', !(await call('actions')).includes('settings.group.music'));
+    await group('weather');
+    check('Weather page offers weather', await current.locator('[data-action="choice.cweather.on"]').count() === 1);
     check('Temperature unit waits for weather', await current.locator('[data-action="choice.wunit.f"].is-disabled').count() === 1);
-    check('Now playing is Android-only', await current.locator('[data-action="choice.cplaying.on"]').count() === 0);
     await act('choice.cweather.on'); await ready();
     check('Weather toggle persists', (await stored()).look.cweather === 'on');
     check('Weather note credits Open-Meteo', /Open-Meteo/.test(await current.locator('#stage').innerText()));
@@ -875,13 +878,11 @@ try {
     check('Weather toggles back off', (await stored()).look.cweather === 'off');
   });
   await run('Screensaver starts when idle and any key wakes Shore', async () => {
-    await page({ minuteMs: 120 }); await group('display');
-    check('Night and idle links to When idle', await current.locator('[data-action="open.idle"]').count() === 1);
-    await act('open.idle');
+    await page({ minuteMs: 120 }); await group('screensaver');
     check('Screensaver is off by default in the browser', (await current.evaluate(() => ShoreQA.saver())).on === false && await current.locator('[data-action="choice.saver.off"].is-applied, [data-action="choice.saver.off"]').count() === 1);
     await act('choice.saver.5'); await ready();
     check('Screensaver delay persists', (await stored()).look.saver === '5');
-    await nav('back'); await nav('back'); await nav('back');
+    await nav('back'); await nav('back');
     await current.waitForFunction(() => ShoreQA.saver().on, null, { timeout: 5000 });
     check('Screensaver starts after the idle time', (await current.evaluate(() => ShoreQA.saver())).on);
     await current.waitForFunction(() => !!ShoreQA.saver().photo, null, { timeout: 5000 });
@@ -893,12 +894,13 @@ try {
     check('Screensaver off stops the timer', !(await current.evaluate(() => ShoreQA.saver())).scheduled || (await current.keyboard.press('ArrowLeft'), !(await current.evaluate(() => ShoreQA.saver())).scheduled));
   });
   await run('Screensaver options: arrangement, motion and what shows', async () => {
-    await page(); await group('display'); await act('open.idle'); await act('open.saveropts');
-    check('Screensaver options offer photos, arrangement and slide time', await current.locator('[data-action^="choice.svsrc."]').count() === 3
-      && await current.locator('[data-action^="choice.svlay."]').count() === 3 && await current.locator('[data-action^="choice.svtime."]').count() === 3);
+    await page(); await group('screensaver');
+    check('Screensaver page offers start time, photos, slide time and Start now', await current.locator('[data-action^="choice.saver."]').count() === 4 && await current.locator('[data-action^="choice.svsrc."]').count() === 3
+      && await current.locator('[data-action^="choice.svtime."]').count() === 3 && await current.locator('[data-action="saver.start"]').count() === 1);
+    await act('open.saverlook');
+    check('Arrangement and clock offers the arrangements', await current.locator('[data-action^="choice.svlay."]').count() === 3);
     await act('choice.svlay.single'); await ready();
     check('Arrangement persists', (await stored()).look.svlay === 'single');
-    await act('open.saverlook');
     await act('choice.svclock.on'); await ready();
     check('Clock toggle turns the saver clock off', (await stored()).look.svclock === 'off');
     await act('choice.svmotion.still'); await ready();
@@ -910,10 +912,11 @@ try {
     await current.evaluate(() => ShoreQA.saver(false));
   });
   await run('Personal touches: accent, glass, icons, clock position and seconds', async () => {
-    await page(); await group('focus'); await act('open.focusmore');
-    await act('choice.tint.warm'); await ready(); await act('choice.dglass.solid'); await ready(); await act('choice.isize.large'); await ready();
+    await page(); await group('focus');
+    await act('choice.tint.warm'); await ready(); await act('choice.dglass.solid'); await ready();
+    await nav('back'); await act('settings.group.typography'); await act('choice.isize.large'); await ready();
     const look = (await stored()).look;
-    check('Colour and motion choices persist', look.tint === 'warm' && look.dglass === 'solid' && look.isize === 'large', look);
+    check('Style and icon size choices persist', look.tint === 'warm' && look.dglass === 'solid' && look.isize === 'large', look);
     check('Stage carries the chosen accent, glass and icon size', await current.evaluate(() => /tint-warm/.test(document.getElementById('stage').className) && /dg-solid/.test(document.getElementById('stage').className) && /is-large/.test(document.getElementById('stage').className)));
     await current.evaluate(() => ShoreQA.look({ layout: 'dock', cpos: 'center', csec: 'on' })); await ready(); await current.evaluate(() => ShoreQA.scene('home'));
     check('Seconds show in the clock', /\d:\d\d:\d\d/.test(await current.evaluate(() => document.querySelector('.caption .clock').textContent)));
@@ -945,8 +948,8 @@ try {
     await current.evaluate(() => ShoreQA.look({ bg: 'dark' }));
     check('No weather layer without a photo', !(await current.evaluate(() => / wx-/.test(document.getElementById('stage').className))));
     await current.evaluate(() => ShoreQA.look({ bg: 'photo' }));
-    await group('clock'); await act('open.clockextra');
-    check('Clock details offer Weather effects', (await current.evaluate(() => ShoreQA.actions())).includes('choice.wfx.on'));
+    await group('weather');
+    check('Weather page offers Weather effects', (await current.evaluate(() => ShoreQA.actions())).includes('choice.wfx.on'));
   });
   await run('Headlines under the clock', async () => {
     await page({ seed: baseline({ bg: 'photo', cnews: 'on' }) });
@@ -957,6 +960,11 @@ try {
     check('Clock updates keep the headline element (no replayed fade)', same);
     await current.evaluate(() => ShoreQA.look({ cnews: 'off' }));
     check('Turning Headlines off removes the line', await current.evaluate(() => document.querySelector('.cap-news-line').textContent === ''));
+    await current.evaluate(() => ShoreQA.look({ cnews: 'on' })); await group('news');
+    check('News page lists Google News and outlets', await current.evaluate(() => ['choice.nsrc.google', 'choice.nsrc.bbc', 'choice.nsrc.guardian'].every(a => ShoreQA.actions().includes(a))));
+    await act('choice.nsrc.bbc'); await ready();
+    check('Chosen outlet persists', (await stored()).look.nsrc === 'bbc');
+    check('Headline names the chosen outlet', /^BBC News/.test(await current.evaluate(() => document.querySelector('.cap-news').textContent)), await current.evaluate(() => document.querySelector('.cap-news').textContent));
   });
   await run('Favourite and hidden wallpapers', async () => {
     await page({ seed: baseline({ mode: 'open', hide: [walls[1].id] }) });
