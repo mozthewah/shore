@@ -112,14 +112,4 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
 .chip.check.on::after{opacity:1}
 .backup-buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .backup-buttons .button{flex:1 1 140px}
-.remote{display:flex;flex-direction:column;align-items:center;gap:16px}
-.dpad{display:grid;grid-template-columns:repeat(3,76px);grid-template-rows:repeat(3,76px);gap:8px}
-.dpad .up{grid-area:1/2}.dpad .left{grid-area:2/1}.dpad .ok{grid-area:2/2;border-radius:50%;background:var(--ink);color:#141b20}.dpad .right{grid-area:2/3}.dpad .down{grid-area:3/2}
-.rk{min-width:76px;min-height:56px;border:0;border-radius:20px;background:rgba(255,255,255,.14);color:var(--ink);font:600 18px Manrope,system-ui,sans-serif;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s,background .2s;touch-action:manipulation}
-.rk:active{transform:scale(.94);background:rgba(255,255,255,.26)}
-.dpad .rk{min-height:76px}
-.rrow{display:flex;gap:10px;width:100%;justify-content:center}.rrow .rk{flex:1;max-width:120px}
-.remote .quiet{text-align:center;font-size:14px}
-.quiet.center{text-align:center}
-.link{background:none;border:0;padding:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
 [hidden]{display:none!important}

@@ -49,7 +49,6 @@ final class Companion {
     interface Listener { void changed(int count); }
     /** Applies a setting chosen on the phone; MainActivity hands it to the page. */
     /** Buttons from the phone remote, answered right away so the phone can say when a button can't reach the TV. */
-    interface Keys { boolean press(String key); }
 
     interface Commands {
         void set(String axis, String value);
@@ -88,8 +87,6 @@ final class Companion {
 
     void setListener(Listener l) { listener = l; }
     void setCommands(Commands c) { commands = c; if (c == null) state = ""; }
-    private volatile Keys keys;
-    void setKeys(Keys k) { keys = k; }
     void setState(String json) { state = json == null || json.length() > 512 * 1024 ? "" : json; }
 
     boolean enabled() { return prefs.getBoolean("enabled", false); }
@@ -248,25 +245,6 @@ final class Companion {
                 if (c == null || state.isEmpty()) { send(out, 503, "application/json", "{\"offline\":true}"); return; }
                 c.set(axis, value);
                 send(out, 200, "application/json", "{\"ok\":true}");
-                return;
-            }
-            if (method.equals("POST") && api.equals("key")) {
-                String k = param(query, "k");
-                Keys handler = keys;
-                if (!k.matches("up|down|left|right|ok|back|home|play|next|prev|volup|voldown|mute")) { send(out, 400, "application/json", "{\"error\":\"bad\"}"); return; }
-                if (handler == null) { send(out, 503, "application/json", "{\"offline\":true}"); return; }
-                send(out, 200, "application/json", "{\"ok\":" + handler.press(k) + ",\"sdk\":" + android.os.Build.VERSION.SDK_INT + ",\"atv\":" + JSONObject.quote(AtvRemote.get(context).status()) + "}");
-                return;
-            }
-            // Pairing with the TV's own remote service, so the arrows work in every app (see AtvRemote).
-            if (api.startsWith("remote/")) {
-                AtvRemote r = AtvRemote.get(context);
-                boolean ok = true;
-                if (method.equals("POST") && api.equals("remote/pair")) ok = r.startPairing();
-                else if (method.equals("POST") && api.equals("remote/code")) ok = r.finishPairing(param(query, "c"));
-                else if (method.equals("POST") && api.equals("remote/forget")) r.forget();
-                else if (!(method.equals("GET") && api.equals("remote/status"))) { send(out, 404, "text/plain", "Not found"); return; }
-                send(out, 200, "application/json", new JSONObject().put("ok", ok).put("atv", r.status()).put("sdk", android.os.Build.VERSION.SDK_INT).toString());
                 return;
             }
             if (method.equals("GET") && api.equals("backup")) {

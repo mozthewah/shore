@@ -32,8 +32,6 @@ public class MainActivity extends Activity {
     private TopShelf topShelf;
     private Companion phone;
     private RemoteKeys.Listener remoteListener;
-    /** Shore is the app in front: the phone remote then drives its UI directly. */
-    static volatile boolean inFront;
 
     /** Tells the page when an HDMI device is plugged in, powered on or switched off. */
     private final TvInputManager.TvInputCallback inputCallback = new TvInputManager.TvInputCallback() {
@@ -46,6 +44,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        deleteSharedPreferences("atvremote"); // key of the removed remote-service pairing (0.8.4x)
         if (getIntent() != null && getIntent().getBooleanExtra(EXTRA_SAVER, false)) saverRequest = true;
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
@@ -88,7 +87,6 @@ public class MainActivity extends Activity {
                 runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFrameCompanionRestore&&window.CleanFrameCompanionRestore(" + org.json.JSONObject.quote(json) + ")", null); });
             }
         });
-        phone.setKeys(this::remoteKey);
         phone.setListener(count -> {
             online.phoneChanged();
             runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFramePhoneChanged&&window.CleanFramePhoneChanged(" + count + ")", null); });
@@ -146,32 +144,6 @@ public class MainActivity extends Activity {
     }
 
     /** One button from the phone remote. Returns whether it reached something. */
-    private boolean remoteKey(String key) {
-        switch (key) {
-            case "volup": case "voldown": case "mute": {
-                android.media.AudioManager audio = (android.media.AudioManager) getSystemService(AUDIO_SERVICE);
-                if (audio == null) return false;
-                audio.adjustSuggestedStreamVolume(key.equals("volup") ? android.media.AudioManager.ADJUST_RAISE : key.equals("voldown") ? android.media.AudioManager.ADJUST_LOWER : android.media.AudioManager.ADJUST_TOGGLE_MUTE,
-                        android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.FLAG_SHOW_UI);
-                return true;
-            }
-            case "play": return NowPlayingService.control(this, null, "toggle");
-            case "next": case "prev": return NowPlayingService.control(this, null, key);
-            case "home":
-                if (inFront) { runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFrameRemoteKey&&window.CleanFrameRemoteKey('home')", null); }); return true; }
-                return atvPress("home") || HomeButtonService.remote("home");
-            default:
-                if (inFront) { runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFrameRemoteKey&&window.CleanFrameRemoteKey(" + org.json.JSONObject.quote(key) + ")", null); }); return true; }
-                return atvPress(key) || HomeButtonService.remote(key);
-        }
-    }
-
-    /** In another app: a real remote key through the TV's remote service, once the phone has paired Shore with it. */
-    private boolean atvPress(String key) {
-        AtvRemote r = AtvRemote.get(this);
-        return r.paired() && r.press(key);
-    }
-
     private void inputsChanged() {
         if (web != null) web.evaluateJavascript("window.CleanFrameInputsChanged&&window.CleanFrameInputsChanged()", null);
     }
@@ -200,7 +172,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        inFront = true;
         if (web != null) { web.onResume(); web.resumeTimers(); web.requestFocus(); inputsChanged(); remoteChanged(); }
         if (online != null) online.refreshIfStale();
         if (phone != null) phone.resume();
@@ -210,7 +181,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         RemoteKeys.learn(false); // never capture a button while another app is in front
-        inFront = false;
         if (web != null) web.onPause(); // stops wallpaper rotation work while an app is open
         super.onPause();
     }
@@ -221,7 +191,7 @@ public class MainActivity extends Activity {
         if (online != null) online.setListener(null);
         if (topShelf != null) topShelf.setListener(null);
         Updater.get(this).setListener(null);
-        if (phone != null) { phone.setListener(null); phone.setCommands(null); phone.setKeys(null); phone.stop(); }
+        if (phone != null) { phone.setListener(null); phone.setCommands(null); phone.stop(); }
         if (RemoteKeys.listener == remoteListener) { RemoteKeys.listener = null; RemoteKeys.learn(false); }
         if (web != null) { web.removeJavascriptInterface("CleanFrameAndroid"); web.destroy(); web = null; }
         super.onDestroy();

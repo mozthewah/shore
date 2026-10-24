@@ -36,33 +36,12 @@ public class HomeButtonService extends AccessibilityService {
         @Override public void run() { longFired = true; openSystemHome(); }
     };
 
-    private static volatile HomeButtonService instance;
 
     @Override
-    protected void onServiceConnected() { connected = true; instance = this; RemoteKeys.notifyChanged(); }
+    protected void onServiceConnected() { connected = true; RemoteKeys.notifyChanged(); }
 
     @Override
-    public boolean onUnbind(Intent intent) { connected = false; instance = null; RemoteKeys.notifyChanged(); return super.onUnbind(intent); }
-
-    /**
-     * The phone remote outside Shore: Back everywhere, arrows and OK as accessibility global actions (Android 13+),
-     * Home opens Shore. Uses only global actions, so no window content is read. False when the service is off.
-     */
-    static boolean remote(String key) {
-        HomeButtonService s = instance;
-        if (s == null) return false;
-        if (key.equals("home")) { s.handler.post(s::openCleanFrame); return true; }
-        if (key.equals("back")) return s.performGlobalAction(GLOBAL_ACTION_BACK);
-        if (android.os.Build.VERSION.SDK_INT < 33) return false;
-        switch (key) {
-            case "up": return s.performGlobalAction(GLOBAL_ACTION_DPAD_UP);
-            case "down": return s.performGlobalAction(GLOBAL_ACTION_DPAD_DOWN);
-            case "left": return s.performGlobalAction(GLOBAL_ACTION_DPAD_LEFT);
-            case "right": return s.performGlobalAction(GLOBAL_ACTION_DPAD_RIGHT);
-            case "ok": return s.performGlobalAction(GLOBAL_ACTION_DPAD_CENTER);
-            default: return false;
-        }
-    }
+    public boolean onUnbind(Intent intent) { connected = false; RemoteKeys.notifyChanged(); return super.onUnbind(intent); }
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {

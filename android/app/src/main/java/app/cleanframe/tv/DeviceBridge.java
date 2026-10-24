@@ -7,7 +7,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.media.tv.TvContract;
@@ -43,16 +42,6 @@ final class DeviceBridge {
         this.online = online;
         this.topShelf = topShelf;
         this.phone = phone;
-    }
-
-    /** Debuggable builds only: drives the remote-service pairing from DevTools (pair, code, press, forget, status). */
-    @JavascriptInterface
-    public String atvDebug(String action, String arg) {
-        if ((context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) == 0) return "off";
-        AtvRemote r = AtvRemote.get(context);
-        boolean ok = action.equals("pair") ? r.startPairing() : action.equals("code") ? r.finishPairing(arg) : action.equals("press") ? r.press(arg) : true;
-        if (action.equals("forget")) r.forget();
-        return ok + " " + r.status();
     }
 
     /** Cached headlines: {at, feed, items:[{t, s, d}], error}. */
