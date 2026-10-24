@@ -28,6 +28,7 @@ android {
         targetSdk 35
         versionCode commitCount
         versionName "0.8.${commitCount}"
+        buildConfigField 'boolean', 'PUBLIC_BUILD', publicBuild ? 'true' : 'false'
         buildConfigField 'String', 'UNSPLASH_ACCESS_KEY', '"' + secret('unsplash.accessKey', 'UNSPLASH_ACCESS_KEY', '') + '"'
         buildConfigField 'String', 'PEXELS_API_KEY', '"' + secret('pexels.apiKey', 'PEXELS_API_KEY', '') + '"'
         buildConfigField 'String', 'KLIPY_API_KEY', '"' + secret('klipy.apiKey', 'KLIPY_API_KEY', '') + '"'

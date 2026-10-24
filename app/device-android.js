@@ -164,6 +164,24 @@
     },
     openSettings: function (done) { reply(ask('nowPlayingSettings'), done, 'Notification access could not open.'); }
   };
+  /* In-app updates: the native side checks the public releases, verifies the APK and opens Android's installer. */
+  var updateListeners = [];
+  window.CleanFrameUpdateChanged = function () { updateListeners.forEach(function (fn) { try { fn(); } catch (e) { } }); };
+  var update = bridge.updateInfo ? {
+    /* {status, error, progress, current, latest, title, size, auto, personal, canInstall} */
+    info: function () {
+      var r;
+      try { r = JSON.parse(bridge.updateInfo()); } catch (e) { r = {}; }
+      var states = ['idle', 'checking', 'current', 'available', 'downloading', 'ready', 'installing', 'error'];
+      return { status: states.indexOf(r.status) >= 0 ? r.status : 'idle', error: String(r.error || ''), progress: Math.max(0, Math.min(100, +r.progress || 0)),
+        current: String(r.current || ''), latest: String(r.latest || ''), title: String(r.title || ''), size: +r.size || 0,
+        auto: r.auto !== false, personal: !!r.personal, canInstall: r.canInstall !== false };
+    },
+    check: function () { try { bridge.updateCheck(); } catch (e) { } },
+    install: function () { try { bridge.updateInstall(); } catch (e) { } },
+    auto: function (on) { try { bridge.updateAuto(!!on); } catch (e) { } },
+    onChange: function (fn) { updateListeners.push(fn); }
+  } : null;
   /* Shore's own screensaver: keeps the TV's screensaver away while enabled, and starts from a remote button. */
   var saver = {
     keepAwake: function (on) { try { bridge.keepAwake(!!on); } catch (e) { } },
@@ -171,7 +189,7 @@
     openSettings: function (done) { reply(ask('screensaverSettings'), done, 'Screensaver settings could not open.'); }
   };
   window.FrameDevice = {
-    platform: 'android', phone: phone, nowPlaying: nowPlaying, saver: saver,
+    platform: 'android', phone: phone, nowPlaying: nowPlaying, saver: saver, update: update,
     launch: launch, launchApp: launchApp, apps: apps,
     inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */

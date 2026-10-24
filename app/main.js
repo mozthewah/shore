@@ -133,7 +133,7 @@
     writes: 0, failed: 0, log: [], logN: 0, lastLaunch: null, press: null,
     wallShown: null, wallPending: null, wallError: null,
     shown: null, pending: null, lookError: null, bundleKey: null, previewBundle: null, reflow: false, fontSwitch: false,
-    phone: { enabled: false, url: '', qr: '', count: 0, place: '' }, playing: { access: false, playing: false, key: '' }, saver: false,
+    phone: { enabled: false, url: '', qr: '', count: 0, place: '' }, update: null, playing: { access: false, playing: false, key: '' }, saver: false,
     remote: { service: false, keys: [], learning: false, missed: false, timer: 0 }
   };
   var scroll = { first: 0, off: 0, photo: 0, photoArrange: 0 };
@@ -608,7 +608,7 @@
   function openSettings() { push({ id: 'settings', f: { id: S.settingsFocus } }); }
   function openAppearance(group) {
     var axis = { background: 'bg', layout: 'layout', typography: 'tweight', fonts: 'font', focus: 'focus', clock: 'cformat', display: 'night' }[group];
-    var action = S.detailFocus[group] || (axis ? 'choice.' + axis + '.' + S.c[axis] : group === 'rotation' ? 'rotation.' + S.c.mode : PARENT[group] === 'online' || group === 'online' ? 'online.' + sourceList()[0] : 'samsung.home');
+    var action = S.detailFocus[group] || (axis ? 'choice.' + axis + '.' + S.c[axis] : group === 'rotation' ? 'rotation.' + S.c.mode : PARENT[group] === 'online' || group === 'online' ? 'online.' + sourceList()[0] : group === 'updates' ? updateSections()[0].items[0].action : 'samsung.home');
     push({ id: 'appearance', group: group, f: { action: action } });
   }
   function openMessage(key) { push({ id: 'message', msg: key, f: { b: 0 } }); }
@@ -943,7 +943,7 @@
   function closeEditor() { clearSession(); pop(); }
 
   /* ---------- Settings, Layout and messages ---------- */
-  var PARENT = { focusmore: 'focus', saveropts: 'idle', saverlook: 'saveropts', rotation: 'background', bgmore: 'background', online: 'bgmore', clockextra: 'clock', idle: 'display', unsplash: 'online', animated: 'online', fonts: 'typography', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
+  var PARENT = { updates: 'samsung', focusmore: 'focus', saveropts: 'idle', saverlook: 'saveropts', rotation: 'background', bgmore: 'background', online: 'bgmore', clockextra: 'clock', idle: 'display', unsplash: 'online', animated: 'online', fonts: 'typography', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
   function subPage(t) { return !!PARENT[t.group]; }
   function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : DETAIL_NAMES[group]; }
   function parentName(t) { return PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
@@ -971,7 +971,7 @@
       { id: 'display', label: 'Night and idle', value: S.c.night === 'off' ? 'Night mode off' : S.c.night === 'always' ? 'Always dimmed' : 'Dimmed ' + VALUE_NAMES[S.c.nhours] },
       { id: 'focus', label: 'Focus', value: VALUE_NAMES[S.c.focus] + (materialApplies() ? ', ' + VALUE_NAMES[S.c.material] : '') },
       { id: 'editor', label: 'Apps on Home', value: n + (n === 1 ? ' app' : ' apps') },
-      { id: 'samsung', label: TV.brand, value: 'Home and TV settings' }]
+      { id: 'samsung', label: TV.brand, value: updateReady() ? 'Shore update available' : 'Home and TV settings' }]
       .concat(PHONE ? [{ id: 'phone', label: 'Phone', value: !S.phone.enabled ? 'Phone companion off' : S.phone.count ? (S.phone.count === 1 ? '1 photo' : S.phone.count + ' photos') : 'Phone companion on' }] : []);
   }
   function settingsIds() { return settingsRows().map(function (r) { return r.id; }); }
@@ -993,7 +993,7 @@
     else if (id === 'phone') openPhone();
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Wallpaper sources', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', clockextra: 'Under the clock', idle: 'When idle', bgmore: 'Online and album art', saveropts: 'Screensaver options', saverlook: 'Motion and clock', focusmore: 'Colour and motion' };
+  var DETAIL_NAMES = { updates: 'Shore updates', fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Wallpaper sources', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', clockextra: 'Under the clock', idle: 'When idle', bgmore: 'Online and album art', saveropts: 'Screensaver options', saverlook: 'Motion and clock', focusmore: 'Colour and motion' };
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
@@ -1274,6 +1274,31 @@
   var PHONE = ANDROID && FrameDevice.phone && ONLINE_INFO.phone ? FrameDevice.phone : null;
   var phoneWall = '';
   function openPhone() { S.phone = PHONE.info(); openAppearance('phone'); }
+  /* ---------- Updates: the native side checks the public releases and opens Android's installer ---------- */
+  var UPDATE = ANDROID && FrameDevice.update ? FrameDevice.update : null;
+  function updateReady() { return S.update && (S.update.status === 'available' || S.update.status === 'ready'); }
+  function updateLine() {
+    var u = S.update;
+    if (!u) return '';
+    if (u.status === 'checking') return 'Checking…';
+    if (u.status === 'downloading') return 'Downloading ' + u.progress + '%';
+    if (u.status === 'installing') return 'Opening the installer…';
+    if (updateReady()) return 'Update available: ' + u.latest;
+    if (u.status === 'error') return 'Couldn’t check for updates';
+    return 'Version ' + u.current;
+  }
+  function updateSections() {
+    var u = S.update, main;
+    if (u.status === 'downloading') main = { action: 'update.wait', label: 'Downloading Shore ' + u.latest, description: u.progress + '%' };
+    else if (u.status === 'installing') main = { action: 'update.wait', label: 'Opening the installer…', description: 'Android asks you to confirm' };
+    else if (updateReady()) main = { action: 'update.install', label: 'Install Shore ' + u.latest, description: u.title || (u.size ? (u.size / 1048576).toFixed(1) + ' MB' : '') };
+    else main = { action: 'update.check', label: u.status === 'checking' ? 'Checking…' : 'Check for updates', description: u.status === 'current' ? 'Shore ' + u.current + ' is the latest version' : 'You have Shore ' + u.current };
+    return [{ id: 'update', title: '', items: [main, { action: 'update.auto', label: 'Check automatically', description: 'Every few hours, when Shore opens', tick: true, applied: u.auto }],
+      reason: u.status === 'error' ? u.error
+        : updateReady() && u.personal ? 'This copy was built with your own keys. The public update has none, so Unsplash, Pexels, Klipy and Top Shelf stop until you build Shore again.'
+        : updateReady() && !u.canInstall ? 'First, Shore asks for permission to install apps. Allow it, then come back and press OK again.'
+        : 'Updates come from Shore’s public releases. Android asks you to confirm, and your settings and photos stay.' }];
+  }
   /* Settings › Phone: the Shore Companion web app, paired by QR code, and the photos it sent. */
   function phoneSections(flat) {
     var p = S.phone, n = p.count;
@@ -1431,6 +1456,7 @@
         reason: flat ? 'Accent, glass and motion need a Photo background.' : S.c.motion === 'drift' ? 'The photo and its glass drift slowly together.' : '' }
     ];
     if (t.group === 'phone') return phoneSections(flat);
+    if (t.group === 'updates') return updateSections();
     if (t.group === 'online' || t.group === 'unsplash' || t.group === 'animated') {
       var items = SOURCES.filter(function (o) { return o.page === t.group; }).map(function (o) { return choice('source', o.id, flat || o.key && !ONLINE_INFO[o.key]); });
       var missing = SOURCES.filter(function (o) { return o.page === t.group && o.key && !ONLINE_INFO[o.key]; }).map(function (o) { return o.key; });
@@ -1446,7 +1472,7 @@
     return [{ id: 'samsung', title: '', items: [
       { action: 'samsung.home', label: TV.home, description: TV.homeLine },
       { action: 'samsung.settings', label: 'TV settings', description: 'Picture, sound and network settings' }
-    ].concat(REMOTE ? [{ action: 'samsung.remote', label: 'Remote buttons', description: S.remote.keys.length ? S.remote.keys.length + (S.remote.keys.length === 1 ? ' button assigned' : ' buttons assigned') : 'Reassign the app and TV buttons' }] : []) }];
+    ].concat(UPDATE ? [{ action: 'open.updates', label: 'Shore updates', description: updateLine() }] : []).concat(REMOTE ? [{ action: 'samsung.remote', label: 'Remote buttons', description: S.remote.keys.length ? S.remote.keys.length + (S.remote.keys.length === 1 ? ' button assigned' : ' buttons assigned') : 'Reassign the app and TV buttons' }] : []) }];
   }
   function detailRows(t) {
     var rows = [[{ action: 'settings.back', label: parentName(t) }]];
@@ -1559,6 +1585,10 @@
     else if (item.action === 'open.saverlook') openAppearance('saverlook');
     else if (item.action === 'open.focusmore') openAppearance('focusmore');
     else if (item.action === 'open.bgmore') openAppearance('bgmore');
+    else if (item.action === 'open.updates') { S.update = UPDATE.info(); openAppearance('updates'); }
+    else if (item.action === 'update.check') UPDATE.check();
+    else if (item.action === 'update.install') UPDATE.install();
+    else if (item.action === 'update.auto') { UPDATE.auto(!S.update.auto); S.update = UPDATE.info(); }
     else if (item.action === 'saver.start') startSaver();
     else if (item.action === 'phone.toggle') { PHONE.enable(!S.phone.enabled); S.phone = PHONE.info(); }
     else if (item.action === 'phone.forget') { PHONE.forget(); S.phone = PHONE.info(); S.note = 'Paired phones forgotten. Scan the new code.'; }
@@ -2255,7 +2285,7 @@
         + command({ action: 'settings.retry', label: 'Try again' }, '<span>Try again</span>', 'setting-retry');
     }
     setHTML(appearanceStatus, status);
-    hint = selected.disabled ? '' : remoteHint(selected) || (selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis === 'source' ? (selected.applied ? 'Remove from rotation' : 'Add to rotation') : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.action === 'phone.toggle' ? (S.phone.enabled ? 'Turn off' : 'Turn on') : selected.action === 'phone.forget' ? 'Phones scan a new code' : selected.action === 'phone.clear' ? 'Remove all my photos' : selected.action === 'nowplaying.access' ? 'Open Notification access' : /^open\./.test(selected.action) ? 'Open selected group' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : selected.action === 'saver.start' ? 'Start the screensaver now' : 'Open on the TV');
+    hint = selected.disabled ? '' : remoteHint(selected) || (selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis === 'source' ? (selected.applied ? 'Remove from rotation' : 'Add to rotation') : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.action === 'phone.toggle' ? (S.phone.enabled ? 'Turn off' : 'Turn on') : selected.action === 'phone.forget' ? 'Phones scan a new code' : selected.action === 'phone.clear' ? 'Remove all my photos' : selected.action === 'nowplaying.access' ? 'Open Notification access' : /^open\./.test(selected.action) ? 'Open selected group' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : selected.action === 'saver.start' ? 'Start the screensaver now' : selected.action === 'update.install' ? 'Download and install' : selected.action === 'update.check' ? 'Check now' : selected.action === 'update.auto' ? (S.update.auto ? 'Turn off' : 'Turn on') : selected.action === 'update.wait' ? 'Please wait' : 'Open on the TV');
     setHTML(appearanceDesc, hint ? '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>' : '');
   }
   function remoteHint(item) {
@@ -2740,6 +2770,7 @@
   if (FrameDevice.onInputs) { FrameDevice.onInputs(refreshInputs); refreshInputs(); }
   if (WEATHER) WEATHER.onChange(function () { if (S.c.cweather === 'on' && (top().id === 'home' || isSettingsDetail(top()))) renderCaption(top(), homeState(top())); });
   if (NOWPLAYING) { pollPlaying(); setInterval(pollPlaying, 5000); }
+  if (UPDATE) { S.update = UPDATE.info(); UPDATE.onChange(function () { S.update = UPDATE.info(); if (isSettingsDetail(top()) || top().id === 'settings') render(); }); }
   if (PHONE) { S.phone = PHONE.info(); PHONE.onChange(function (count) { S.phone.count = count; if (isSettingsDetail(top()) || top().id === 'settings') render(); }); }
   if (REMOTE) {
     REMOTE.onLearned(remoteLearned);

@@ -44,6 +44,19 @@ final class DeviceBridge {
         this.phone = phone;
     }
 
+    /** In-app updates from the public releases (Updater). Only the activity offers them. */
+    @JavascriptInterface
+    public String updateInfo() { return activity == null ? "{}" : Updater.get(context).info(); }
+
+    @JavascriptInterface
+    public void updateCheck() { if (activity != null) Updater.get(context).check(); }
+
+    @JavascriptInterface
+    public void updateInstall() { if (activity != null) Updater.get(context).install(); }
+
+    @JavascriptInterface
+    public void updateAuto(boolean on) { if (activity != null) Updater.get(context).setAuto(on); }
+
     /** {access, playing, title, artist, app, pkg} from the active media sessions (needs notification access). */
     @JavascriptInterface
     public String nowPlaying() { return NowPlayingService.info(context); }

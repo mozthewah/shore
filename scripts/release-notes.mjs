@@ -49,7 +49,6 @@ const out = [];
 // Branded header. Artwork is pinned to this commit, so old releases keep what they shipped with.
 out.push('<div align="center">', '',
   `<img src="${raw('docs/brand/banner.gif')}" width="100%" alt="Shore: a calm home screen for Google TV">`, '',
-  '**A calm home screen for Google TV.** Your apps, your HDMI devices, a beautiful picture and the time. Nothing else.', '',
   `[Website](https://taynotfound.github.io/shore/) · [Guide](https://github.com/${repo}#readme) · [Phone companion](https://github.com/${repo}#phone-companion) · [All releases](https://github.com/${repo}/releases)`, '',
   '</div>', '');
 

@@ -73,6 +73,9 @@ public class MainActivity extends Activity {
         topShelf.setListener(index -> runOnUiThread(() -> {
             if (web != null) web.evaluateJavascript("window.CleanFrameTopShelfChanged&&window.CleanFrameTopShelfChanged(" + index + ")", null);
         }));
+        Updater.get(this).setListener(() -> runOnUiThread(() -> {
+            if (web != null) web.evaluateJavascript("window.CleanFrameUpdateChanged&&window.CleanFrameUpdateChanged()", null);
+        }));
         phone = new Companion(this);
         online.setPhone(phone);
         phone.setCommands((axis, value) -> runOnUiThread(() -> {
@@ -165,6 +168,7 @@ public class MainActivity extends Activity {
         if (web != null) { web.onResume(); web.resumeTimers(); web.requestFocus(); inputsChanged(); remoteChanged(); }
         if (online != null) online.refreshIfStale();
         if (phone != null) phone.resume();
+        Updater.get(this).checkIfStale();
     }
 
     @Override
@@ -179,6 +183,7 @@ public class MainActivity extends Activity {
         if (tvInputs != null) tvInputs.unregisterCallback(inputCallback);
         if (online != null) online.setListener(null);
         if (topShelf != null) topShelf.setListener(null);
+        Updater.get(this).setListener(null);
         if (phone != null) { phone.setListener(null); phone.setCommands(null); phone.stop(); }
         if (RemoteKeys.listener == remoteListener) { RemoteKeys.listener = null; RemoteKeys.learn(false); }
         if (web != null) { web.removeJavascriptInterface("CleanFrameAndroid"); web.destroy(); web = null; }
