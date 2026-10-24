@@ -85,7 +85,7 @@ You need a computer on the same Wi-Fi with [Android platform tools](https://deve
    adb install -r Shore.apk
    ```
 
-Shore now appears in your apps. Open it once; it remembers everything on the TV.
+Shore now appears in your apps. Open it once; it remembers everything on the TV. The first time, it offers a short setup: *Settings → Google TV → Setup and health* lists each step (Home button, what's playing, wallpaper sources, phone companion, updates) with a tick when it works, and OK opens the place that fixes it. Come back to it whenever something seems off, for example when the TV blocked the Home button service after a restart.
 
 **Updating:** after the first install you don't need a computer again. *Settings → Google TV → Shore updates* checks the public releases (automatically every few hours, or on demand), downloads the new APK, checks that it is Shore, newer and signed with the same key, and opens Android's installer. Android asks you to confirm, and the first time it asks you to allow Shore to install apps. Settings and photos stay. Only release APKs update themselves: a copy you built yourself just tells you when a new version is out, so you can pull the latest source and rebuild it with your keys.
 
