@@ -102,6 +102,19 @@ nasa.apiKey=...          # optional, https://api.nasa.gov/ (default DEMO_KEY is 
 
 Keys are compiled into your APK, so don't share an APK that contains your keys. Credits for each photo or clip appear in the wallpaper gallery, as the sources' terms ask.
 
+## Top Shelf (Shelf layout)
+
+*Settings → Layout → Shelf.* Like the Apple TV Top Shelf, the focused app's backdrop fills the screen with what is trending there, and **Down** opens a row of recommendations. **OK** opens an item in its app where the app accepts a link (YouTube, Twitch, ZDF, ARTE), otherwise it opens the app. **Up** or **Back** returns to the apps.
+
+Google TV doesn't share its recommendation rows with other launchers, so CleanFrame reads public catalogues instead, about once an hour, over HTTPS only. Images are resized once on download. ARD Mediathek, ZDF and ARTE work without keys. Netflix, Disney+, Prime Video, Joyn, waipu.tv and Apple TV use [TMDB](https://www.themoviedb.org) watch providers for Germany. YouTube and Twitch need their own keys. Apps without recommendations show their TV banner, softly blurred, as the backdrop. Add the keys to `android/local.properties`, or set them as environment variables (`TMDB_TOKEN`, `YOUTUBE_API_KEY`, `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET`, also used as GitHub Actions secrets):
+
+```properties
+tmdb.token=...           # TMDB "API Read Access Token" (v4 Bearer), https://www.themoviedb.org/settings/api
+youtube.apiKey=...       # YouTube Data API v3 key, https://console.cloud.google.com/apis/library/youtube.googleapis.com
+twitch.clientId=...      # https://dev.twitch.tv/console/apps
+twitch.clientSecret=...
+```
+
 ## Build from source
 
 Requirements: JDK 17 and the Android SDK (platform 35), or Android Studio.
@@ -157,3 +170,4 @@ Live TV, inputs, settings, the remote, AirPlay/Miracast, updates and Google TV i
 - App logos: [Simple Icons](https://simpleicons.org) (CC0) and public-domain wordmarks from Wikimedia Commons. See `app/assets/icons/SOURCES.json`. Trademarks belong to their owners.
 - Online wallpapers belong to their authors and are shown under each provider's terms: [NASA APOD](https://apod.nasa.gov), [Bing](https://www.bing.com), [Wikimedia Commons](https://commons.wikimedia.org), [Lorem Picsum](https://picsum.photos), [Unsplash](https://unsplash.com), [Pexels](https://www.pexels.com), [KLIPY](https://klipy.com) ("Powered by KLIPY").
 - Bundled animated loops are generated procedurally for this project.
+- Top Shelf: This product uses the TMDB API but is not endorsed or certified by TMDB. Recommendations and images come from [TMDB](https://www.themoviedb.org), [ARD Mediathek](https://www.ardmediathek.de), [ZDF](https://www.zdf.de), [ARTE](https://www.arte.tv), [YouTube](https://www.youtube.com) and [Twitch](https://www.twitch.tv) under their terms; titles and artwork belong to their owners.

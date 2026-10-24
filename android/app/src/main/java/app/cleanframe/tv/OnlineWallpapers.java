@@ -53,7 +53,7 @@ final class OnlineWallpapers {
             "loops", "pexels-ocean", "pexels-rain", "pexels-clouds", "pexels-city", "klipy-lofi", "klipy-rain", "klipy-space" };
     private static final int MAX_PHOTOS = 8, W = 1920, H = 1080;
     private static final long REFRESH_MS = 6L * 60 * 60 * 1000;
-    private static final String UA = "CleanFrame-TCL/1.0 (Android TV home screen; https://github.com/taynotfound/CleanFrame-TCL)";
+    static final String UA = "CleanFrame-TCL/1.0 (Android TV home screen; https://github.com/taynotfound/CleanFrame-TCL)";
 
     private final Context context;
     private final File root, wallDir, matDir, index;
@@ -369,7 +369,7 @@ final class OnlineWallpapers {
         return out;
     }
 
-    private static void boxH(int[] px, int w, int h, int r) {
+    static void boxH(int[] px, int w, int h, int r) {
         int[] row = new int[w];
         int d = 2 * r + 1;
         for (int y = 0; y < h; y++) {
@@ -384,7 +384,7 @@ final class OnlineWallpapers {
         }
     }
 
-    private static void boxV(int[] px, int w, int h, int r) {
+    static void boxV(int[] px, int w, int h, int r) {
         int[] col = new int[h];
         int d = 2 * r + 1;
         for (int x = 0; x < w; x++) {
@@ -504,7 +504,7 @@ final class OnlineWallpapers {
 
     private static byte[] download(String url, int limit) throws IOException { return download(url, limit, null, null); }
 
-    private static byte[] download(String url, int limit, String header, String value) throws IOException {
+    static byte[] download(String url, int limit, String header, String value) throws IOException {
         for (int hop = 0; hop < 5; hop++) {
             if (!url.startsWith("https://")) throw new IOException("HTTPS only");
             HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
@@ -520,7 +520,7 @@ final class OnlineWallpapers {
         throw new IOException("Too many redirects");
     }
 
-    private static byte[] readAll(InputStream in, int limit) throws IOException {
+    static byte[] readAll(InputStream in, int limit) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buf = new byte[16384];
         for (int n; (n = in.read(buf)) > 0; ) { out.write(buf, 0, n); if (out.size() > limit) throw new IOException("Too large"); }

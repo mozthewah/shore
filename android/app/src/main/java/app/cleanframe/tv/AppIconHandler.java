@@ -30,7 +30,7 @@ final class AppIconHandler implements WebViewAssetLoader.PathHandler {
         String pkg = path.endsWith(".png") ? path.substring(0, path.length() - 4) : path;
         if (!pkg.matches("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)+")) return null;
         try {
-            Drawable icon = banner ? banner(pkg) : pm.getApplicationIcon(pkg);
+            Drawable icon = banner ? banner(pm, pkg) : pm.getApplicationIcon(pkg);
             if (icon == null) return null; // no banner: the page shows its own card
             int w = banner ? BANNER_W : SIZE, h = banner ? BANNER_H : SIZE;
             Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
@@ -47,7 +47,7 @@ final class AppIconHandler implements WebViewAssetLoader.PathHandler {
     }
 
     /** The leanback launcher activity's banner, else the application banner. */
-    private Drawable banner(String pkg) throws PackageManager.NameNotFoundException {
+    static Drawable banner(PackageManager pm, String pkg) throws PackageManager.NameNotFoundException {
         android.content.Intent launch = pm.getLeanbackLaunchIntentForPackage(pkg);
         if (launch != null && launch.getComponent() != null) {
             Drawable d = pm.getActivityBanner(launch.getComponent());

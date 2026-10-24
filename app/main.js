@@ -524,6 +524,13 @@
     S.press = id; S.lastLaunch = a.name;
     perform(a.name, function (done) { FrameDevice.launchApp(a.appId, done); });
   }
+  /* Top Shelf: deep link into the tile's app where it supports one, otherwise launch it. */
+  function openRec(id, it) {
+    var a = app(id);
+    if (!a || !it || busy) return;
+    S.press = id; S.lastLaunch = a.name;
+    perform(a.name, function (done) { SHELF.open(a.appId, it.url, done); });
+  }
   function refreshCatalog() {
     var request, oldFocus;
     if (catalog.loading) return;
@@ -618,8 +625,21 @@
         S.lastUtil = f.u;
         return;
       }
+      if (f.zone === 'recs') {
+        var R = recsFor(S.sel);
+        if (!R) f.zone = 'apps';
+        else {
+          f.r = clamp(f.r || 0, 0, R.items.length - 1);
+          if (k === 'left' && f.r > 0) f.r--;
+          else if (k === 'right' && f.r < R.items.length - 1) f.r++;
+          else if (k === 'up' || k === 'back') f.zone = 'apps';
+          else if (k === 'ok') openRec(S.sel, R.items[f.r]);
+          return;
+        }
+      }
       f.zone = 'apps';
       if (k === x.out && inputRow()) { f.zone = 'input'; f.n = clamp(f.n || 0, 0, LIVE.length - 1); }
+      else if (k === x.inn && recsFor(S.sel)) { f.zone = 'recs'; f.r = 0; }
       else if (k === x.out) { f.zone = 'util'; f.u = clamp(S.lastUtil, 0, U.length - 1); }
       else if (k === 'back') openMessage('leave');
       else if (!h.length) { if (k === 'ok') addAppsRoute(); }
@@ -1227,6 +1247,7 @@
     else stage.style.removeProperty('--dock-clock-ink');
     applyHomeFont();
     if (!sheet) renderHome(t);
+    renderTopShelf(t, sheet);
     renderSheet(t, sheet);
     renderAppearance(t);
     renderFocusStatus(t);
@@ -1376,7 +1397,7 @@
     var broad = S.geom === 'broad' && n > 5;
     if (n < 0) { w = 912; shelfW = 880; }
     else if (broad) { w = 1728; shelfW = 1696; }
-    return { x: Math.round((1920 - w) / 2), y: 908 - m.th - 32, h: m.th + 32, w: w, shelf: shelfW, vis: vis, broad: broad, empty: n < 0, tw: m.tw, th: m.th, pitch: m.pitch };
+    return { x: Math.round((1920 - w) / 2), y: shelfLifted() ? SHELF_ROW_Y : 908 - m.th - 32, h: m.th + 32, w: w, shelf: shelfW, vis: vis, broad: broad, empty: n < 0, tw: m.tw, th: m.th, pitch: m.pitch };
   }
   /* Five centred: the window moves one tile when focus passes an edge. Broad: keep a
      148px glimpse of the neighbour, as the current dock does. */
@@ -1430,11 +1451,99 @@
     if (Date.now() < dockEdgeUntil) dockEdgeFrame = window.requestAnimationFrame(trackDockEdges);
   }
 
+  /* ---------- Top Shelf (Shelf layout, Android shell) ----------
+     The focused app's first recommendation (or its blurred TV banner) becomes the backdrop, and Down
+     opens a row of its recommendations. Images arrive pre-rendered from TopShelf.java; nothing blurs here. */
+  var SHELF = ANDROID && FrameDevice.topShelf ? FrameDevice.topShelf : null, shelfIndex = {}, shelfAsked = '';
+  var SHELF_ROW_Y = 400, REC_LEFT = 140, REC_PITCH = 376, REC_VIEW = 1920 - 2 * REC_LEFT;
+  var heroEl = document.createElement('div'), heroImgs = [document.createElement('img'), document.createElement('img')], heroFront = 0, heroSrc = '', heroTimer = 0;
+  var heroText = document.createElement('div'), recsEl = document.createElement('div'), recsTrack = document.createElement('div'), recsTitle = document.createElement('div'), recsKey = '';
+  heroEl.className = 'hero'; heroEl.setAttribute('aria-hidden', 'true');
+  heroImgs.forEach(function (img) { img.className = 'hero-img'; img.alt = ''; heroEl.appendChild(img); });
+  heroEl.appendChild(document.createElement('div')).className = 'hero-shade';
+  IMG.photo.parentNode.insertBefore(heroEl, IMG.photo.parentNode.querySelector('.scrim')); // above photo and video, below the scrim
+  heroText.className = 'hero-text'; heroText.setAttribute('aria-live', 'polite');
+  recsEl.className = 'recs'; recsTrack.className = 'recs-track'; recsTitle.className = 'recs-title';
+  recsEl.appendChild(recsTrack); recsEl.appendChild(recsTitle);
+  homeEl.insertBefore(heroText, dock); homeEl.insertBefore(recsEl, dock);
+
+  function cleanShelfIndex(index) {
+    var out = {}, img = /^\/topshelf\/img\/[0-9a-f]+-(card|hero)\.jpg$/;
+    Object.keys(index || {}).forEach(function (pkg) {
+      var e = index[pkg], items = e && e.items && e.items.filter ? e.items.filter(function (it) {
+        return it && typeof it.title === 'string' && img.test(it.card) && img.test(it.hero) && typeof (it.url || '') === 'string';
+      }) : [];
+      if (items.length) out[pkg] = { service: String(e.service || ''), items: items };
+    });
+    return out;
+  }
+  function shelfPkg(id) { var a = app(id); return a && !a.input && FrameDevice.packageOf ? FrameDevice.packageOf(a.appId) : null; }
+  function recsFor(id) {
+    var pkg = SHELF && isShelf() ? shelfPkg(id) : null, e = pkg ? shelfIndex[pkg] : null;
+    return e ? { pkg: pkg, service: e.service, items: e.items } : null;
+  }
+  /* Stable layout: the row moves up once any Home app has recommendations, not per focused app. */
+  function shelfLifted() { return !!SHELF && isShelf() && visibleHome().some(function (id) { return !!recsFor(id); }); }
+  function requestShelf() {
+    var pkgs = [];
+    if (!SHELF || !isShelf()) return;
+    visibleHome().forEach(function (id) { var p = shelfPkg(id); if (p && pkgs.indexOf(p) < 0) pkgs.push(p); });
+    if (pkgs.join() === shelfAsked) return;
+    shelfAsked = pkgs.join(); SHELF.request(pkgs);
+  }
+  /* Two images crossfade; the next one only shows once loaded, and fast scrolling settles first. */
+  function showHero(src) {
+    if (src === heroSrc) return;
+    heroSrc = src; clearTimeout(heroTimer);
+    heroEl.className = 'hero' + (src ? ' is-on' : '');
+    if (!src) { heroImgs[0].className = heroImgs[1].className = 'hero-img'; return; }
+    heroTimer = setTimeout(function () {
+      var back = heroImgs[1 - heroFront], want = src;
+      function swap() {
+        if (heroSrc !== want) return;
+        back.className = 'hero-img is-on'; heroImgs[heroFront].className = 'hero-img'; heroFront = 1 - heroFront;
+      }
+      back.onload = swap;
+      back.onerror = function () { if (heroSrc === want) heroImgs[heroFront].className = 'hero-img'; };
+      if (back.getAttribute('src') === want && back.complete) swap(); else back.src = want;
+    }, 160);
+  }
+  function renderTopShelf(t, sheet) {
+    var on = !!SHELF && isShelf() && !sheet && t.id === 'home' && !S.idleHidden, f = t.f || {};
+    var zone = on && (f.zone === 'apps' || f.zone === 'recs') ? f.zone : null, R = zone ? recsFor(S.sel) : null;
+    var r = R ? clamp(f.r || 0, 0, R.items.length - 1) : 0, item = R ? R.items[zone === 'recs' ? r : 0] : null, pkg = zone ? shelfPkg(S.sel) : null;
+    var off = R ? clamp((r - 2) * REC_PITCH, 0, Math.max(0, R.items.length * REC_PITCH - 24 - REC_VIEW)) : 0, key;
+    if (on) requestShelf();
+    showHero(item ? item.hero : pkg ? '/topshelf/banner/' + pkg + '.jpg' : '');
+    setHTML(heroText, item ? '<span class="hero-title">' + esc(item.title) + '</span><span class="hero-service">Trending on ' + esc(R.service) + '</span>' : '');
+    heroText.className = 'hero-text' + (item ? ' is-on' : '');
+    key = R ? R.pkg + '|' + R.items.map(function (it) { return it.card; }).join() : '';
+    if (key !== recsKey) {
+      recsKey = key;
+      setHTML(recsTrack, R ? R.items.map(function (it, i) {
+        return '<span class="rec" style="transform:translate3d(' + (i * REC_PITCH) + 'px,0,0)"><img alt="" src="' + esc(it.card) + '" onerror="this.style.visibility=\'hidden\'"></span>';
+      }).join('') : '');
+    }
+    Array.prototype.forEach.call(recsTrack.childNodes, function (el, i) { el.className = 'rec' + (zone === 'recs' && i === r ? ' is-focus' : ''); });
+    recsTrack.style.transform = 'translate3d(' + (-off) + 'px,0,0)';
+    setHTML(recsTitle, zone === 'recs' && R ? '<span class="recs-name">' + esc(R.items[r].title) + '</span>' + (R.items[r].sub ? '<span class="recs-sub">' + esc(R.items[r].sub) + '</span>' : '') : '');
+    recsTitle.style.transform = 'translate3d(' + (r * REC_PITCH - off) + 'px,0,0)';
+    recsEl.className = 'recs' + (R ? ' is-on' : '') + (zone === 'recs' ? ' is-active' : '');
+  }
+  if (SHELF) {
+    shelfIndex = cleanShelfIndex(SHELF.index());
+    SHELF.onChange(function (index) {
+      shelfIndex = cleanShelfIndex(index); recsKey = ''; // new files may replace images that failed to load
+      if (heroImgs[0].className === heroImgs[1].className) heroSrc = '';
+      render();
+    });
+  }
+
   function renderDock(hs) {
     var items = hs.items, n = items.length, empty = hs.mode !== 'arrange' && !n, g = dockGeom(empty ? -1 : n);
     var anchor = clamp(hs.i, 0, Math.max(0, n - 1)), off = empty ? 0 : dockOffset(n, anchor, g);
     var full = hs.arr ? live(hs.arr.slots).length >= CAP : false, ns = hs.arr ? hs.arr.slots.length : n;
-    var tileFocus = hs.zone === 'apps' || hs.zone === 'tiles', tileSel = hs.zone === 'act' || hs.zone === 'ctl' || hs.zone === 'preview';
+    var tileFocus = hs.zone === 'apps' || hs.zone === 'tiles', tileSel = hs.zone === 'act' || hs.zone === 'ctl' || hs.zone === 'preview' || hs.zone === 'recs';
     var focusItem = items[anchor], s, ax, label, width;
 
     dock.className = 'dock' + (empty ? ' is-empty' : '');
@@ -2077,7 +2186,7 @@
   document.addEventListener('visibilitychange', function () {
     heldKeys = {};
     if (document.hidden) { pauseRotation(); clearTimeout(clockTimer); VIDEO.pause(); }
-    else { release(); after(); updateClock(); focusStage(); }
+    else { shelfAsked = ''; release(); after(); updateClock(); focusStage(); }
   });
   window.addEventListener('resize', fit);
 

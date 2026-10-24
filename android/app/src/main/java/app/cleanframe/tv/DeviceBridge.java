@@ -25,13 +25,32 @@ final class DeviceBridge {
     private final Context context;
     private final PackageManager pm;
     private final OnlineWallpapers online;
+    private final TopShelf topShelf;
 
-    DeviceBridge(Context context) { this(context, null); }
+    DeviceBridge(Context context) { this(context, null, null); }
 
-    DeviceBridge(Context context, OnlineWallpapers online) {
+    DeviceBridge(Context context, OnlineWallpapers online, TopShelf topShelf) {
         this.context = context.getApplicationContext();
         this.pm = this.context.getPackageManager();
         this.online = online;
+        this.topShelf = topShelf;
+    }
+
+    /** Top Shelf recommendations already on disk: {pkg: {service, items:[{title, sub, card, hero, url}]}}. */
+    @JavascriptInterface
+    public String topShelfIndex() { return topShelf == null ? "{}" : topShelf.index(); }
+
+    /** Refreshes recommendations for these Home packages (JSON array) in the background. */
+    @JavascriptInterface
+    public void topShelf(String packagesJson) { if (topShelf != null && packagesJson != null) topShelf.request(packagesJson); }
+
+    /** Opens an https:// or app deep link inside one package; false lets the page launch the app instead. */
+    @JavascriptInterface
+    public boolean openLink(String url, String pkg) {
+        if (url == null || pkg == null || pkg.equals(context.getPackageName())) return false;
+        if (url.startsWith("http://") || !url.startsWith("https://") && !url.matches("[a-z][a-z0-9+.-]*://[^\\s]+")) return false;
+        Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url)).setPackage(pkg);
+        return start(intent); // false when the app has no matching link handler
     }
 
     /** {source, unsplash}: the chosen online photo source and whether Unsplash has a build-time key. */

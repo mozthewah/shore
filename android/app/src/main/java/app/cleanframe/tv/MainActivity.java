@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
     private WebView web;
     private TvInputManager tvInputs;
     private OnlineWallpapers online;
+    private TopShelf topShelf;
 
     /** Tells the page when an HDMI device is plugged in, powered on or switched off. */
     private final TvInputManager.TvInputCallback inputCallback = new TvInputManager.TvInputCallback() {
@@ -60,11 +61,16 @@ public class MainActivity extends Activity {
             if (web != null) web.evaluateJavascript("window.CleanFrameOnlineChanged&&window.CleanFrameOnlineChanged(" + (entries == null ? "null" : entries)
                     + "," + org.json.JSONObject.quote(status) + ")", null);
         }));
+        topShelf = new TopShelf(this);
+        topShelf.setListener(index -> runOnUiThread(() -> {
+            if (web != null) web.evaluateJavascript("window.CleanFrameTopShelfChanged&&window.CleanFrameTopShelfChanged(" + index + ")", null);
+        }));
         final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/assets/", online.handler()) // online photos, then bundled files
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
                 .addPathHandler("/appicon/", new AppIconHandler(this))
                 .addPathHandler("/appbanner/", new AppIconHandler(this, true))
+                .addPathHandler("/topshelf/", topShelf.handler())
                 .build();
 
         web.setWebViewClient(new WebViewClient() {
@@ -79,7 +85,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        web.addJavascriptInterface(new DeviceBridge(this, online), "CleanFrameAndroid");
+        web.addJavascriptInterface(new DeviceBridge(this, online, topShelf), "CleanFrameAndroid");
         web.loadUrl(ORIGIN + "/assets/index.html");
         tvInputs = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
         if (tvInputs != null) tvInputs.registerCallback(inputCallback, new Handler(Looper.getMainLooper()));
@@ -134,6 +140,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         if (tvInputs != null) tvInputs.unregisterCallback(inputCallback);
         if (online != null) online.setListener(null);
+        if (topShelf != null) topShelf.setListener(null);
         if (web != null) { web.removeJavascriptInterface("CleanFrameAndroid"); web.destroy(); web = null; }
         super.onDestroy();
     }

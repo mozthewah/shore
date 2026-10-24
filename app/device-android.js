@@ -84,10 +84,27 @@
     onChange: function (fn) { onlineListeners.push(fn); }
   };
   window.CleanFrameInputsChanged = function () { inputListeners.forEach(function (fn) { try { fn(); } catch (e) { } }); };
+  /* Top Shelf (Shelf layout): recommendations fetched and pre-rendered natively, keyed by package. */
+  var shelfListeners = [];
+  function hasApp(pkg) { try { return JSON.parse(bridge.apps()).some(function (a) { return a.appId === pkg; }); } catch (e) { return false; } }
+  window.CleanFrameTopShelfChanged = function (index) { shelfListeners.forEach(function (fn) { try { fn(index || {}); } catch (e) { } }); };
+  var topShelf = {
+    index: function () { try { return JSON.parse(bridge.topShelfIndex()) || {}; } catch (e) { return {}; } },
+    request: function (pkgs) { try { bridge.topShelf(JSON.stringify(pkgs || [])); } catch (e) { } },
+    onChange: function (fn) { shelfListeners.push(fn); },
+    /* Deep link into the tile's own app when it handles the link, otherwise just launch the app. */
+    open: function (id, url, done) {
+      var pkg = TIZEN[id] ? PACKAGES[TIZEN[id]] : PACKAGES[id] || id;
+      if (FALLBACK[BRAND[pkg]] && !hasApp(pkg)) pkg = FALLBACK[BRAND[pkg]];
+      var ok = false;
+      if (url && /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$/.test(pkg)) { try { ok = !!bridge.openLink(String(url), pkg); } catch (e) { } }
+      if (ok) reply(true, done); else launchApp(id, done);
+    }
+  };
   window.FrameDevice = {
     platform: 'android',
     launch: launch, launchApp: launchApp, apps: apps,
-    inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online,
+    inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, topShelf: topShelf,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */
     packageOf: function (id) { var brand = TIZEN[id] || BRAND[id] || (PACKAGES[id] ? id : ''), pkg = brand === 'youtube' ? FALLBACK.youtube : TIZEN[id] ? PACKAGES[TIZEN[id]] : PACKAGES[id] || id; // YouTube tile shows YouTube's banner
       return /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$/.test(pkg) ? pkg : null; },

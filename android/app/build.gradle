@@ -23,6 +23,11 @@ android {
         buildConfigField 'String', 'PEXELS_API_KEY', '"' + secret('pexels.apiKey', 'PEXELS_API_KEY', '') + '"'
         buildConfigField 'String', 'KLIPY_API_KEY', '"' + secret('klipy.apiKey', 'KLIPY_API_KEY', '') + '"'
         buildConfigField 'String', 'NASA_API_KEY', '"' + secret('nasa.apiKey', 'NASA_API_KEY', 'DEMO_KEY') + '"'
+        // Top Shelf recommendations (Shelf layout). Missing keys fall back to the app's banner.
+        buildConfigField 'String', 'TMDB_TOKEN', '"' + secret('tmdb.token', 'TMDB_TOKEN', '') + '"'
+        buildConfigField 'String', 'YOUTUBE_API_KEY', '"' + secret('youtube.apiKey', 'YOUTUBE_API_KEY', '') + '"'
+        buildConfigField 'String', 'TWITCH_CLIENT_ID', '"' + secret('twitch.clientId', 'TWITCH_CLIENT_ID', '') + '"'
+        buildConfigField 'String', 'TWITCH_CLIENT_SECRET', '"' + secret('twitch.clientSecret', 'TWITCH_CLIENT_SECRET', '') + '"'
     }
     buildFeatures { buildConfig true }
 
