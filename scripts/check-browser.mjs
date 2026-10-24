@@ -936,6 +936,18 @@ try {
       await closePage();
     }
   });
+  await run('Weather effects', async () => {
+    await page({ seed: baseline({ bg: 'photo', cweather: 'on', wfx: 'on' }) });
+    const on = await current.evaluate(() => ShoreQA.weatherFx('snow'));
+    check('Snow is drawn over a photo background', on && await current.evaluate(() => getComputedStyle(document.querySelector('.wx-layer')).display === 'block'));
+    const props = await current.evaluate(() => document.getAnimations().filter(a => a.effect.target.closest('.wx-layer')).map(a => a.effect.getKeyframes().map(k => Object.keys(k).filter(p => !/^(offset|computedOffset|easing|composite)$/.test(p)).join()).join()));
+    check('Weather layers animate only transform and opacity', props.length > 0 && props.every(p => /^(transform|opacity)(,(transform|opacity))*$/.test(p)), props);
+    await current.evaluate(() => ShoreQA.look({ bg: 'dark' }));
+    check('No weather layer without a photo', !(await current.evaluate(() => / wx-/.test(document.getElementById('stage').className))));
+    await current.evaluate(() => ShoreQA.look({ bg: 'photo' }));
+    await group('clock'); await act('open.clockextra');
+    check('Clock details offer Weather effects', (await current.evaluate(() => ShoreQA.actions())).includes('choice.wfx.on'));
+  });
   await run('Favourite and hidden wallpapers', async () => {
     await page({ seed: baseline({ mode: 'open', hide: [walls[1].id] }) });
     check('Open rotation skips a hidden wallpaper', (await state()).wallpaper !== walls[1].id, (await state()).wallpaper);
