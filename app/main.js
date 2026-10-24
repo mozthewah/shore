@@ -74,15 +74,15 @@
   var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], inputs: ['front', 'row'], lstyle: ['glass', 'shelf'], motion: ['still', 'drift'], tweight: ['auto', 'light', 'regular', 'bold'], tsize: ['small', 'default', 'large'],
     cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], clook: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'],
-    svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
+    svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
     cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'] };
   /* Newer axes with their defaults: stored, migrated and validated like the others. */
-  var MORE_LOOK = { svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move' };
+  var MORE_LOOK = { iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move' };
   /* On/off settings that OK flips. */
-  var TOGGLES = ['cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec'];
+  var TOGGLES = ['iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec'];
   var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', clook: 'Artist pictures', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material',
-    svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
+    iask: 'Ask to switch', svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
     cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
@@ -147,7 +147,7 @@
   }
   function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, clook: c.clook, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material, svsrc: c.svsrc, svlay: c.svlay, svtime: c.svtime,
-      svmotion: c.svmotion, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
+      svmotion: c.svmotion, iask: c.iask, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
       cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
   function derivedTheme() { return S.c.layout === 'list' ? 'list' : 'shore'; }
@@ -445,6 +445,17 @@
     return out;
   }
   /* ---------- TV inputs ---------- */
+  /* A device was just switched on while Home is showing: offer to switch to it (Layout › Inputs › Ask to switch). */
+  var inputsSeen = false, askTimer = 0;
+  function askInput(id) {
+    var a = app(id), t = top();
+    if (!a || S.c.iask !== 'on' || document.hidden || (t.id !== 'home' && !S.saver)) return;
+    stopSaver();
+    push({ id: 'message', content: { title: a.name + ' is on', line: 'Switch to it now?', note: '', actions: [['input:' + id, 'Switch'], ['stay', 'Stay']] }, f: { b: 0 } });
+    render();
+    clearTimeout(askTimer);
+    askTimer = setTimeout(function () { var m = top(); if (m.id === 'message' && m.content && m.content.actions[0][0] === 'input:' + id) { pop(); render(); } }, 20000);
+  }
   function refreshInputs() {
     if (!FrameDevice.inputs) return;
     FrameDevice.inputs(function (err, list) {
@@ -458,8 +469,11 @@
         a.appId = input.id; a.name = input.name.slice(0, 160); a.brand = 'hdmi'; a.mark = true; a.input = true;
         live.push(id);
       });
-      if (same(live, LIVE)) return;
+      if (same(live, LIVE)) { inputsSeen = true; return; }
+      var fresh = inputsSeen ? live.filter(function (id) { return LIVE.indexOf(id) < 0; }) : [];
+      inputsSeen = true;
       LIVE = live; render();
+      if (fresh.length) askInput(fresh[0]);
     });
   }
   function initialise() {
@@ -1029,9 +1043,11 @@
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : /^(svclock|svdate|svmusic|wicon|cwave)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
+      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
   /* "Seconds" in the Format row, abbreviated where the word is long. */
+  /* "Ask" (to switch inputs), short enough to share the Inputs row in every language. */
+  function askLabel() { var w = T('Ask (inputs)'); return w === 'Ask (inputs)' ? 'Ask' : w; }
   function shortSeconds() { var w = T('Seconds (short)'); return w === 'Seconds (short)' ? 'Seconds' : w; }
   /* "Light" as a font weight differs from the Light background in some languages. */
   function weightLight() { var w = T('Light weight'); return w === 'Light weight' ? 'Light' : w;
@@ -1381,7 +1397,7 @@
      Shore applies it exactly as if it was chosen with the remote. */
   var COMPANION_GROUPS = [
     ['Background', ['bg', 'wall', 'mode', 'source', 'cart', 'npdim', 'clook']],
-    ['Layout', ['layout', 'apps', 'controls', 'inputs', 'isize']],
+    ['Layout', ['layout', 'apps', 'controls', 'inputs', 'iask', 'isize']],
     ['Text', ['font', 'tweight', 'tsize']],
     ['Clock', ['cformat', 'csec', 'cdate', 'csize', 'cweight', 'cpos', 'cweather', 'wunit', 'wicon', 'cplaying', 'cwave']],
     ['Focus', ['focus', 'material', 'tint', 'dglass', 'motion']],
@@ -1481,7 +1497,7 @@
         { action: 'choice.layout.shelf', axis: 'layout', value: 'shelf', label: 'Shelf', applied: isShelf() }] },
       { id: 'apps', title: 'App display', horizontal: true, items: options('apps', ['text', 'icons', 'both']) },
       { id: 'controls', title: 'Home controls', horizontal: true, items: options('controls', ['text', 'icons', 'both']) },
-      { id: 'inputs', title: 'Inputs', horizontal: true, items: options('inputs', ['front', 'row'], S.c.layout === 'list'),
+      { id: 'inputs', title: 'Inputs', horizontal: true, items: options('inputs', ['front', 'row'], S.c.layout === 'list').concat(ANDROID ? options('iask', ['on']) : []),
         reason: S.c.layout === 'list' ? 'Own row needs the Dock layout.' : '' }
     ];
     if (t.group === 'fonts') return [{ id: 'font', title: '', items: options('font', LOOK_VALUES.font) }];
@@ -1722,7 +1738,7 @@
       if (k === 'left') t.f.b = Math.max(0, t.f.b - 1);
       else if (k === 'right') t.f.b = Math.min(A.length - 1, t.f.b + 1);
       else if (k === 'back') pop();
-      else if (k === 'ok') { a = A[t.f.b][0]; pop(); if (a === 'setup') openHealth(); else if (a === 'samsung') perform(TV.home, FrameDevice.home); else if (a === 'clearphotos' && PHONE) { PHONE.clear(); S.phone.count = 0; render(); } }
+      else if (k === 'ok') { a = A[t.f.b][0]; pop(); if (a.indexOf('input:') === 0) { clearTimeout(askTimer); launch(a.slice(6)); } else if (a === 'setup') openHealth(); else if (a === 'samsung') perform(TV.home, FrameDevice.home); else if (a === 'clearphotos' && PHONE) { PHONE.clear(); S.phone.count = 0; render(); } }
     },
     point: function (t, z, i) { if (z === 'act') { t.f.b = i; this.key(t, 'ok'); } }
   };
@@ -2573,7 +2589,7 @@
     },
     message: function (t, el) {
       setHTML(el.acts, messageContent(t).actions.map(function (a, i) {
-        return '<button type="button" tabindex="-1" class="btn' + (i === t.f.b ? ' is-focus' : '') + '" data-z="act" data-i="' + i + '" data-action="message.' + a[0] + '"><span>' + a[1] + '</span></button>';
+        return '<button type="button" tabindex="-1" class="btn' + (i === t.f.b ? ' is-focus' : '') + '" data-z="act" data-i="' + i + '" data-action="message.' + esc(a[0]) + '"><span>' + esc(a[1]) + '</span></button>';
       }).join(''));
     }
   };
