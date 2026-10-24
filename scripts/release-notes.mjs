@@ -52,6 +52,13 @@ const link = (sha) => `[\`${short(sha)}\`](https://github.com/${repo}/commit/${s
 const quote = (text) => text.split('\n').map((l) => l ? '> ' + l : '>').join('\n');
 
 const out = [];
+// Branded header. Images are pinned to this commit so old releases keep the artwork they shipped with.
+const raw = (path) => `https://raw.githubusercontent.com/${repo}/${head}/${path}`;
+out.push('<div align="center">', '');
+out.push(`<img src="${raw('docs/brand/banner.gif')}" width="100%" alt="Shore: a calm home screen for Google TV">`, '');
+out.push('**A calm home screen for Google TV: your apps, your HDMI devices, a beautiful picture and the time. Nothing else.**', '');
+out.push(`[Website](https://taynotfound.github.io/shore/) · [README](https://github.com/${repo}#readme) · [All releases](https://github.com/${repo}/releases) · [Install steps](#install-or-update)`, '');
+out.push('</div>', '', '---', '');
 out.push(`## ${latest.subject}`, '');
 if (latest.body) out.push(unwrap(latest.body), '');
 
@@ -78,6 +85,8 @@ function firstSentence(text) {
 }
 
 if (allAreas.length) out.push(`**Touches:** ${allAreas.join(' · ')}`, '');
+
+out.push(`<img src="${raw('docs/images/tcl/home.jpg')}" width="100%" alt="Shore on a TCL TV">`, '');
 
 out.push('### Install or update', '');
 out.push(`1. Download **\`shore-${version}.apk\`** below (or open \`github.com/${repo}/releases/latest\` in a TV browser or the Downloader app).`);
