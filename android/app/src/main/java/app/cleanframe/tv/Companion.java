@@ -48,7 +48,11 @@ import java.util.concurrent.Executors;
 final class Companion {
     interface Listener { void changed(int count); }
     /** Applies a setting chosen on the phone; MainActivity hands it to the page. */
-    interface Commands { void set(String axis, String value); }
+    interface Commands {
+        void set(String axis, String value);
+        /** A settings backup from the phone, already checked to be a Shore backup. */
+        void restore(String json);
+    }
 
     static final int MAX_FILES = 30, MAX_BYTES = 60 * 1024 * 1024;
     private static final int[] PORTS = { 8642, 8643, 8644, 8645 };
@@ -235,6 +239,26 @@ final class Companion {
                 if (!axis.matches("[a-z][a-z.]{0,15}") || !value.matches("[A-Za-z0-9._:-]{1,120}")) { send(out, 400, "application/json", "{\"error\":\"bad\"}"); return; }
                 if (c == null || state.isEmpty()) { send(out, 503, "application/json", "{\"offline\":true}"); return; }
                 c.set(axis, value);
+                send(out, 200, "application/json", "{\"ok\":true}");
+                return;
+            }
+            if (method.equals("GET") && api.equals("backup")) {
+                JSONObject b = state.isEmpty() ? null : new JSONObject(state).optJSONObject("backup");
+                if (b == null) { send(out, 503, "application/json", "{\"offline\":true}"); return; }
+                send(out, 200, "application/json", b.toString());
+                return;
+            }
+            if (method.equals("POST") && api.equals("restore")) {
+                if (length <= 0 || length > 512 * 1024) { send(out, 413, "application/json", "{\"error\":\"size\"}"); return; }
+                byte[] body = new byte[(int) length];
+                for (int got = 0, n; got < body.length; got += n) if ((n = in.read(body, got, body.length - got)) < 0) throw new IOException("Body cut short");
+                String text = new String(body, StandardCharsets.UTF_8);
+                JSONObject b;
+                try { b = new JSONObject(text); } catch (Exception e) { b = null; }
+                if (b == null || !"backup".equals(b.optString("shore")) || b.optJSONObject("settings") == null) { send(out, 400, "application/json", "{\"error\":\"backup\"}"); return; }
+                Commands c = commands;
+                if (c == null || state.isEmpty()) { send(out, 503, "application/json", "{\"offline\":true}"); return; }
+                c.restore(b.toString());
                 send(out, 200, "application/json", "{\"ok\":true}");
                 return;
             }

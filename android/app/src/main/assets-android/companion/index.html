@@ -36,6 +36,14 @@
     <div id="tab-tv" class="tab" hidden>
       <p id="tvOffline" class="card quiet" hidden data-t="Open Shore on the TV to change its settings from here.">Open Shore on the TV to change its settings from here.</p>
       <div id="tvGroups"></div>
+      <section id="backupCard" class="card" hidden>
+        <h2 data-t="Backup">Backup</h2>
+        <p class="quiet" data-t="Save every TV setting to this phone, then restore it later or on another TV. Photos stay on the TV.">Save every TV setting to this phone, then restore it later or on another TV. Photos stay on the TV.</p>
+        <div class="backup-buttons">
+          <button id="backupSave" type="button" class="button" data-t="Save backup">Save backup</button>
+          <label class="button"><span data-t="Restore…">Restore…</span><input id="backupFile" type="file" accept="application/json,.json"></label>
+        </div>
+      </section>
     </div>
     <div id="tab-apps" class="tab" hidden>
       <section class="card">

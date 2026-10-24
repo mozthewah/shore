@@ -78,9 +78,14 @@ public class MainActivity extends Activity {
         }));
         phone = new Companion(this);
         online.setPhone(phone);
-        phone.setCommands((axis, value) -> runOnUiThread(() -> {
-            if (web != null) web.evaluateJavascript("window.CleanFrameCompanionSet&&window.CleanFrameCompanionSet(" + org.json.JSONObject.quote(axis) + "," + org.json.JSONObject.quote(value) + ")", null);
-        }));
+        phone.setCommands(new Companion.Commands() {
+            @Override public void set(String axis, String value) {
+                runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFrameCompanionSet&&window.CleanFrameCompanionSet(" + org.json.JSONObject.quote(axis) + "," + org.json.JSONObject.quote(value) + ")", null); });
+            }
+            @Override public void restore(String json) {
+                runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFrameCompanionRestore&&window.CleanFrameCompanionRestore(" + org.json.JSONObject.quote(json) + ")", null); });
+            }
+        });
         phone.setListener(count -> {
             online.phoneChanged();
             runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFramePhoneChanged&&window.CleanFramePhoneChanged(" + count + ")", null); });

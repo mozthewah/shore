@@ -108,3 +108,5 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
 .chip.check{position:relative;padding-right:44px}
 .chip.check::after{content:"";position:absolute;right:16px;top:50%;width:14px;height:8px;margin-top:-6px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);opacity:0}
 .chip.check.on::after{opacity:1}
+.backup-buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.backup-buttons .button{flex:1 1 140px}

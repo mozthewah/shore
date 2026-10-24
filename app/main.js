@@ -94,6 +94,7 @@
   var MSG = {
     leave: { title: 'Leave Home?', line: 'Open ' + TV.home + '?', note: '', actions: [['stay', 'Stay'], ['samsung', TV.home]] },
     welcome: { title: 'Welcome to Shore', line: 'A few quick steps make Shore feel at home: the Home button, what’s playing, wallpapers and your phone.', note: '', actions: [['setup', 'Set up'], ['stay', 'Later']] },
+    restored: { title: 'Settings restored', line: 'Shore now looks and works the way your backup was saved. Photos on the TV stay as they were.', note: '', actions: [['stay', 'OK']] },
     clearphotos: { title: 'Remove all my photos?', line: 'They are deleted from the TV. Your phone keeps its own copies.', note: '', actions: [['stay', 'Keep them'], ['clearphotos', 'Remove']] }
   };
   var SVG = {
@@ -1379,10 +1380,25 @@
     var others = APPS.filter(function (a) { return !a.input && a.appId && S.c.home.indexOf(a.id) < 0 && installedApp(a); }).slice(0, 80).map(function (a) { return { id: a.id, name: a.name }; });
     return { version: 1, lang: (window.CleanFrameI18n && CleanFrameI18n.lang) || 'en', saver: !!S.saver, cap: CAP,
       groups: COMPANION_GROUPS.map(function (g) { return { name: T(g[0]), items: g[1].map(companionAxis).filter(Boolean) }; }),
-      home: home, others: others,
+      home: home, others: others, backup: backupOf(),
       labels: { start: T('Start the screensaver now'), apps: T('Apps on Home'), more: T('Other installed apps'), full: T(FULL) } };
   }
   function installedApp(a) { return !!a; }
+  /* Backup for the companion: every saved preference, in the same format Shore stores. No timestamp, so an unchanged
+     model is not republished; the phone dates the file. Photos stay on the TV and are not part of it. */
+  function backupOf() { return { shore: 'backup', format: 1, settings: serialise(S.c) }; }
+  /* Restore from the companion. The backup goes through clean(), exactly like saved preferences at startup,
+     so a damaged or edited file can only fall back to defaults. Shore then reloads with it. */
+  window.CleanFrameCompanionRestore = function (json) {
+    var o, c;
+    try { o = JSON.parse(String(json)); } catch (e) { return; }
+    if (!o || o.shore !== 'backup' || !o.settings || typeof o.settings !== 'object' || Array.isArray(o.settings)) return;
+    c = clean(o.settings);
+    c.source = sourceCsv(o.settings.source);
+    if (ONLINE) ONLINE.select(c.source, false);
+    try { localStorage.setItem(KEY, JSON.stringify(serialise(c))); sessionStorage.setItem('shore.restored', '1'); } catch (e) { return; }
+    location.reload();
+  };
   function publishCompanion(now) {
     if (!PHONE || !PHONE.publish) return;
     clearTimeout(companionTimer);
@@ -2821,6 +2837,7 @@
   setLook({}, { transient: true, startup: true });
   norm(); render(); fit(); focusStage(); updateClock(); syncRotation();
   if (S.firstRun) { openMessage('welcome'); render(); }
+  try { if (sessionStorage.getItem('shore.restored')) { sessionStorage.removeItem('shore.restored'); openMessage('restored'); render(); } } catch (e) { }
   window.CleanFrameSaver = function () { startSaver(); };
   if (DREAM || SAVER_API && SAVER_API.requested()) startSaver();
 })();
