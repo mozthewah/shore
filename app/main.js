@@ -52,8 +52,8 @@
   WALLS.forEach(function (w) { w.ut = w.ut || { tr: 'light', br: 'light' }; w.frostVeil = w.frostVeil || .12; });
   var MODES = [
     { id: 'fixed', name: 'Fixed', min: 0 }, { id: 'open', name: 'Each time Home opens', min: 0 },
-    { id: '5', name: 'Every 5 minutes', min: 5 }, { id: '15', name: 'Every 15 minutes', min: 15 },
-    { id: '60', name: 'Every hour', min: 60 }
+    { id: '5', name: 'Every 5 minutes', min: 5 }, { id: '15', name: 'Every 15 minutes', min: 15 }, { id: '30', name: 'Every 30 minutes', min: 30 },
+    { id: '60', name: 'Every hour', min: 60 }, { id: 'day', name: 'Once a day', min: 1440 }
   ];
   var KEY = 'cleanframe.home.v1', storageOk = true, catalog = { loading: false, loaded: false, error: null, request: 0, revision: 0 };
   var QA = window.ShoreQA = { minuteMs: window.ShoreQA && window.ShoreQA.minuteMs || 60000 };
@@ -75,18 +75,21 @@
   var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], inputs: ['front', 'row'], lstyle: ['glass', 'shelf'], motion: ['still', 'drift'], tweight: ['auto', 'light', 'regular', 'bold'], tsize: ['small', 'default', 'large'],
     cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], clook: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'],
-    svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'] };
+    svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
+    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'] };
   /* Newer axes with their defaults: stored, migrated and validated like the others. */
-  var MORE_LOOK = { svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on' };
+  var MORE_LOOK = { svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move' };
   /* On/off settings that OK flips. */
-  var TOGGLES = ['cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave'];
+  var TOGGLES = ['cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec'];
   var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', clook: 'Artist pictures', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material',
-    svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter' };
+    svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
+    cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
     '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min', '10': 'After 10 min', '15': 'After 15 min', c: '°C', f: '°F',
-    like: 'Like Home', every: 'Everything', builtin: 'Built-in', mix: 'Mixed', single: 'One photo', mosaic: 'Mosaics' };
+    like: 'Like Home', every: 'Everything', builtin: 'Built-in', mix: 'Mixed', single: 'One photo', mosaic: 'Mosaics',
+    left: 'Left', center: 'Centred', none: 'None', warm: 'Warm', cool: 'Cool', rose: 'Rose', green: 'Green', clear: 'Clear', solid: 'Solid', move: 'Moving', fixed: 'Fixed' };
   VALUE_NAMES.off = 'Off'; VALUE_NAMES.light = VALUE_NAMES.light || 'Light';
   var UTIL = { art: [TV.art, 'art'], apps: ['All apps', 'apps'], arrange: ['Arrange', 'arrange'], settings: ['Settings', 'settings'] };
   var MSG = {
@@ -142,7 +145,8 @@
   }
   function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, clook: c.clook, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material, svsrc: c.svsrc, svlay: c.svlay, svtime: c.svtime,
-      svmotion: c.svmotion, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave }; }
+      svmotion: c.svmotion, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
+      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
   function derivedTheme() { return S.c.layout === 'list' ? 'list' : 'shore'; }
 
@@ -940,7 +944,7 @@
   function closeEditor() { clearSession(); pop(); }
 
   /* ---------- Settings, Layout and messages ---------- */
-  var PARENT = { saveropts: 'idle', saverlook: 'saveropts', rotation: 'background', bgmore: 'background', online: 'bgmore', clockextra: 'clock', idle: 'display', unsplash: 'online', animated: 'online', fonts: 'typography', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
+  var PARENT = { focusmore: 'focus', saveropts: 'idle', saverlook: 'saveropts', rotation: 'background', bgmore: 'background', online: 'bgmore', clockextra: 'clock', idle: 'display', unsplash: 'online', animated: 'online', fonts: 'typography', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
   function subPage(t) { return !!PARENT[t.group]; }
   function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : DETAIL_NAMES[group]; }
   function parentName(t) { return PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
@@ -977,12 +981,14 @@
     else if (id === 'phone') openPhone();
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Online wallpapers', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation and motion', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', clockextra: 'Under the clock', idle: 'When idle', bgmore: 'Online and album art', saveropts: 'Screensaver options', saverlook: 'Motion and clock' };
+  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Online wallpapers', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', clockextra: 'Under the clock', idle: 'When idle', bgmore: 'Online and album art', saveropts: 'Screensaver options', saverlook: 'Motion and clock', focusmore: 'Colour and motion' };
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: SOURCES.filter(function (o) { return o.id === value; })[0].name };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : /^(svclock|svdate|svmusic|wicon|cwave)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
+      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : /^(svclock|svdate|svmusic|wicon|cwave)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
+  /* "Seconds" in the Format row, abbreviated where the word is long. */
+  function shortSeconds() { var w = T('Seconds (short)'); return w === 'Seconds (short)' ? 'Seconds' : w; }
   /* "Light" as a font weight differs from the Light background in some languages. */
   function weightLight() { var w = T('Light weight'); return w === 'Light weight' ? 'Light' : w;
   }
@@ -1214,7 +1220,7 @@
       if (!S.saver || slide !== svSlides[1 - saverFront]) return;
       slide.className = 'sv-slide l-' + layout + ' is-on'; svSlides[saverFront].className = svSlides[saverFront].className.replace(' is-on', ' is-out');
       saverFront = 1 - saverFront; saverStep++;
-      if (saverStep % SAVER_MOVE_EVERY === 0) moveSaverInfo();
+      if (saverStep % SAVER_MOVE_EVERY === 0 && S.c.svpos === 'move') moveSaverInfo();
     }
   }
   /* Fade out, jump to the next corner, fade in: keeps the clock from sitting on the same pixels for hours. */
@@ -1281,9 +1287,10 @@
     /* Sub-page: online sources and the album art background. */
     if (t.group === 'bgmore') return (ONLINE ? [{ id: 'online', title: 'Online wallpapers', items: [{ action: 'background.online', label: S.c.source === 'off' ? 'Online wallpapers off' : source().name, disabled: flat }] }] : [])
       .concat(NOWPLAYING ? [{ id: 'cart', title: 'While music plays', items: [{ action: 'choice.cart.on', axis: 'cart', value: 'on', label: 'Album art as background', tick: true, applied: S.c.cart === 'on', disabled: flat }],
-        reason: S.c.cart === 'on' ? 'The cover replaces the wallpaper on Home until the music stops. The screensaver keeps your photos.' : 'Home keeps your wallpaper while music plays.' },
+        reason: '' },
+        { id: 'npdim', title: 'Album art dimming', horizontal: true, items: options('npdim', ['none', 'soft', 'strong'], flat || S.c.cart !== 'on') },
         { id: 'clook', title: 'Sharper pictures', items: options('clook', ['on'], flat || S.c.cart !== 'on'),
-          reason: S.c.clook === 'on' ? 'Shows a wide photo of the artist when TheAudioDB has one, and a sharper cover from iTunes. Only the artist, title and album are sent.' : 'Uses only the cover the music app provides.' }] : []);
+          reason: S.c.clook === 'on' ? 'Asks TheAudioDB and iTunes, sending only the artist, title and album.' : 'Uses only the cover the music app provides.' }] : []);
     if (t.group === 'layout') return [
       { id: 'layout', title: 'Layout', horizontal: true, items: [
         { action: 'choice.layout.list', axis: 'layout', value: 'list', label: 'List', applied: S.c.layout === 'list' },
@@ -1300,15 +1307,16 @@
       { id: 'tweight', title: 'Text weight', horizontal: true, items: options('tweight', ['auto', 'light', 'regular', 'bold']) },
       { id: 'tsize', title: 'App name size', horizontal: true, items: options('tsize', ['small', 'default', 'large']) }];
     if (t.group === 'clock') return [
-      { id: 'cformat', title: 'Format', horizontal: true, items: options('cformat', ['12', '24']).concat(options('cdate', ['on'])) },
+      { id: 'cformat', title: 'Format', horizontal: true, items: options('cformat', ['12', '24']).concat(options('cdate', ['on'])).concat(options('csec', ['on'])) },
       { id: 'csize', title: 'Clock size', horizontal: true, items: options('csize', ['small', 'medium', 'large', 'huge']) },
       { id: 'cweight', title: 'Clock weight', horizontal: true, items: options('cweight', ['auto', 'thin', 'light', 'bold']) },
       { id: 'cextra', title: 'Under the clock', items: [{ action: 'open.clockextra', label: clockExtraSummary(), more: true }] }];
     if (t.group === 'clockextra') return [
+      { id: 'cpos', title: 'Clock position', horizontal: true, items: options('cpos', ['left', 'center'], S.c.layout === 'list') },
       { id: 'cextra', title: 'Show', horizontal: true, items: options('cweather', ['on']).concat(NOWPLAYING ? options('cplaying', ['on']) : []), reason: clockExtraNote() },
       { id: 'wunit', title: 'Temperature', horizontal: true, items: options('wunit', ['c', 'f'], S.c.cweather !== 'on') }]
-      .concat([{ id: 'cdetails', title: 'Details', horizontal: true, items: options('wicon', ['on'], S.c.cweather !== 'on').concat(NOWPLAYING ? options('cwave', ['on'], S.c.cplaying !== 'on') : []) }])
-      .concat(NOWPLAYING && S.c.cplaying === 'on' && !S.playing.access ? [{ id: 'nowplaying', title: '', items: [{ action: 'nowplaying.access', label: 'Notification access', description: 'Let Shore see what’s playing' }] }] : []);
+      .concat(NOWPLAYING && S.c.cplaying === 'on' && !S.playing.access ? [{ id: 'nowplaying', title: '', items: [{ action: 'nowplaying.access', label: 'Notification access', description: 'Let Shore see what’s playing' }] }]
+        : [{ id: 'cdetails', title: 'Details', horizontal: true, items: options('wicon', ['on'], S.c.cweather !== 'on').concat(NOWPLAYING ? options('cwave', ['on'], S.c.cplaying !== 'on') : []) }]);
     if (t.group === 'display') return [
       { id: 'night', title: 'Night mode', horizontal: true, items: options('night', ['off', 'scheduled', 'always']) },
       { id: 'nhours', title: 'Night hours', horizontal: true, items: options('nhours', ['21-7', '22-6', '23-7'], S.c.night !== 'scheduled') },
@@ -1327,12 +1335,21 @@
       { id: 'svmore', title: '', items: [{ action: 'open.saverlook', label: 'Motion and clock', description: saverLookSummary(), more: true }] }];
     if (t.group === 'saverlook') return [
       { id: 'svmotion', title: 'Photo motion', horizontal: true, items: options('svmotion', ['drift', 'still']) },
+      { id: 'svpos', title: 'Clock on the screensaver', horizontal: true, items: options('svpos', ['move', 'fixed']) },
       { id: 'svshow', title: 'Show', items: options('svclock', ['on']).concat(options('svdate', ['on'])).concat(NOWPLAYING ? options('svmusic', ['on']) : []),
         reason: 'With everything off, only the photos remain.' }];
     if (t.group === 'focus') return [
       { id: 'focus', title: 'Focus style', horizontal: true, items: options('focus', ['type', 'glass']) },
       { id: 'material', title: 'Material', horizontal: true, items: options('material', ['soft', 'frost', 'tint'], inactive),
-        reason: inactive ? flat ? 'Materials are available with a Photo background.' : 'Choose Glass focus or the Dock layout to use materials.' : '' }
+        reason: inactive ? flat ? 'Materials are available with a Photo background.' : 'Choose Glass focus or the Dock layout to use materials.' : '' },
+      { id: 'fmore', title: '', items: [{ action: 'open.focusmore', label: 'Colour and motion', description: [VALUE_NAMES[S.c.tint], VALUE_NAMES[S.c.motion]].map(T).join(', '), more: true }] }
+    ];
+    if (t.group === 'focusmore') return [
+      { id: 'tint', title: 'Accent', horizontal: true, items: options('tint', ['none', 'warm', 'cool', 'rose', 'green'], flat) },
+      { id: 'dglass', title: 'App row glass', horizontal: true, items: options('dglass', ['clear', 'default', 'solid'], flat || S.c.layout !== 'dock') },
+      { id: 'isize', title: 'Icon size', horizontal: true, items: options('isize', ['small', 'default', 'large'], S.c.layout !== 'dock' || S.c.apps === 'text') },
+      { id: 'motion', title: 'Background motion', horizontal: true, items: options('motion', ['still', 'drift'], flat),
+        reason: flat ? 'Accent, glass and motion need a Photo background.' : S.c.motion === 'drift' ? 'The photo and its glass drift slowly together.' : '' }
     ];
     if (t.group === 'phone') return phoneSections(flat);
     if (t.group === 'online' || t.group === 'unsplash' || t.group === 'animated') {
@@ -1345,9 +1362,8 @@
         reason: flat ? 'Choose Photo in Background to use online wallpapers.' : S.onlineStatus ? ONLINE_STATUS[S.onlineStatus] || ''
           : missing.length ? keyNote(missing) : '' }];
     }
-    if (t.group === 'rotation') return [{ id: 'mode', title: '', items: options('mode', MODES.map(function (m) { return m.id; }), flat) },
-      { id: 'motion', title: 'Motion', horizontal: true, items: options('motion', ['still', 'drift'], flat),
-        reason: flat ? 'Choose Photo in Background to use rotation and motion.' : S.c.motion === 'drift' ? 'The photo and its glass drift slowly together.' : 'Timed changes pause while Settings or another panel is open.' }];
+    if (t.group === 'rotation') return [{ id: 'mode', title: '', items: options('mode', MODES.map(function (m) { return m.id; }), flat),
+      reason: flat ? 'Choose Photo in Background to use rotation.' : '' }];
     if (PARENT[t.group] && remotePage(t)) return remoteSections(t);
     return [{ id: 'samsung', title: '', items: [
       { action: 'samsung.home', label: TV.home, description: TV.homeLine },
@@ -1445,6 +1461,7 @@
     else if (item.action === 'open.idle') openAppearance('idle');
     else if (item.action === 'open.saveropts') openAppearance('saveropts');
     else if (item.action === 'open.saverlook') openAppearance('saverlook');
+    else if (item.action === 'open.focusmore') openAppearance('focusmore');
     else if (item.action === 'open.bgmore') openAppearance('bgmore');
     else if (item.action === 'saver.start') startSaver();
     else if (item.action === 'phone.toggle') { PHONE.enable(!S.phone.enabled); S.phone = PHONE.info(); }
@@ -1619,7 +1636,8 @@
     var t = top(), sheet = !!V[t.id].sheet, shown = wall(S.shown ? S.shown.wall : S.c.wall), np = npArt(), palette = np ? null : ADAPTIVE_INK[shown.id];
     var adaptive = applyAdaptiveInk(palette), tr = np ? 'light' : adaptive && palette.tr ? palette.tr.pol : shown.ut.tr, br = np ? 'light' : adaptive && palette.br ? palette.br.pol : shown.ut.br;
     stage.className = 'stage bg-' + S.c.bg + ' l-' + S.c.layout + ' v-' + S.variant + ' m-' + (materialApplies() ? S.c.material : 'none') + ' f-' + S.c.focus + ' a-' + S.c.apps + ' u-' + S.c.controls + ' g-' + S.geom + ' tone-' + (np ? 'dark' : shown.tone) + ' tr-' + tr + ' br-' + br + wallClasses(shown) + inkRungClasses(palette, adaptive) + ' at-' + t.id + ' font-' + homeFont() + (homeFont() !== 'manrope' ? ' font-custom' : '') + (S.fontSwitch ? ' is-font-switch' : '') + (adaptive ? ' has-adaptive-ink adaptive-tl-' + palette.tl.pol : '') + (!adaptive && !np && shown.clockInk ? ' has-clock-ink' : '') + (!adaptive && !np && shown.dockClockInk ? ' has-dock-clock-ink' : '') + (np ? ' has-np-art' : '') + (S.saver ? ' is-saver' : '') + (registeredMaterial(shown.id) ? ' registered-material' : '') + (sheet ? ' is-sheet' : '') + (S.reflow ? ' is-reflow' : '') + ' mo-' + (S.c.bg === 'photo' && !animated(shown) ? S.c.motion : 'still') + (syncPause() ? ' anim-paused' : '') + (nightActive() ? ' is-night nd-' + S.c.ndim : '') + (S.idleHidden && top().id === 'home' ? ' is-idle' : '')
-      + ' ls-' + (isShelf() ? 'shelf' : 'glass') + ' cs-' + S.c.csize + ' cw-' + S.c.cweight + ' tw-' + S.c.tweight + ' ts-' + S.c.tsize;
+      + ' ls-' + (isShelf() ? 'shelf' : 'glass') + ' cs-' + S.c.csize + ' cw-' + S.c.cweight + ' tw-' + S.c.tweight + ' ts-' + S.c.tsize
+      + ' cp-' + S.c.cpos + ' tint-' + S.c.tint + ' dg-' + S.c.dglass + ' is-' + S.c.isize + ' npd-' + S.c.npdim;
     if (!adaptive && !np && shown.clockInk) stage.style.setProperty('--clock-ink', shown.clockInk);
     else stage.style.removeProperty('--clock-ink');
     if (!adaptive && !np && shown.dockClockInk) stage.style.setProperty('--dock-clock-ink', shown.dockClockInk);
@@ -1664,7 +1682,8 @@
 
   function clockText() {
     var d = new Date(), h = S.c.cformat === '24' ? d.getHours() : d.getHours() % 12 || 12, m = d.getMinutes();
-    return (S.c.cformat === '24' && h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+    var sec = d.getSeconds();
+    return (S.c.cformat === '24' && h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + (S.c.csec === 'on' ? ':' + (sec < 10 ? '0' : '') + sec : '');
   }
   function dateText() {
     try { return new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) { return new Date().toDateString(); }
@@ -2116,7 +2135,7 @@
     }
     setHTML(appearanceBack, command({ action: 'settings.back', label: parentName(t) }, icon('left') + '<span>' + esc(parentName(t)) + '</span>', 'setting-back'));
     setHTML(appearanceRows, detailSections(t).map(function (section) {
-      return '<section class="setting-section' + (section.horizontal ? ' is-horizontal' + (section.items.length >= 4 ? ' is-many' : '') : '') + ' section-' + section.id + '">'
+      return '<section class="setting-section' + (section.horizontal ? ' is-horizontal' + (section.items.length >= 4 ? ' is-many' : '') + (section.items.length >= 5 ? ' is-five' : '') : '') + ' section-' + section.id + '">'
         + (section.title ? '<h3 class="setting-label" id="setting-' + section.id + '">' + esc(section.title) + '</h3>' : '')
         + (section.qr ? '<div class="setting-qr">' + (section.qr.length > 1 ? '<img src="' + section.qr + '" alt="">' : '') + '<div class="setting-qr-copy"><h3>' + esc('Scan with your phone') + '</h3><p>' + esc(section.qrNote) + '</p>'
           + (section.url ? '<p class="setting-url">' + escRaw(section.url.replace(/^http:\/\//, '')) + '</p>' : '') + '</div></div>' : '')
@@ -2498,7 +2517,7 @@
     if (top().id === 'home' || isSettingsDetail(top())) renderCaption(top(), homeState(top()));
     if (S.saver) renderSaver(); else if (!saverTimer) saverReset();
     syncAwake();
-    clockTimer = setTimeout(updateClock, 60000 - (Date.now() % 60000) + 30);
+    clockTimer = setTimeout(updateClock, S.c.csec === 'on' ? 1000 - (Date.now() % 1000) + 20 : 60000 - (Date.now() % 60000) + 30);
   }
   function focusStage() { try { stage.focus({ preventScroll: true }); } catch (e) { stage.focus(); } }
   function after() { norm(); render(); syncRotation(); }

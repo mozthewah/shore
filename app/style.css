@@ -509,7 +509,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .is-horizontal .setting-choice{flex:1;min-width:max-content;min-height:92px;padding:12px 20px;gap:16px;font-size:36px}
 .is-horizontal .setting-tick{width:26px;margin-left:0}
 .is-horizontal .setting-tick .ico{width:26px;height:26px}
-.is-horizontal.is-many .setting-options{gap:4px}.is-horizontal.is-many .setting-choice{padding:12px 14px;gap:10px;font-size:33px}
+.is-horizontal.is-many .setting-options{gap:2px}.is-horizontal.is-many .setting-choice{padding:12px 12px;gap:8px;font-size:31px}.is-horizontal.is-five .setting-choice{padding:12px 9px;gap:6px;font-size:29px}
 .section-material .setting-choice:last-child{flex:1.4}
 .detail-background .section-rotation .setting-choice{padding-left:128px}
 .detail-focus .setting-section+.setting-section{margin-top:64px}
@@ -758,3 +758,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .sv-title .wave i{height:28px;width:5px}
 .sv-artist{font-size:30px;line-height:40px;opacity:.82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:880px}
 .wx{width:1.15em;height:1.15em;margin-right:.3em;vertical-align:-.2em;stroke-width:1.7!important}
+/* ---------- Personal touches: clock position, accent, app row glass, icon size, album art dimming ---------- */
+.cp-center.l-dock .caption{left:360px;right:360px;max-width:none;align-items:center;text-align:center}
+.tint-warm{--accent:242,197,139}.tint-cool{--accent:140,190,235}.tint-rose{--accent:236,160,178}.tint-green{--accent:150,205,160}
+.tint-warm .mat::before,.tint-cool .mat::before,.tint-rose .mat::before,.tint-green .mat::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(var(--accent),.16);pointer-events:none;z-index:1}
+.tint-warm .plate,.tint-cool .plate,.tint-rose .plate,.tint-green .plate{box-shadow:inset 0 0 0 400px rgba(var(--accent),.20)}
+.dg-clear .mat{opacity:.55}
+.dg-solid .mat-veil{background:rgba(8,14,18,.5)!important}
+.dg-solid .mat-scrim{display:block}
+.is-small .dock .tile .mark{transform:scale(.82);transform-origin:50% 100%}
+.is-large .dock .tile .mark{transform:scale(1.22);transform-origin:50% 100%}
+.np-bg::after{content:"";position:absolute;left:0;top:0;width:1920px;height:1080px;background:#000;opacity:0;transition:opacity 600ms ease;pointer-events:none}
+.npd-soft .np-bg::after{opacity:.18}
+.npd-strong .np-bg::after{opacity:.38}

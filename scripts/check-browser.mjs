@@ -395,7 +395,7 @@ try {
     check('Photo tools are reachable from Background', backgroundActions.includes('background.wallpaper') && backgroundActions.includes('background.rotation'), backgroundActions);
     await act('background.rotation');
     const rotationRows = (await radios()).filter(r => r.action.startsWith('rotation.'));
-    check('All five rotation modes are visible together', same(rotationRows.map(r => r.action).sort(), ['fixed', 'open', '5', '15', '60'].map(v => 'rotation.' + v).sort()), rotationRows);
+    check('All rotation modes are visible together', same(rotationRows.map(r => r.action).sort(), ['fixed', 'open', '5', '15', '30', '60', 'day'].map(v => 'rotation.' + v).sort()), rotationRows);
     await nav('back');
     check('Rotation Back restores its Background row', (await state()).settingsGroup === 'background' && (await state()).focusAction === 'background.rotation', await call('where'));
     await group('samsung');
@@ -908,6 +908,16 @@ try {
     check('One photo per slide, without motion or clock', await current.evaluate(() => document.querySelectorAll('.sv-slide.is-on .sv-tile').length === 1
       && !!document.querySelector('.sv-slide.is-on .sv-img.still') && !document.querySelector('.sv-clock').textContent));
     await current.evaluate(() => ShoreQA.saver(false));
+  });
+  await run('Personal touches: accent, glass, icons, clock position and seconds', async () => {
+    await page(); await group('focus'); await act('open.focusmore');
+    await act('choice.tint.warm'); await ready(); await act('choice.dglass.solid'); await ready(); await act('choice.isize.large'); await ready();
+    const look = (await stored()).look;
+    check('Colour and motion choices persist', look.tint === 'warm' && look.dglass === 'solid' && look.isize === 'large', look);
+    check('Stage carries the chosen accent, glass and icon size', await current.evaluate(() => /tint-warm/.test(document.getElementById('stage').className) && /dg-solid/.test(document.getElementById('stage').className) && /is-large/.test(document.getElementById('stage').className)));
+    await current.evaluate(() => ShoreQA.look({ layout: 'dock', cpos: 'center', csec: 'on' })); await ready(); await current.evaluate(() => ShoreQA.scene('home'));
+    check('Seconds show in the clock', /\d:\d\d:\d\d/.test(await current.evaluate(() => document.querySelector('.caption .clock').textContent)));
+    check('Centred clock is centred', await current.evaluate(() => { const r = document.querySelector('.caption').getBoundingClientRect(), s = document.getElementById('stage').getBoundingClientRect(); return Math.abs((r.left + r.right) / 2 - (s.left + s.right) / 2) < 4; }));
   });
   await run('Open rotation and browser fallback', async () => {
     await page({ seed: baseline({ mode: 'open' }) }); check('Open mode advances at cold start', (await state()).wallpaper === walls[1].id);
