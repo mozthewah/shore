@@ -720,19 +720,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .has-np-art .photo-video{visibility:hidden}
 
 /* Shore's screensaver: covers everything; the Home underneath stops drawing. */
-.saver{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:#000;opacity:0;visibility:hidden;transition:opacity 1200ms ease,visibility 0s linear 1200ms;color:#fff;z-index:50}
+.saver{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:#000;opacity:0;visibility:hidden;transition:opacity 350ms ease,visibility 0s linear 350ms;color:#fff;z-index:50}
 .saver.is-on{opacity:1;visibility:visible;transition:opacity 1200ms ease}
 .is-saver .scene,.is-saver .appearance,.is-saver .sheet,.is-saver .focus-status{visibility:hidden}
-.sv-photos,.sv-art{position:absolute;left:0;top:0;width:1920px;height:1080px}
-.sv-img,.sv-art-img{position:absolute;left:0;top:0;width:1920px;height:1080px;max-width:none;object-fit:cover;opacity:0;transition:opacity 2400ms ease}
-.sv-img.is-on,.sv-art-img.is-on{opacity:1}
-.sv-img.is-out{opacity:0}
-.sv-img.kb-0{transform-origin:20% 30%}.sv-img.kb-1{transform-origin:80% 70%}.sv-img.kb-2{transform-origin:75% 25%}.sv-img.kb-3{transform-origin:25% 75%}
-.sv-img.is-on,.sv-img.is-out{animation:sv-kb 52s linear both}
-@keyframes sv-kb{from{transform:scale(1)}to{transform:scale(1.09)}}
-.sv-art{opacity:0;transition:opacity 1200ms ease}
-.saver.has-art .sv-art{opacity:1}
-.saver.has-art .sv-photos{visibility:hidden}
+.sv-slide{position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:0;transition:opacity 2400ms ease}
+.sv-slide.is-on{opacity:1}
+.sv-tile{position:absolute;overflow:hidden;background:#0b0f12}
+.l-full .t0{left:0;top:0;width:1920px;height:1080px}
+.l-pair .t0{left:0;top:0;width:954px;height:1080px}.l-pair .t1{left:966px;top:0;width:954px;height:1080px}
+.l-trio .t0{left:0;top:0;width:1266px;height:1080px}.l-trio .t1{left:1278px;top:0;width:642px;height:534px}.l-trio .t2{left:1278px;top:546px;width:642px;height:534px}
+.sv-img{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:cover;transform:scale(1.18)}
+.sv-slide.is-on .sv-img,.sv-slide.is-out .sv-img{animation:34s linear both}
+.sv-img.m0{animation-name:sv-m0!important}.sv-img.m1{animation-name:sv-m1!important}.sv-img.m2{animation-name:sv-m2!important}.sv-img.m3{animation-name:sv-m3!important}
+@keyframes sv-m0{from{transform:scale(1.22) translate(-3%,-2%)}to{transform:scale(1.04) translate(2%,1.5%)}}
+@keyframes sv-m1{from{transform:scale(1.04) translate(2.5%,0)}to{transform:scale(1.2) translate(-3%,-1.5%)}}
+@keyframes sv-m2{from{transform:scale(1.18) translate(3%,2.5%)}to{transform:scale(1.06) translate(-2%,-2%)}}
+@keyframes sv-m3{from{transform:scale(1.08) translate(-2.5%,2%)}to{transform:scale(1.22) translate(2.5%,-1%)}}
 .sv-shade{position:absolute;left:0;top:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 40%,rgba(0,0,0,.42)),linear-gradient(to top,rgba(0,0,0,.42),rgba(0,0,0,0) 46%)}
 .sv-night{position:absolute;left:0;top:0;width:1920px;height:1080px;background:#000;opacity:0}
 .is-night .sv-night{opacity:calc(1 - var(--night))}
@@ -753,3 +756,4 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .sv-title .wave{width:36px;height:28px;margin-right:16px}
 .sv-title .wave i{height:28px;width:5px}
 .sv-artist{font-size:30px;line-height:40px;opacity:.82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:880px}
+.wx{width:1.15em;height:1.15em;margin-right:.3em;vertical-align:-.2em;stroke-width:1.7!important}

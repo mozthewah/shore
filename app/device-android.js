@@ -152,12 +152,13 @@
     onChange: function (fn) { phoneListeners.push(fn); }
   };
   var nowPlaying = {
-    info: function () {
+    /* lookup: allow a sharper cover and a wide artist picture from the internet (artist, title and album are sent). */
+    info: function (lookup) {
       var r;
-      try { r = JSON.parse(bridge.nowPlaying()); } catch (e) { r = {}; }
-      var img = /^\/nowplaying\/[0-9a-f]+(-b)?\.jpg$/;
+      try { r = JSON.parse(bridge.nowPlayingWith ? bridge.nowPlayingWith(!!lookup) : bridge.nowPlaying()); } catch (e) { r = {}; }
+      var img = /^\/nowplaying\/[0-9a-f]+(-b)?\.jpg$/, wide = /^\/nowplaying\/a\/[0-9a-f]+\.jpg$/;
       return { access: !!r.access, playing: !!r.playing && typeof r.title === 'string', title: String(r.title || ''), artist: String(r.artist || ''), app: String(r.app || ''),
-        art: img.test(r.art || '') ? r.art : '', back: img.test(r.back || '') ? r.back : '' };
+        art: img.test(r.art || '') ? r.art : '', back: img.test(r.back || '') ? r.back : '', wide: wide.test(r.wide || '') ? r.wide : '' };
     },
     openSettings: function (done) { reply(ask('nowPlayingSettings'), done, 'Notification access could not open.'); }
   };

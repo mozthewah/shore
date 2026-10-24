@@ -48,6 +48,10 @@ final class DeviceBridge {
     @JavascriptInterface
     public String nowPlaying() { return NowPlayingService.info(context); }
 
+    /** Same, and with lookup true also a sharper cover (iTunes) and a wide artist picture (TheAudioDB) when found. */
+    @JavascriptInterface
+    public String nowPlayingWith(boolean lookup) { return NowPlayingService.info(context, lookup); }
+
     /** Opens the screen where the user allows CleanFrame to read what is playing. */
     @JavascriptInterface
     public boolean nowPlayingSettings() {

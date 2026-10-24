@@ -5,7 +5,7 @@
 (function (root) {
   'use strict';
   var KEY = 'cleanframe.weather.v2', MAX_AGE = 30 * 60000, RETRY = 10 * 60000;
-  var state = { temp: null, code: -1, at: 0, place: '', tried: 0, busy: false }, listeners = [];
+  var state = { temp: null, code: -1, day: 1, at: 0, place: '', tried: 0, busy: false }, listeners = [];
   /* WMO weather codes, grouped. */
   function label(code) {
     if (code === 0) return 'Clear';
@@ -18,6 +18,18 @@
     if (code >= 80 && code <= 82) return 'Showers';
     if (code >= 85 && code <= 86) return 'Snow showers';
     if (code >= 95) return 'Thunderstorm';
+    return '';
+  }
+  /* Icon name for the same groups; clear and partly cloudy have night versions. */
+  function iconName(code, day) {
+    if (code === 0) return day ? 'sun' : 'moon';
+    if (code <= 2) return day ? 'partly' : 'partly-night';
+    if (code === 3) return 'cloud';
+    if (code === 45 || code === 48) return 'fog';
+    if (code >= 51 && code <= 57) return 'drizzle';
+    if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return 'rain';
+    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+    if (code >= 95) return 'storm';
     return '';
   }
   /* Default unit before the user picks one: °F only for US-style English. */
@@ -45,9 +57,9 @@
     try { x.send(); } catch (e) { done(null); }
   }
   function load() {
-    try { var saved = JSON.parse(root.localStorage.getItem(KEY)); if (saved && typeof saved.temp === 'number') { state.temp = saved.temp; state.code = +saved.code; state.at = +saved.at || 0; state.place = String(saved.place || ''); } } catch (e) { }
+    try { var saved = JSON.parse(root.localStorage.getItem(KEY)); if (saved && typeof saved.temp === 'number') { state.temp = saved.temp; state.code = +saved.code; state.at = +saved.at || 0; state.place = String(saved.place || ''); state.day = saved.day === 0 ? 0 : 1; } } catch (e) { }
   }
-  function save() { try { root.localStorage.setItem(KEY, JSON.stringify({ temp: state.temp, code: state.code, at: state.at, place: state.place })); } catch (e) { } }
+  function save() { try { root.localStorage.setItem(KEY, JSON.stringify({ temp: state.temp, code: state.code, day: state.day, at: state.at, place: state.place })); } catch (e) { } }
   function changed() { listeners.forEach(function (fn) { try { fn(); } catch (e) { } }); }
   function refresh(force) {
     var name = place(), now = Date.now();
@@ -58,11 +70,11 @@
     get('https://geocoding-api.open-meteo.com/v1/search?count=1&format=json&name=' + encodeURIComponent(name), function (geo) {
       var hit = geo && geo.results && geo.results[0];
       if (!hit || typeof hit.latitude !== 'number') { state.busy = false; return; }
-      get('https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code&timezone=auto&latitude=' + hit.latitude + '&longitude=' + hit.longitude, function (data) {
+      get('https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code,is_day&timezone=auto&latitude=' + hit.latitude + '&longitude=' + hit.longitude, function (data) {
         state.busy = false;
         var c = data && data.current;
         if (!c || typeof c.temperature_2m !== 'number') return;
-        state.temp = c.temperature_2m; state.code = +c.weather_code;
+        state.temp = c.temperature_2m; state.code = +c.weather_code; state.day = c.is_day === 0 ? 0 : 1;
         state.at = Date.now(); state.place = name;
         save(); changed();
       });
@@ -77,6 +89,8 @@
       var value = unit === 'f' ? state.temp * 9 / 5 + 32 : state.temp;
       return Math.round(value) + (unit === 'f' ? ' °F' : ' °C') + (word ? ' ' + T(word) : '');
     },
+    /* Icon for the current sky (sun, moon, partly, partly-night, cloud, fog, drizzle, rain, snow, storm), or ''. */
+    icon: function () { return state.temp === null || Date.now() - state.at > 3 * 3600000 ? '' : iconName(state.code, state.day); },
     defaultUnit: function () { return fahrenheit() ? 'f' : 'c'; },
     refresh: refresh,
     onChange: function (fn) { listeners.push(fn); }
