@@ -892,6 +892,23 @@ try {
     await current.evaluate(() => ShoreQA.look({ saver: 'off' }));
     check('Screensaver off stops the timer', !(await current.evaluate(() => ShoreQA.saver())).scheduled || (await current.keyboard.press('ArrowLeft'), !(await current.evaluate(() => ShoreQA.saver())).scheduled));
   });
+  await run('Screensaver options: arrangement, motion and what shows', async () => {
+    await page(); await group('display'); await act('open.idle'); await act('open.saveropts');
+    check('Screensaver options offer photos, arrangement and slide time', await current.locator('[data-action^="choice.svsrc."]').count() === 3
+      && await current.locator('[data-action^="choice.svlay."]').count() === 3 && await current.locator('[data-action^="choice.svtime."]').count() === 3);
+    await act('choice.svlay.single'); await ready();
+    check('Arrangement persists', (await stored()).look.svlay === 'single');
+    await act('open.saverlook');
+    await act('choice.svclock.on'); await ready();
+    check('Clock toggle turns the saver clock off', (await stored()).look.svclock === 'off');
+    await act('choice.svmotion.still'); await ready();
+    check('Photo motion persists', (await stored()).look.svmotion === 'still');
+    await current.evaluate(() => ShoreQA.saver(true));
+    await current.waitForFunction(() => document.querySelector('.sv-slide.is-on'), null, { timeout: 5000 });
+    check('One photo per slide, without motion or clock', await current.evaluate(() => document.querySelectorAll('.sv-slide.is-on .sv-tile').length === 1
+      && !!document.querySelector('.sv-slide.is-on .sv-img.still') && !document.querySelector('.sv-clock').textContent));
+    await current.evaluate(() => ShoreQA.saver(false));
+  });
   await run('Open rotation and browser fallback', async () => {
     await page({ seed: baseline({ mode: 'open' }) }); check('Open mode advances at cold start', (await state()).wallpaper === walls[1].id);
     const first = (await state()).wallpaper;

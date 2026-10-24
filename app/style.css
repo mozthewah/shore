@@ -509,6 +509,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .is-horizontal .setting-choice{flex:1;min-width:max-content;min-height:92px;padding:12px 20px;gap:16px;font-size:36px}
 .is-horizontal .setting-tick{width:26px;margin-left:0}
 .is-horizontal .setting-tick .ico{width:26px;height:26px}
+.is-horizontal.is-many .setting-options{gap:4px}.is-horizontal.is-many .setting-choice{padding:12px 14px;gap:10px;font-size:33px}
 .section-material .setting-choice:last-child{flex:1.4}
 .detail-background .section-rotation .setting-choice{padding-left:128px}
 .detail-focus .setting-section+.setting-section{margin-top:64px}
@@ -731,7 +732,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .l-trio .t0{left:0;top:0;width:1266px;height:1080px}.l-trio .t1{left:1278px;top:0;width:642px;height:534px}.l-trio .t2{left:1278px;top:546px;width:642px;height:534px}
 .sv-img{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;object-fit:cover;transform:scale(1.18)}
 .sv-slide.is-on .sv-img,.sv-slide.is-out .sv-img{animation:34s linear both}
-.sv-img.m0{animation-name:sv-m0!important}.sv-img.m1{animation-name:sv-m1!important}.sv-img.m2{animation-name:sv-m2!important}.sv-img.m3{animation-name:sv-m3!important}
+.sv-img.still{transform:none}.sv-img.m0{animation-name:sv-m0!important}.sv-img.m1{animation-name:sv-m1!important}.sv-img.m2{animation-name:sv-m2!important}.sv-img.m3{animation-name:sv-m3!important}
 @keyframes sv-m0{from{transform:scale(1.22) translate(-3%,-2%)}to{transform:scale(1.04) translate(2%,1.5%)}}
 @keyframes sv-m1{from{transform:scale(1.04) translate(2.5%,0)}to{transform:scale(1.2) translate(-3%,-1.5%)}}
 @keyframes sv-m2{from{transform:scale(1.18) translate(3%,2.5%)}to{transform:scale(1.06) translate(-2%,-2%)}}
