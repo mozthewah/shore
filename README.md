@@ -51,7 +51,7 @@ Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://githu
 | | |
 | --- | --- |
 | ![Inputs in their own row](docs/images/tcl/inputs-row.jpg) | ![Settings](docs/images/tcl/settings.jpg) |
-| ![Online wallpapers](docs/images/tcl/online.jpg) | ![Animated wallpapers](docs/images/tcl/animated.jpg) |
+| ![Wallpaper sources](docs/images/tcl/online.jpg) | ![Animated wallpapers](docs/images/tcl/animated.jpg) |
 | ![Wallpaper gallery with online photos and credits](docs/images/tcl/gallery.jpg) | ![Layout settings](docs/images/tcl/layout.jpg) |
 | ![Shore's screensaver as a mosaic](docs/images/tcl/screensaver.jpg) | ![Screensaver options](docs/images/tcl/screensaver-options.jpg) |
 
@@ -152,7 +152,7 @@ Shore uses the TV's system language: German, French, Spanish, Dutch and Polish a
 
 ### Screensaver
 
-*Settings → Night and idle → When idle.* Shore has its own screensaver instead of the TV's: after 5, 10 (default) or 15 minutes without a button press it fades to a slow slideshow of your wallpapers (the current rotation source, including My photos). Photos drift slowly, and every few slides it shows a mosaic of two or three photos at once. A large clock, the date and the weather sit on top. While music plays it adds a small card with the cover, title and artist; the album art never replaces the photos. The clock moves to another corner every few minutes so nothing sits on the same pixels for hours. Any button wakes Shore without doing anything else. *Start the screensaver now* is on the same page, and the **Screensaver** button on Home and the *Screensaver* remote-button action start it too.
+*Settings → Night and idle → When idle.* Shore has its own screensaver instead of the TV's: after 5, 10 (default) or 15 minutes without a button press it fades to a slow slideshow of your wallpapers (the sources in rotation, including My photos). Photos drift slowly, and every few slides it shows a mosaic of two or three photos at once. A large clock, the date and the weather sit on top. While music plays it adds a small card with the cover, title and artist; the album art never replaces the photos. The clock moves to another corner every few minutes so nothing sits on the same pixels for hours. Any button wakes Shore without doing anything else. *Start the screensaver now* is on the same page, and the **Screensaver** button on Home and the *Screensaver* remote-button action start it too.
 
 *Screensaver options* on the same page choose the photos (*Like Home*, which adds Shore's wallpapers when your rotation has only a few; *Everything*; or *Built-in*), the arrangement (mixed, one photo or mosaics) and 15, 30 or 60 seconds per slide. *Motion and clock* switches the slow pan off and hides the clock, the date and weather or the music card.
 
@@ -206,7 +206,9 @@ To undo, run the same command with `disallow_listener`.
 
 ## Online and animated wallpapers
 
-*Settings → Background → Online wallpapers.* The TV downloads up to eight pictures or clips from the chosen source. On download it renders them once into the same files the bundled gallery uses: photo, thumbnail and four pre-blurred glass layers. Nothing is blurred live, so Home stays smooth. New wallpapers arrive every few hours, and rotation cycles through them.
+*Settings → Background → Online and album art → Wallpaper sources.* Tick as many sources as you like: Shore wallpapers (the bundled gallery), My photos, NASA Astronomy Picture, NASA Image Library, Bing, Wikimedia, Picsum, Unsplash themes and animated loops. Only ticked sources rotate. The page says how many photos are in rotation (or which source couldn't be reached), OK on a row says *Add to rotation* or *Remove from rotation*, and the wallpaper gallery marks every photo that isn't in rotation.
+
+The TV downloads up to eight pictures or clips per source. On download it renders them once into the same files the bundled gallery uses: photo, thumbnail and four pre-blurred glass layers. Nothing is blurred live, so Home stays smooth. New wallpapers arrive every few hours, and rotation cycles through them.
 
 Animated wallpapers play as muted MP4 loops, with glass rendered from the first frame. Klipy GIFs are fetched as MP4s, which are much lighter than GIF files.
 
@@ -216,7 +218,6 @@ NASA, Bing, Wikimedia, Picsum and the bundled loops work without keys. Unsplash,
 unsplash.accessKey=...   # https://unsplash.com/developers
 pexels.apiKey=...        # https://www.pexels.com/api/
 klipy.apiKey=...         # https://partner.klipy.com/
-nasa.apiKey=...          # optional, https://api.nasa.gov/ (the default DEMO_KEY is rate limited)
 ```
 
 > [!WARNING]

@@ -49,7 +49,7 @@ import java.util.concurrent.Executors;
 final class OnlineWallpapers {
     interface Listener { void changed(String entriesJson, String status); }
 
-    static final String[] SOURCES = { "off", "nasa", "nasalib", "bing", "wikimedia", "picsum", "unsplash-nature", "unsplash-city", "unsplash-space",
+    static final String[] SOURCES = { "off", "builtin", "nasa", "nasalib", "bing", "wikimedia", "picsum", "unsplash-nature", "unsplash-city", "unsplash-space",
             "loops", "pexels-ocean", "pexels-rain", "pexels-clouds", "pexels-city", "klipy-lofi", "klipy-rain", "klipy-space", "phone" };
     private static final int MAX_PHOTOS = 8, W = 1920, H = 1080;
     private static final long REFRESH_MS = 6L * 60 * 60 * 1000;
@@ -89,53 +89,77 @@ final class OnlineWallpapers {
         return id;
     }
 
+    /**
+     * The chosen sources as a comma list in a fixed order, e.g. "builtin,nasa,phone"; "off" when none.
+     * "builtin" (Shore's own wallpapers) is handled by the page and never downloaded.
+     */
     String source() { return prefs.getString("source", "off"); }
 
-    /** Called from the page. A new source refreshes immediately; the same source refreshes when stale. */
-    void select(String source, boolean force) {
-        boolean known = false;
-        for (String s : SOURCES) if (s.equals(source)) known = true;
-        if (!known) return;
-        boolean changed = !source.equals(source());
-        prefs.edit().putString("source", source).apply();
-        if (source.equals("off")) { worker.execute(() -> { writeIndex(new JSONArray()); clean(new HashSet<>()); notifyChanged("off"); }); return; }
-        if (source.equals("phone")) { refresh(); return; } // local files: always rebuild the list
+    static List<String> list(String csv) {
+        List<String> out = new ArrayList<>();
+        for (String s : SOURCES) if (!s.equals("off") && ("," + csv + ",").contains("," + s + ",")) out.add(s);
+        return out;
+    }
+
+    private static boolean downloads(List<String> sources) { for (String s : sources) if (!s.equals("builtin")) return true; return false; }
+
+    /** Called from the page with the comma list. A changed list refreshes immediately; the same list refreshes when stale. */
+    void select(String csv, boolean force) {
+        List<String> chosen = list(csv == null ? "" : csv);
+        String normal = chosen.isEmpty() ? "off" : android.text.TextUtils.join(",", chosen);
+        boolean changed = !normal.equals(source());
+        prefs.edit().putString("source", normal).apply();
+        if (!downloads(chosen)) { worker.execute(() -> { writeIndex(new JSONArray()); clean(new HashSet<>()); prefs.edit().remove("failed").apply(); notifyChanged("off"); }); return; }
+        if (chosen.contains("phone") && changed) { refresh(); return; }
         long age = System.currentTimeMillis() - prefs.getLong("refreshed", 0);
         if (changed || force || age > REFRESH_MS) refresh();
     }
 
+    /** Sources that could not be reached on the last refresh, as a comma list. */
+    String failed() { return prefs.getString("failed", ""); }
+
     void refreshIfStale() {
-        if (!source().equals("off") && System.currentTimeMillis() - prefs.getLong("refreshed", 0) > REFRESH_MS) refresh();
+        if (downloads(list(source())) && System.currentTimeMillis() - prefs.getLong("refreshed", 0) > REFRESH_MS) refresh();
     }
 
-    /** A new upload arrived: rebuild the list when "My photos" is the chosen source. */
-    void phoneChanged() { if (source().equals("phone")) refresh(); }
+    /** A new upload arrived: rebuild the list when "My photos" is one of the chosen sources. */
+    void phoneChanged() { if (list(source()).contains("phone")) refresh(); }
 
     private void refresh() {
         if (busy) { again = true; return; }
         busy = true;
-        final String source = source();
+        final String csv = source();
         notifyStatus("loading");
         worker.execute(() -> {
             String status = "ready";
+            List<String> failedNow = new ArrayList<>();
             try {
-                List<Photo> photos = fetch(source);
                 JSONArray entries = new JSONArray();
                 Set<String> keep = new HashSet<>();
-                int limit = source.equals("phone") ? Companion.MAX_FILES : MAX_PHOTOS;
-                for (Photo p : photos) {
-                    if (entries.length() >= limit) break;
-                    if (!source.equals(source())) return; // superseded by another choice
-                    try {
-                        if (!new File(wallDir, p.id + ".jpg").exists() || p.video && !new File(wallDir, p.id + ".mp4").exists()
-                                || p.gif && !new File(wallDir, p.id + ".gif").exists()) build(p);
-                        entries.put(entry(p));
-                        keep.add(p.id);
-                    } catch (Exception ignored) { /* skip one bad photo, keep the rest */ }
+                // Each source keeps its own share, so one busy source can't crowd out the others.
+                for (String source : list(csv)) {
+                    if (source.equals("builtin")) continue;
+                    if (!csv.equals(source())) return; // superseded by another choice
+                    int limit = source.equals("phone") ? Companion.MAX_FILES : MAX_PHOTOS, got = 0;
+                    List<Photo> photos;
+                    try { photos = fetch(source); } catch (Exception e) { failedNow.add(source); continue; }
+                    for (Photo p : photos) {
+                        if (got >= limit) break;
+                        if (!csv.equals(source())) return;
+                        try {
+                            if (!new File(wallDir, p.id + ".jpg").exists() || p.video && !new File(wallDir, p.id + ".mp4").exists()
+                                    || p.gif && !new File(wallDir, p.id + ".gif").exists()) build(p);
+                            entries.put(entry(p).put("source", source));
+                            keep.add(p.id);
+                            got++;
+                        } catch (Exception ignored) { /* skip one bad photo, keep the rest */ }
+                    }
+                    if (got == 0 && !source.equals("phone")) failedNow.add(source);
                 }
+                prefs.edit().putString("failed", android.text.TextUtils.join(",", failedNow)).apply();
                 if (entries.length() == 0) {
-                    status = "empty";
-                    if (source.equals("phone")) { writeIndex(entries); clean(keep); }
+                    status = failedNow.isEmpty() ? "empty" : "error";
+                    if (list(csv).contains("phone")) { writeIndex(entries); clean(keep); }
                 } else {
                     writeIndex(entries);
                     clean(keep);

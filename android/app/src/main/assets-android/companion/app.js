@@ -253,6 +253,23 @@
       setTimeout(function () { var on = opts.querySelector('.on'); if (on) opts.scrollLeft = on.offsetLeft - 16; }, 0);
       return row;
     }
+    if (item.kind === 'multi') {
+      opts = el('div', 'chips is-list');
+      item.options.forEach(function (o) {
+        var on = item.value.indexOf(o.value) >= 0, b = el('button', 'chip check' + (on ? ' on' : ''), o.label);
+        b.type = 'button'; b.setAttribute('aria-pressed', String(on));
+        b.onclick = function () {
+          var i = item.value.indexOf(o.value);
+          if (i >= 0 && item.value.length === 1) return; // at least one source stays
+          if (i >= 0) item.value.splice(i, 1); else item.value.push(o.value);
+          b.classList.toggle('on', i < 0); b.setAttribute('aria-pressed', String(i < 0));
+          set('source', o.value);
+        };
+        opts.appendChild(b);
+      });
+      row.appendChild(opts);
+      return row;
+    }
     opts = el('div', 'chips' + (item.kind === 'list' ? ' is-list' : ''));
     item.options.forEach(function (o) {
       var b = el('button', 'chip' + (o.value === item.value ? ' on' : ''), o.label);

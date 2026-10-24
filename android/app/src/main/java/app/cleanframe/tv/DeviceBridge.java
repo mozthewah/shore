@@ -103,7 +103,7 @@ final class DeviceBridge {
     public String onlineInfo() {
         try {
             return new JSONObject().put("source", online == null ? "off" : online.source()).put("unsplash", OnlineWallpapers.unsplashAvailable())
-                    .put("pexels", OnlineWallpapers.pexelsAvailable()).put("klipy", OnlineWallpapers.klipyAvailable()).put("phone", phone != null).toString();
+                    .put("pexels", OnlineWallpapers.pexelsAvailable()).put("klipy", OnlineWallpapers.klipyAvailable()).put("phone", phone != null).put("failed", online == null ? "" : online.failed()).toString();
         } catch (Exception e) { return "{}"; }
     }
 

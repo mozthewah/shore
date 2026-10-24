@@ -36,15 +36,14 @@
     .concat(window.CleanFrameOnlineWallpapers || []);
   /* Online photo sources (Android shell only). Photos arrive pre-rendered, like the bundled gallery. */
   var ONLINE = window.FrameDevice && FrameDevice.online, ONLINE_INFO = ONLINE ? ONLINE.info() : { source: 'off', unsplash: false };
-  var SOURCES = [{ id: 'off', name: 'Off' }, { id: 'nasa', name: 'NASA Astronomy Picture' }, { id: 'nasalib', name: 'NASA Image Library' }, { id: 'bing', name: 'Bing Picture of the Day' },
+  var SOURCES = [{ id: 'builtin', name: 'Shore wallpapers' }, { id: 'phone', name: 'My photos', key: 'phone' }, { id: 'nasa', name: 'NASA Astronomy Picture' }, { id: 'nasalib', name: 'NASA Image Library' }, { id: 'bing', name: 'Bing Picture of the Day' },
     { id: 'wikimedia', name: 'Wikimedia Picture of the Day' }, { id: 'picsum', name: 'Random photos (Picsum)' },
     { id: 'unsplash-nature', name: 'Unsplash · Nature and landscapes', unsplash: true }, { id: 'unsplash-city', name: 'Unsplash · Cities and architecture', unsplash: true },
     { id: 'unsplash-space', name: 'Unsplash · Night sky and space', unsplash: true },
     { id: 'loops', name: 'Bundled loops', page: 'animated' }, { id: 'pexels-ocean', name: 'Pexels · Ocean waves', key: 'pexels', page: 'animated' },
     { id: 'pexels-rain', name: 'Pexels · Rain on glass', key: 'pexels', page: 'animated' }, { id: 'pexels-clouds', name: 'Pexels · Clouds', key: 'pexels', page: 'animated' },
     { id: 'pexels-city', name: 'Pexels · City at night', key: 'pexels', page: 'animated' }, { id: 'klipy-lofi', name: 'Klipy · Lofi', key: 'klipy', page: 'animated' },
-    { id: 'klipy-rain', name: 'Klipy · Cozy rain', key: 'klipy', page: 'animated' }, { id: 'klipy-space', name: 'Klipy · Space', key: 'klipy', page: 'animated' },
-    { id: 'phone', name: 'My photos', key: 'phone', page: 'phone' }];
+    { id: 'klipy-rain', name: 'Klipy · Cozy rain', key: 'klipy', page: 'animated' }, { id: 'klipy-space', name: 'Klipy · Space', key: 'klipy', page: 'animated' }];
   SOURCES.forEach(function (o) { if (o.unsplash) { o.key = 'unsplash'; o.page = 'unsplash'; } else if (!o.page) o.page = 'online'; });
   var ONLINE_STATUS = { loading: 'Downloading wallpapers…', error: 'Couldn’t reach this source. Shore tries again later.', empty: 'No suitable landscape photos right now.', ready: 'New wallpapers arrive every few hours.', off: '' };
 
@@ -422,7 +421,7 @@
       font: pick(modern.font, LOOK_VALUES.font, 'manrope'), wall: wall(modern.wall || s.wallpaper) ? modern.wall || s.wallpaper : WALLS[0].id,
       home: h, recent: recent, lastApp: h.indexOf(s.lastApp) >= 0 ? s.lastApp : h[0],
       mode: pick(s.mode, MODES.map(function (m) { return m.id; }), 'fixed'),
-      source: pick(ONLINE_INFO.source, SOURCES.map(function (o) { return o.id; }), 'off')
+      source: sourceCsv(ONLINE ? ONLINE_INFO.source : 'builtin')
     };
     Object.keys(MORE_LOOK).forEach(function (k) { out[k] = pick(modern[k], LOOK_VALUES[k], MORE_LOOK[k]); });
     return out;
@@ -609,7 +608,7 @@
   function openSettings() { push({ id: 'settings', f: { id: S.settingsFocus } }); }
   function openAppearance(group) {
     var axis = { background: 'bg', layout: 'layout', typography: 'tweight', fonts: 'font', focus: 'focus', clock: 'cformat', display: 'night' }[group];
-    var action = S.detailFocus[group] || (axis ? 'choice.' + axis + '.' + S.c[axis] : group === 'rotation' ? 'rotation.' + S.c.mode : PARENT[group] === 'online' || group === 'online' ? 'online.' + S.c.source : 'samsung.home');
+    var action = S.detailFocus[group] || (axis ? 'choice.' + axis + '.' + S.c[axis] : group === 'rotation' ? 'rotation.' + S.c.mode : PARENT[group] === 'online' || group === 'online' ? 'online.' + sourceList()[0] : 'samsung.home');
     push({ id: 'appearance', group: group, f: { action: action } });
   }
   function openMessage(key) { push({ id: 'message', msg: key, f: { b: 0 } }); }
@@ -948,6 +947,19 @@
   function subPage(t) { return !!PARENT[t.group]; }
   function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : DETAIL_NAMES[group]; }
   function parentName(t) { return PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
+  /* ---------- Wallpaper sources: any mix of Shore's own, My photos and online sources ----------
+     S.c.source is a comma list in SOURCES order. Only photos from these sources rotate. */
+  function sourceCsv(value) {
+    var have = String(value || '').split(','), out = SOURCES.filter(function (o) { return have.indexOf(o.id) >= 0; }).map(function (o) { return o.id; });
+    return out.length ? out.join(',') : 'builtin'; // "off" and old empty choices mean Shore's own wallpapers
+  }
+  function sourceList() { return S.c.source.split(','); }
+  function sourceOn(id) { return sourceList().indexOf(id) >= 0; }
+  function sourceName(id) { var o = SOURCES.filter(function (x) { return x.id === id; })[0]; return o ? o.name : id; }
+  function sourceShort() { var l = sourceList().map(function (id) { return T(sourceName(id)); }); return l.length > 1 ? l[0] + ' +' + (l.length - 1) : l[0]; }
+  function sourceSummary() { return sourceList().map(function (id) { return T(sourceName(id)); }).join(', '); }
+  /* A wallpaper rotates when its source is chosen. Online and phone photos carry their source; older entries count as online. */
+  function inRotation(w) { return w.online ? !w.source || sourceOn(w.source) : sourceOn('builtin'); }
   function source() { for (var i = 0; i < SOURCES.length; i++) if (SOURCES[i].id === S.c.source) return SOURCES[i]; return SOURCES[0]; }
   function mode() { for (var i = 0; i < MODES.length; i++) if (MODES[i].id === S.c.mode) return MODES[i]; return MODES[0]; }
   function settingsRows() {
@@ -981,9 +993,9 @@
     else if (id === 'phone') openPhone();
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Online wallpapers', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', clockextra: 'Under the clock', idle: 'When idle', bgmore: 'Online and album art', saveropts: 'Screensaver options', saverlook: 'Motion and clock', focusmore: 'Colour and motion' };
+  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Wallpaper sources', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', clockextra: 'Under the clock', idle: 'When idle', bgmore: 'Online and album art', saveropts: 'Screensaver options', saverlook: 'Motion and clock', focusmore: 'Colour and motion' };
   function choice(axis, value, disabled) {
-    if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: SOURCES.filter(function (o) { return o.id === value; })[0].name };
+    if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
       label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : /^(svclock|svdate|svmusic|wicon|cwave)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
@@ -1272,7 +1284,7 @@
     sections.push({ id: 'phoneuse', title: 'Wallpaper', items: [choice('source', 'phone', flat || !n)]
       .concat(n ? [{ action: 'phone.clear', label: 'Remove all my photos', description: n === 1 ? '1 photo' : n + ' photos' }] : [])
       .concat(p.enabled ? [{ action: 'phone.forget', label: 'Forget paired phones' }] : []),
-      reason: flat ? 'Choose Photo in Background to use online wallpapers.' : !n ? 'Send a photo from your phone first.' : S.c.source === 'phone' && S.onlineStatus ? ONLINE_STATUS[S.onlineStatus] || '' : '' });
+      reason: flat ? 'Choose Photo in Background to use online wallpapers.' : !n ? 'Send a photo from your phone first.' : sourceOn('phone') && S.onlineStatus ? ONLINE_STATUS[S.onlineStatus] || '' : '' });
     return sections;
   }
   /* ---------- Phone companion: every setting from the phone ----------
@@ -1292,7 +1304,7 @@
     if (axis === 'wall') return { id: 'wall', name: T('Wallpaper'), kind: 'wall', value: S.c.wall,
       options: WALLS.map(function (w) { return { value: w.id, label: T(w.name), mine: /^file:/.test(w.src || '') }; }) };
     if (axis === 'mode') return { id: 'mode', name: T('Rotation'), kind: 'list', value: S.c.mode, options: MODES.map(function (m) { return { value: m.id, label: T(m.name) }; }) };
-    if (axis === 'source') return ONLINE ? { id: 'source', name: T('Online wallpapers'), kind: 'list', value: S.c.source,
+    if (axis === 'source') return ONLINE ? { id: 'source', name: T('Wallpaper sources'), kind: 'multi', value: sourceList(),
       options: SOURCES.filter(function (o) { return !o.key || ONLINE_INFO[o.key]; }).filter(function (o) { return o.id !== 'phone' || PHONE; }).map(function (o) { return { value: o.id, label: T(o.name) }; }) } : null;
     if (axis === 'layout') return { id: 'layout', name: T('Layout'), kind: 'choice', value: isShelf() ? 'shelf' : S.c.layout,
       options: [{ value: 'list', label: T('List') }, { value: 'dock', label: T('Dock') }, { value: 'shelf', label: T('Shelf') }] };
@@ -1352,7 +1364,7 @@
         .concat(ONLINE || NOWPLAYING ? [{ action: 'open.bgmore', label: 'Online and album art', disabled: flat }] : []), reason: flat ? 'Choose Photo to use wallpaper and rotation.' : '' }
     ];
     /* Sub-page: online sources and the album art background. */
-    if (t.group === 'bgmore') return (ONLINE ? [{ id: 'online', title: 'Online wallpapers', items: [{ action: 'background.online', label: S.c.source === 'off' ? 'Online wallpapers off' : source().name, disabled: flat }] }] : [])
+    if (t.group === 'bgmore') return (ONLINE ? [{ id: 'online', title: 'Wallpaper sources', items: [{ action: 'background.online', label: sourceShort(), disabled: flat }] }] : [])
       .concat(NOWPLAYING ? [{ id: 'cart', title: 'While music plays', items: [{ action: 'choice.cart.on', axis: 'cart', value: 'on', label: 'Album art as background', tick: true, applied: S.c.cart === 'on', disabled: flat }],
         reason: '' },
         { id: 'npdim', title: 'Album art dimming', horizontal: true, items: options('npdim', ['none', 'soft', 'strong'], flat || S.c.cart !== 'on') },
@@ -1422,12 +1434,11 @@
     if (t.group === 'online' || t.group === 'unsplash' || t.group === 'animated') {
       var items = SOURCES.filter(function (o) { return o.page === t.group; }).map(function (o) { return choice('source', o.id, flat || o.key && !ONLINE_INFO[o.key]); });
       var missing = SOURCES.filter(function (o) { return o.page === t.group && o.key && !ONLINE_INFO[o.key]; }).map(function (o) { return o.key; });
-      if (t.group === 'online') items = items.concat([
-        { action: 'open.unsplash', label: source().page === 'unsplash' ? source().name : 'Unsplash themes', more: true, disabled: flat },
-        { action: 'open.animated', label: source().page === 'animated' ? source().name : 'Animated wallpapers', more: true, disabled: flat }]);
-      return [{ id: 'source', title: '', items: items,
-        reason: flat ? 'Choose Photo in Background to use online wallpapers.' : S.onlineStatus ? ONLINE_STATUS[S.onlineStatus] || ''
-          : missing.length ? keyNote(missing) : '' }];
+      if (t.group === 'online') items = items.filter(function (item) { return item.value !== 'phone' || PHONE; }).concat([
+        { action: 'open.unsplash', label: pageCount('unsplash', 'Unsplash themes'), more: true, disabled: flat },
+        { action: 'open.animated', label: pageCount('animated', 'Animated wallpapers'), more: true, disabled: flat }]);
+      return [{ id: 'source', title: '', compact: t.group === 'online', items: items,
+        reason: flat ? 'Choose Photo in Background to use online wallpapers.' : sourceNote() || (missing.length ? keyNote(missing) : '') }];
     }
     if (t.group === 'rotation') return [{ id: 'mode', title: '', items: options('mode', MODES.map(function (m) { return m.id; }), flat),
       reason: flat ? 'Choose Photo in Background to use rotation.' : '' }];
@@ -1466,19 +1477,37 @@
     c = next(S.c.home.slice(), S.c.recent.slice()); c.mode = value;
     if (!write(c, 'Wallpaper rotation')) S.lookError = { type: 'save', patch: { mode: value }, row: 'mode', transient: false };
   }
+  function pageCount(page, label) { var n = SOURCES.filter(function (o) { return o.page === page && sourceOn(o.id); }).length; return n ? T(label) + ' · ' + n : label; }
+  /* What rotates now, and what could not be reached. */
+  function sourceNote() {
+    var failed = String(ONLINE_INFO.failed || '').split(',').filter(function (id) { return id && sourceOn(id); }).map(function (id) { return T(sourceName(id)); });
+    if (S.onlineStatus === 'loading') return ONLINE_STATUS.loading;
+    if (failed.length) return T('Couldn’t reach') + ' ' + failed.join(', ') + '. ' + T('Shore tries again later.');
+    return T('Rotating') + ' ' + rotationPool().length + ' ' + T('photos') + '.';
+  }
   function keyNote(keys) {
     var names = keys.filter(function (k, i) { return keys.indexOf(k) === i; }).map(function (k) { return { unsplash: 'Unsplash', pexels: 'Pexels', klipy: 'Klipy' }[k]; });
     return names.join(' and ') + (names.length > 1 ? ' need API keys' : ' needs an API key') + ' when the app is built. See the README.';
   }
+  /* OK on a source adds it to the rotation or takes it out; at least one source stays. */
   function applySource(value) {
-    var c;
-    if (S.c.bg !== 'photo' || !ONLINE) return;
+    var c, list = sourceList(), i = list.indexOf(value);
+    if (S.c.bg !== 'photo') return;
     S.err = null; S.lookError = null;
-    if (value === S.c.source && value !== 'off') { S.onlineStatus = 'loading'; ONLINE.select(value, true); return; }
-    c = next(S.c.home.slice(), S.c.recent.slice()); c.source = value;
-    if (!write(c, 'Online photos')) return;
-    S.onlinePick = value !== 'off'; S.onlineStatus = value === 'off' ? '' : 'loading';
-    ONLINE.select(value, false);
+    if (i >= 0) { if (list.length === 1) { S.note = 'Keep at least one source.'; return; } list.splice(i, 1); }
+    else list.push(value);
+    c = next(S.c.home.slice(), S.c.recent.slice()); c.source = sourceCsv(list.join(','));
+    if (!write(c, 'Wallpaper sources')) return;
+    S.note = '';
+    if (ONLINE) { S.onlineStatus = c.source.split(',').some(function (id) { return id !== 'builtin'; }) ? 'loading' : ''; ONLINE.select(c.source, false); }
+    keepWallInRotation(); syncRotation();
+  }
+  /* When the shown wallpaper leaves the rotation, the first photo that rotates takes its place. */
+  function keepWallInRotation() {
+    var w = wall(S.c.wall), pool = rotationPool();
+    if (w && inRotation(w) || !pool.length) return;
+    if (S.pending) { setTimeout(keepWallInRotation, 600); return; } // a wallpaper is still loading; try once it settled
+    setLook({ wall: pool[0].id }, { row: 'bg' });
   }
   /* New online photos replace the previous set in the gallery; the first new photo is shown after a source change. */
   function onlineChanged(entries, status) {
@@ -1487,16 +1516,16 @@
     if (entries) {
       for (i = WALLS.length - 1; i >= 0; i--) if (WALLS[i].online) WALLS.splice(i, 1);
       entries.forEach(function (w) { if (w && safeId(w.id) && !wall(w.id)) { WALLS.push(w); ids.push(w.id); } });
-      if (S.onlinePick && ids.length) { S.onlinePick = false; setLook({ wall: ids[0] }, { row: 'bg' }); }
-      else if (!wall(S.c.wall)) setLook({ wall: WALLS[0].id }, { row: 'bg' });
+      if (!wall(S.c.wall)) setLook({ wall: (rotationPool()[0] || WALLS[0]).id }, { row: 'bg' });
+      else keepWallInRotation();
     }
-    if (status !== 'loading' && !(entries && entries.length)) S.onlinePick = false;
+    if (ONLINE) ONLINE_INFO.failed = ONLINE.info().failed || '';
     render(); syncRotation();
   }
-  /* Rotation stays within the chosen online source while it has photos. */
+  /* The photos that rotate: those from the chosen sources. While online photos are still downloading, Shore's own fill in. */
   function rotationPool() {
-    var online = S.c.source !== 'off' ? WALLS.filter(function (w) { return w.online; }) : [];
-    return online.length ? online : WALLS.filter(function (w) { return !w.online; });
+    var pool = WALLS.filter(inRotation);
+    return pool.length ? pool : WALLS.filter(function (w) { return !w.online; });
   }
   function detailBack() { cancelLook(); S.err = null; pop(); }
   function detailOk(t, item) {
@@ -2203,7 +2232,7 @@
     }
     setHTML(appearanceBack, command({ action: 'settings.back', label: parentName(t) }, icon('left') + '<span>' + esc(parentName(t)) + '</span>', 'setting-back'));
     setHTML(appearanceRows, detailSections(t).map(function (section) {
-      return '<section class="setting-section' + (section.horizontal ? ' is-horizontal' + (section.items.length >= 4 ? ' is-many' : '') + (section.items.length >= 5 ? ' is-five' : '') : '') + ' section-' + section.id + '">'
+      return '<section class="setting-section' + (section.horizontal ? ' is-horizontal' + (section.items.length >= 4 ? ' is-many' : '') + (section.items.length >= 5 ? ' is-five' : '') + (section.compact ? ' is-compact' : '') : '') + ' section-' + section.id + '">'
         + (section.title ? '<h3 class="setting-label" id="setting-' + section.id + '">' + esc(section.title) + '</h3>' : '')
         + (section.qr ? '<div class="setting-qr">' + (section.qr.length > 1 ? '<img src="' + section.qr + '" alt="">' : '') + '<div class="setting-qr-copy"><h3>' + esc('Scan with your phone') + '</h3><p>' + esc(section.qrNote) + '</p>'
           + (section.url ? '<p class="setting-url">' + escRaw(section.url.replace(/^http:\/\//, '')) + '</p>' : '') + '</div></div>' : '')
@@ -2226,7 +2255,7 @@
         + command({ action: 'settings.retry', label: 'Try again' }, '<span>Try again</span>', 'setting-retry');
     }
     setHTML(appearanceStatus, status);
-    hint = selected.disabled ? '' : remoteHint(selected) || (selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.action === 'phone.toggle' ? (S.phone.enabled ? 'Turn off' : 'Turn on') : selected.action === 'phone.forget' ? 'Phones scan a new code' : selected.action === 'phone.clear' ? 'Remove all my photos' : selected.action === 'nowplaying.access' ? 'Open Notification access' : /^open\./.test(selected.action) ? 'Open selected group' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : selected.action === 'saver.start' ? 'Start the screensaver now' : 'Open on the TV');
+    hint = selected.disabled ? '' : remoteHint(selected) || (selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis === 'source' ? (selected.applied ? 'Remove from rotation' : 'Add to rotation') : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.action === 'phone.toggle' ? (S.phone.enabled ? 'Turn off' : 'Turn on') : selected.action === 'phone.forget' ? 'Phones scan a new code' : selected.action === 'phone.clear' ? 'Remove all my photos' : selected.action === 'nowplaying.access' ? 'Open Notification access' : /^open\./.test(selected.action) ? 'Open selected group' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : selected.action === 'saver.start' ? 'Start the screensaver now' : 'Open on the TV');
     setHTML(appearanceDesc, hint ? '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>' : '');
   }
   function remoteHint(item) {
@@ -2245,7 +2274,7 @@
     var rows = appearanceRows.querySelector('.wallpaper-rows'), shown = wall(S.wallShown) || wall(S.c.wall), candidate = WALLS[t.i], status, note, hint;
     keyed(rows, WALLS.map(function (w) { return { key: w.id, wall: w }; }), function (row, item, i) {
       var visible = i >= t.top && i < t.top + WALL_VISIBLE, w = item.wall, image;
-      setContent(row, w.id + '|' + visible, '<span class="wallpaper-thumb">' + (visible ? '<img src="' + WP + w.id + '-thumb.jpg" alt="">' : '') + '</span><span class="setting-copy"><span class="setting-name">' + esc(w.name) + '</span>' + (w.credit ? '<span class="setting-credit">' + esc(w.credit) + '</span>' : '') + '</span><span class="setting-tick" aria-hidden="true"></span>');
+      setContent(row, w.id + '|' + visible + '|' + inRotation(w), '<span class="wallpaper-thumb">' + (visible ? '<img src="' + WP + w.id + '-thumb.jpg" alt="">' : '') + '</span><span class="setting-copy"><span class="setting-name">' + esc(w.name) + '</span>' + (!inRotation(w) ? '<span class="setting-credit not-rotating">' + esc(T('Not in rotation')) + '</span>' : w.credit ? '<span class="setting-credit">' + esc(w.credit) + '</span>' : '') + '</span><span class="setting-tick" aria-hidden="true"></span>');
       row.className = 'setting-choice wallpaper-choice' + (t.f.zone === 'photo' && t.i === i ? ' is-focus' : '') + (w.id === S.c.wall ? ' is-applied' : '');
       row.style.transform = 'translate3d(0,' + (i * WALL_ROW) + 'px,0)'; row.style.visibility = visible ? 'visible' : 'hidden';
       row.setAttribute('role', 'radio'); row.setAttribute('tabindex', '-1'); row.setAttribute('aria-label', w.name);
@@ -2717,7 +2746,7 @@
     REMOTE.onChange(function () { refreshRemote(); if (top().id === 'appearance') render(); });
     refreshRemote();
   }
-  if (ONLINE) { ONLINE.onChange(onlineChanged); if (S.c.source !== 'off') ONLINE.select(S.c.source, false); }
+  if (ONLINE) { ONLINE.onChange(onlineChanged); ONLINE.select(S.c.source, false); }
   setLook({}, { transient: true, startup: true });
   norm(); render(); fit(); focusStage(); updateClock(); syncRotation();
   window.CleanFrameSaver = function () { startSaver(); };

@@ -496,7 +496,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .setting-choice.is-disabled{color:var(--faint)}
 .setting-choice.is-disabled.is-focus{color:var(--solid-mute)}
 .setting-copy{min-width:0;display:flex;flex-direction:column;gap:4px}
-.setting-name{display:block;white-space:nowrap}
+.setting-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .setting-tick{display:flex;align-items:center;justify-content:center;flex:none;width:30px;height:32px;margin-left:0}
 .setting-tick .ico{width:30px;height:30px;stroke-width:2.2}
 .setting-forward{width:28px;height:28px;margin-left:auto;flex:none}
@@ -771,3 +771,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .np-bg::after{content:"";position:absolute;left:0;top:0;width:1920px;height:1080px;background:#000;opacity:0;transition:opacity 600ms ease;pointer-events:none}
 .npd-soft .np-bg::after{opacity:.18}
 .npd-strong .np-bg::after{opacity:.38}
+/* Wallpaper sources: one tick per source, tighter rows so the whole list and its note fit. */
+.setting-section.section-source .setting-choice{min-height:56px;padding-top:4px;padding-bottom:4px}
+.setting-credit.not-rotating{opacity:.7;font-style:italic}
