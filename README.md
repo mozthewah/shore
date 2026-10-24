@@ -138,7 +138,7 @@ Shore uses the TV's system language: German, French, Spanish, Dutch and Polish a
 *Settings → Clock → Under the clock.*
 
 - **Weather** shows the temperature and sky, such as *12 °C Cloudy*, next to the date. It comes from [Open-Meteo](https://open-meteo.com), which needs no key or account. The place is the city of the TV's time zone (*Europe/Berlin* → Berlin), or the place you type in the [phone companion](#phone-companion). Choose **°C or °F** under *Temperature*. Shore refreshes the weather every 30 minutes, and it is off until you turn it on.
-- **Now playing** shows *♪ Title · Artist — App* while music or video plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings → Apps → Special app access → Notification access*; the Clock page has a shortcut. Shore reads only the active media session and ignores notifications themselves.
+- **Now playing** shows *♪ Title · Artist — App* for music, or *▶ Title — App* for video and TV, while something plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings → Apps → Special app access → Notification access*; the Clock page has a shortcut. Shore reads only the active media session and ignores notifications themselves.
 
 <details>
 <summary>Google TV hides Notification access</summary>
@@ -155,18 +155,20 @@ To undo, run the same command with `disallow_listener`.
 
 ## Phone companion
 
-*Settings → Phone → Phone companion.* Turn it on and the TV shows a QR code. Scan it with your phone's camera: a small web app opens, served by the TV itself and styled like the launcher, with your current wallpaper behind glass cards.
+*Settings → Phone → Phone companion.* Turn it on and the TV shows a QR code. Scan it with your phone's camera and tap **Install app**: Shore Companion lands on your home screen. Opening it takes you to a small web app served by the TV itself, styled like the launcher, with your current wallpaper behind glass cards.
 
 - **Send to your TV**: pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. They appear under **My photos**, a wallpaper source like the others. Glass is rendered once, rotation cycles through them, and GIFs and clips play animated. Choose *Settings → Phone → My photos* to use them.
 - **My photos**: see what's stored and delete single photos or all of them. Shore keeps the newest 30, in its private storage on the TV.
 - **Weather place**: the city for the weather under the clock.
-- **Keep it as an app**: in the phone's browser menu, choose *Add to Home screen*. The page has a web app manifest and icons, so it opens full screen like an app.
+- **Install it**: the QR code opens [taynotfound.github.io/shore/app](https://taynotfound.github.io/shore/app/), a tiny installable page (HTTPS, manifest, offline cache). It remembers your TV and opens it whenever you start the app. If your browser shows no install button, use its menu: *Install app* or *Add to Home screen*. On iPhone: *Share → Add to Home Screen*.
 
 **Privacy and limits**
 
 - Nothing goes through the internet. Phone and TV must be on the same Wi-Fi, and the companion only runs while it's switched on.
 - The QR code carries a random pairing key, which the phone keeps. Without it the TV answers nothing but the page itself. *Forget paired phones* makes a new key, and every phone has to scan again.
-- The page is plain `http://` on your network, so browsers treat it as an ordinary website: *Add to Home screen* works, but offline use and full PWA install need HTTPS, which a TV can't offer on a home network. If the TV's IP address changes, scan the code again. A DHCP reservation in your router avoids that.
+- Why two pages: browsers only install HTTPS sites, and a TV can't get a trusted certificate on a home network. So the installable part lives on the website, and the TV keeps serving the real page over `http://` on your Wi-Fi. The TV address and pairing key travel after the `#` in the link, which browsers never send to the website, and stay on your phone. The TV also shows its address for use without internet.
+- If the TV's IP address changes, scan the code again. A DHCP reservation in your router avoids that.
+- Forks: change `Companion.PAIR_URL` to your own GitHub Pages address.
 
 ## Online and animated wallpapers
 

@@ -51,6 +51,12 @@ final class Companion {
     static final int MAX_FILES = 30, MAX_BYTES = 60 * 1024 * 1024;
     private static final int[] PORTS = { 8642, 8643, 8644, 8645 };
     private static final String NAME = "phone-\\d+\\.(jpg|png|webp|gif|mp4)";
+    /**
+     * Installable launcher on the project website (HTTPS, so phones can install it; the TV's own page is http and can't be).
+     * It keeps the TV address and key from the link's fragment, which browsers never send to the web server.
+     * Forks change this to their own GitHub Pages address.
+     */
+    static final String PAIR_URL = "https://taynotfound.github.io/shore/app/";
 
     private final Context context;
     private final File dir, onlineDir;
@@ -108,7 +114,10 @@ final class Companion {
     /** {enabled, url, qr, count, place}; url and qr are empty while off or without a network. */
     String info() {
         try {
-            String link = url.isEmpty() ? "" : url + "/#k=" + key();
+            ServerSocket s = server;
+            String address = s == null || s.isClosed() ? null : address();
+            url = address == null ? "" : "http://" + address + ":" + s.getLocalPort(); // follows a new IP address
+            String link = url.isEmpty() ? "" : PAIR_URL + "#tv=" + java.net.URLEncoder.encode(url, "UTF-8") + "&k=" + key();
             return new JSONObject().put("enabled", enabled()).put("url", url).put("qr", link.isEmpty() ? "" : qr(link))
                     .put("count", count()).put("place", place()).toString();
         } catch (Exception e) { return "{}"; }
@@ -242,7 +251,7 @@ final class Companion {
         JSONArray photos = new JSONArray();
         File[] all = files();
         for (int i = all.length - 1; i >= 0; i--) photos.put(all[i].getName());
-        return new JSONObject().put("name", "Shore").put("count", all.length).put("max", MAX_FILES).put("place", place()).put("photos", photos).toString();
+        return new JSONObject().put("name", "Shore").put("install", PAIR_URL).put("count", all.length).put("max", MAX_FILES).put("place", place()).put("photos", photos).toString();
     }
 
     private void asset(OutputStream out, String name) throws IOException {

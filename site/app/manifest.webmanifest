@@ -1,0 +1,16 @@
+{
+  "name": "Shore Companion",
+  "short_name": "Shore",
+  "description": "Send photos to your Shore TV home screen and set the weather place.",
+  "id": "/shore/app/",
+  "start_url": "/shore/app/?source=app",
+  "scope": "/shore/app/",
+  "display": "standalone",
+  "background_color": "#18222a",
+  "theme_color": "#18222a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

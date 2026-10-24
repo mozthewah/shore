@@ -1075,7 +1075,7 @@
   function clockExtras() {
     var html = '', p = S.playing, w = S.c.cweather === 'on' && WEATHER ? WEATHER.text(S.c.wunit) : '', date = S.c.cdate === 'on' ? T(dateText()) : '';
     if (date || w) html += '<span class="cap-date">' + escRaw(date && w ? date + ' · ' + w : date || w) + '</span>';
-    if (NOWPLAYING && S.c.cplaying === 'on' && p.playing) html += '<span class="cap-date cap-playing">' + escRaw('♪ ' + p.title + (p.artist ? ' · ' + p.artist : '') + (p.app ? ' — ' + p.app : '')) + '</span>';
+    if (NOWPLAYING && S.c.cplaying === 'on' && p.playing) html += '<span class="cap-date cap-playing">' + escRaw((p.artist ? '♪ ' : '▶ ') + p.title + (p.artist ? ' · ' + p.artist : '') + (p.app ? ' — ' + p.app : '')) + '</span>';
     return html;
   }
   /* ---------- My photos: sent from a phone over the local network (Android shell) ---------- */
@@ -1088,7 +1088,7 @@
     var sections = [{ id: 'companion', title: '', items: [{ action: 'phone.toggle', label: 'Phone companion', description: 'Photos and weather from your phone', tick: true, applied: p.enabled }],
       reason: p.enabled ? '' : 'The companion runs on your home Wi-Fi only and needs this code to pair.' }];
     if (p.enabled) sections.push({ id: 'phonecode', title: '', items: [], qr: p.qr || ' ', url: p.url,
-      qrNote: p.url ? 'Point your phone’s camera at the code. Add the page to your home screen to keep it as an app.' : 'Connect the TV to your Wi-Fi to use the companion.' });
+      qrNote: p.url ? 'Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:' : 'Connect the TV to your Wi-Fi to use the companion.' });
     sections.push({ id: 'phoneuse', title: 'Wallpaper', items: [choice('source', 'phone', flat || !n)]
       .concat(n ? [{ action: 'phone.clear', label: 'Remove all my photos', description: n === 1 ? '1 photo' : n + ' photos' }] : [])
       .concat(p.enabled ? [{ action: 'phone.forget', label: 'Forget paired phones' }] : []),
@@ -1915,8 +1915,8 @@
     setHTML(appearanceRows, detailSections(t).map(function (section) {
       return '<section class="setting-section' + (section.horizontal ? ' is-horizontal' : '') + ' section-' + section.id + '">'
         + (section.title ? '<h3 class="setting-label" id="setting-' + section.id + '">' + esc(section.title) + '</h3>' : '')
-        + (section.qr ? '<div class="setting-qr">' + (section.qr.length > 1 ? '<img src="' + section.qr + '" alt="">' : '') + '<div class="setting-qr-copy"><h3>' + esc('Scan with your phone') + '</h3>'
-          + (section.url ? '<p class="setting-url">' + escRaw(section.url.replace(/^http:\/\//, '')) + '</p>' : '') + '<p>' + esc(section.qrNote) + '</p></div></div>' : '')
+        + (section.qr ? '<div class="setting-qr">' + (section.qr.length > 1 ? '<img src="' + section.qr + '" alt="">' : '') + '<div class="setting-qr-copy"><h3>' + esc('Scan with your phone') + '</h3><p>' + esc(section.qrNote) + '</p>'
+          + (section.url ? '<p class="setting-url">' + escRaw(section.url.replace(/^http:\/\//, '')) + '</p>' : '') + '</div></div>' : '')
         + '<div class="setting-options"' + (section.items[0] && section.items[0].axis ? ' role="radiogroup" aria-label="' + esc(section.title || LOOK_NAMES[section.id] || DETAIL_NAMES[t.group]) + '"' : '') + '>'
         + section.items.map(function (item) {
           var swatch = item.axis === 'bg', body = '';

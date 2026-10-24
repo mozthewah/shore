@@ -97,7 +97,7 @@
       "Point your phone’s camera at the code. Add the page to your home screen to keep it as an app.": "Richte die Handykamera auf den Code. Füge die Seite zum Startbildschirm hinzu, um sie als App zu behalten.",
       "Connect the TV to your Wi-Fi to use the companion.": "Verbinde den Fernseher mit dem WLAN, um den Begleiter zu nutzen.",
       "Forget paired phones": "Gekoppelte Handys vergessen", "Turn off": "Ausschalten", "Turn on": "Einschalten",
-      "Phones scan a new code": "Handys scannen einen neuen Code", "Paired phones forgotten. Scan the new code.": "Gekoppelte Handys vergessen. Scanne den neuen Code."
+      "Phones scan a new code": "Handys scannen einen neuen Code", "Paired phones forgotten. Scan the new code.": "Gekoppelte Handys vergessen. Scanne den neuen Code.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Richte die Handykamera auf den Code und tippe dann auf „App installieren“, um Shore Companion aufs Handy zu holen. Ohne Internet öffne stattdessen diese Adresse:"
     },
     fr: {
       "Settings": "Réglages", "All apps": "Toutes les apps", "Apps on Home": "Apps sur l’accueil", "Other installed apps": "Autres apps installées",
@@ -187,7 +187,7 @@
       "Connect the TV to your Wi-Fi to use the companion.": "Connectez le téléviseur à votre Wi-Fi pour utiliser le compagnon.",
       "Forget paired phones": "Oublier les téléphones associés", "Turn off": "Désactiver", "Turn on": "Activer",
       "Phones scan a new code": "Les téléphones scannent un nouveau code",
-      "Paired phones forgotten. Scan the new code.": "Téléphones associés oubliés. Scannez le nouveau code."
+      "Paired phones forgotten. Scan the new code.": "Téléphones associés oubliés. Scannez le nouveau code.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Pointez l’appareil photo du téléphone vers le code, puis touchez Installer l’app pour garder Shore Companion. Sans internet, ouvrez plutôt cette adresse :"
     },
     es: {
       "Settings": "Ajustes", "All apps": "Todas las apps", "Apps on Home": "Apps en Inicio", "Other installed apps": "Otras apps instaladas",
@@ -277,7 +277,7 @@
       "Connect the TV to your Wi-Fi to use the companion.": "Conecta el televisor a tu Wi-Fi para usar el acompañante.",
       "Forget paired phones": "Olvidar móviles vinculados", "Turn off": "Desactivar", "Turn on": "Activar",
       "Phones scan a new code": "Los móviles escanean un código nuevo",
-      "Paired phones forgotten. Scan the new code.": "Móviles vinculados olvidados. Escanea el código nuevo."
+      "Paired phones forgotten. Scan the new code.": "Móviles vinculados olvidados. Escanea el código nuevo.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Apunta la cámara del móvil al código y toca Instalar app para tener Shore Companion en el móvil. Sin internet, abre esta dirección:"
     },
     nl: {
       "Settings": "Instellingen", "All apps": "Alle apps", "Apps on Home": "Apps op Home", "Other installed apps": "Andere geïnstalleerde apps",
@@ -364,7 +364,7 @@
       "Connect the TV to your Wi-Fi to use the companion.": "Verbind de tv met je wifi om de companion te gebruiken.",
       "Forget paired phones": "Gekoppelde telefoons vergeten", "Turn off": "Uitzetten", "Turn on": "Aanzetten",
       "Phones scan a new code": "Telefoons scannen een nieuwe code",
-      "Paired phones forgotten. Scan the new code.": "Gekoppelde telefoons vergeten. Scan de nieuwe code."
+      "Paired phones forgotten. Scan the new code.": "Gekoppelde telefoons vergeten. Scan de nieuwe code.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Richt de camera van je telefoon op de code en tik op App installeren om Shore Companion te bewaren. Zonder internet open je dit adres:"
     },
     pl: {
       "Settings": "Ustawienia", "All apps": "Wszystkie aplikacje", "Apps on Home": "Aplikacje na ekranie głównym",
@@ -453,7 +453,7 @@
       "Point your phone’s camera at the code. Add the page to your home screen to keep it as an app.": "Skieruj aparat telefonu na kod. Dodaj stronę do ekranu głównego, aby mieć ją jako aplikację.",
       "Connect the TV to your Wi-Fi to use the companion.": "Połącz telewizor z Wi-Fi, aby używać aplikacji na telefon.",
       "Forget paired phones": "Zapomnij sparowane telefony", "Turn off": "Wyłącz", "Turn on": "Włącz", "Phones scan a new code": "Telefony skanują nowy kod",
-      "Paired phones forgotten. Scan the new code.": "Zapomniano sparowane telefony. Zeskanuj nowy kod."
+      "Paired phones forgotten. Scan the new code.": "Zapomniano sparowane telefony. Zeskanuj nowy kod.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Skieruj aparat telefonu na kod, a potem stuknij Zainstaluj aplikację, aby mieć Shore Companion w telefonie. Bez internetu otwórz ten adres:"
     }
   };
   /* Composite messages: [English pattern, translation with $1… placeholders]. Captured parts are translated too. */
