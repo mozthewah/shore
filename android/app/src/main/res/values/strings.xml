@@ -2,5 +2,6 @@
 <resources>
     <string name="home_service_label">Shore Home button</string>
     <string name="now_playing_label">Shore Now playing</string>
+    <string name="screensaver_label">Shore</string>
     <string name="home_service_description">Opens Shore when you press the remote\'s Home button. Hold Home to open Google TV Home instead. Also applies the remote buttons you reassign in Shore\'s settings. Shore only watches remote keys and which app is in front; it does not read screen content.</string>
 </resources>

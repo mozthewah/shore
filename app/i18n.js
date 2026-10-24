@@ -97,7 +97,10 @@
       "Point your phone’s camera at the code. Add the page to your home screen to keep it as an app.": "Richte die Handykamera auf den Code. Füge die Seite zum Startbildschirm hinzu, um sie als App zu behalten.",
       "Connect the TV to your Wi-Fi to use the companion.": "Verbinde den Fernseher mit dem WLAN, um den Begleiter zu nutzen.",
       "Forget paired phones": "Gekoppelte Handys vergessen", "Turn off": "Ausschalten", "Turn on": "Einschalten",
-      "Phones scan a new code": "Handys scannen einen neuen Code", "Paired phones forgotten. Scan the new code.": "Gekoppelte Handys vergessen. Scanne den neuen Code.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Richte die Handykamera auf den Code und tippe dann auf „App installieren“, um Shore Companion aufs Handy zu holen. Ohne Internet öffne stattdessen diese Adresse:"
+      "Phones scan a new code": "Handys scannen einen neuen Code", "Paired phones forgotten. Scan the new code.": "Gekoppelte Handys vergessen. Scanne den neuen Code.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Richte die Handykamera auf den Code und tippe dann auf „App installieren“, um Shore Companion aufs Handy zu holen. Ohne Internet öffne stattdessen diese Adresse:",
+      "Album art": "Albumcover", "After 10 min": "Nach 10 Min.", "After 15 min": "Nach 15 Min.", "Choose Photo in Background to use album art.": "Wähle Foto unter Hintergrund, um Albumcover zu nutzen.", "While music plays, its album art becomes the background.": "Während Musik läuft, wird ihr Albumcover zum Hintergrund.", "Your photos, the clock and what’s playing. Any button wakes Shore.": "Deine Fotos, die Uhr und was gerade läuft. Jede Taste weckt Shore.", "Screensaver settings could not open.": "Die Bildschirmschoner-Einstellungen konnten nicht geöffnet werden.", "The screensaver could not start.": "Der Bildschirmschoner konnte nicht starten.",
+      "When idle": "Bei Inaktivität", "Screensaver off": "Bildschirmschoner aus", "Start the screensaver now": "Bildschirmschoner jetzt starten",
+      "5 min": "5 Min.", "10 min": "10 Min.", "15 min": "15 Min."
     },
     fr: {
       "Settings": "Réglages", "All apps": "Toutes les apps", "Apps on Home": "Apps sur l’accueil", "Other installed apps": "Autres apps installées",
@@ -187,7 +190,9 @@
       "Connect the TV to your Wi-Fi to use the companion.": "Connectez le téléviseur à votre Wi-Fi pour utiliser le compagnon.",
       "Forget paired phones": "Oublier les téléphones associés", "Turn off": "Désactiver", "Turn on": "Activer",
       "Phones scan a new code": "Les téléphones scannent un nouveau code",
-      "Paired phones forgotten. Scan the new code.": "Téléphones associés oubliés. Scannez le nouveau code.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Pointez l’appareil photo du téléphone vers le code, puis touchez Installer l’app pour garder Shore Companion. Sans internet, ouvrez plutôt cette adresse :"
+      "Paired phones forgotten. Scan the new code.": "Téléphones associés oubliés. Scannez le nouveau code.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Pointez l’appareil photo du téléphone vers le code, puis touchez Installer l’app pour garder Shore Companion. Sans internet, ouvrez plutôt cette adresse :",
+      "Album art": "Pochette", "After 10 min": "Après 10 min", "After 15 min": "Après 15 min", "Choose Photo in Background to use album art.": "Choisissez Photo dans Fond pour utiliser la pochette.", "While music plays, its album art becomes the background.": "Pendant la lecture, la pochette devient le fond.", "Your photos, the clock and what’s playing. Any button wakes Shore.": "Vos photos, l’horloge et ce qui est en lecture. N’importe quel bouton réveille Shore.", "Screensaver settings could not open.": "Impossible d’ouvrir les réglages de l’économiseur d’écran.", "The screensaver could not start.": "L’économiseur d’écran n’a pas pu démarrer.",
+      "When idle": "En cas d’inactivité", "Screensaver off": "Économiseur d’écran désactivé", "Start the screensaver now": "Lancer l’économiseur d’écran"
     },
     es: {
       "Settings": "Ajustes", "All apps": "Todas las apps", "Apps on Home": "Apps en Inicio", "Other installed apps": "Otras apps instaladas",
@@ -277,7 +282,9 @@
       "Connect the TV to your Wi-Fi to use the companion.": "Conecta el televisor a tu Wi-Fi para usar el acompañante.",
       "Forget paired phones": "Olvidar móviles vinculados", "Turn off": "Desactivar", "Turn on": "Activar",
       "Phones scan a new code": "Los móviles escanean un código nuevo",
-      "Paired phones forgotten. Scan the new code.": "Móviles vinculados olvidados. Escanea el código nuevo.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Apunta la cámara del móvil al código y toca Instalar app para tener Shore Companion en el móvil. Sin internet, abre esta dirección:"
+      "Paired phones forgotten. Scan the new code.": "Móviles vinculados olvidados. Escanea el código nuevo.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Apunta la cámara del móvil al código y toca Instalar app para tener Shore Companion en el móvil. Sin internet, abre esta dirección:",
+      "Album art": "Portada", "After 10 min": "Tras 10 min", "After 15 min": "Tras 15 min", "Choose Photo in Background to use album art.": "Elige Foto en Fondo para usar la portada.", "While music plays, its album art becomes the background.": "Mientras suena música, su portada se convierte en el fondo.", "Your photos, the clock and what’s playing. Any button wakes Shore.": "Tus fotos, el reloj y lo que suena. Cualquier botón despierta Shore.", "Screensaver settings could not open.": "No se pudieron abrir los ajustes del salvapantallas.", "The screensaver could not start.": "El salvapantallas no pudo iniciarse.",
+      "When idle": "En reposo", "Screensaver off": "Salvapantallas desactivado", "Start the screensaver now": "Iniciar el salvapantallas ahora"
     },
     nl: {
       "Settings": "Instellingen", "All apps": "Alle apps", "Apps on Home": "Apps op Home", "Other installed apps": "Andere geïnstalleerde apps",
@@ -364,7 +371,9 @@
       "Connect the TV to your Wi-Fi to use the companion.": "Verbind de tv met je wifi om de companion te gebruiken.",
       "Forget paired phones": "Gekoppelde telefoons vergeten", "Turn off": "Uitzetten", "Turn on": "Aanzetten",
       "Phones scan a new code": "Telefoons scannen een nieuwe code",
-      "Paired phones forgotten. Scan the new code.": "Gekoppelde telefoons vergeten. Scan de nieuwe code.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Richt de camera van je telefoon op de code en tik op App installeren om Shore Companion te bewaren. Zonder internet open je dit adres:"
+      "Paired phones forgotten. Scan the new code.": "Gekoppelde telefoons vergeten. Scan de nieuwe code.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Richt de camera van je telefoon op de code en tik op App installeren om Shore Companion te bewaren. Zonder internet open je dit adres:",
+      "Album art": "Albumhoes", "After 10 min": "Na 10 min", "After 15 min": "Na 15 min", "Choose Photo in Background to use album art.": "Kies Foto bij Achtergrond om albumhoezen te gebruiken.", "While music plays, its album art becomes the background.": "Terwijl er muziek speelt, wordt de albumhoes de achtergrond.", "Your photos, the clock and what’s playing. Any button wakes Shore.": "Je foto’s, de klok en wat er speelt. Elke knop maakt Shore wakker.", "Screensaver settings could not open.": "Instellingen voor schermbeveiliging konden niet openen.", "The screensaver could not start.": "De schermbeveiliging kon niet starten.",
+      "When idle": "Bij inactiviteit", "Screensaver off": "Schermbeveiliging uit", "Start the screensaver now": "Schermbeveiliging nu starten"
     },
     pl: {
       "Settings": "Ustawienia", "All apps": "Wszystkie aplikacje", "Apps on Home": "Aplikacje na ekranie głównym",
@@ -453,7 +462,9 @@
       "Point your phone’s camera at the code. Add the page to your home screen to keep it as an app.": "Skieruj aparat telefonu na kod. Dodaj stronę do ekranu głównego, aby mieć ją jako aplikację.",
       "Connect the TV to your Wi-Fi to use the companion.": "Połącz telewizor z Wi-Fi, aby używać aplikacji na telefon.",
       "Forget paired phones": "Zapomnij sparowane telefony", "Turn off": "Wyłącz", "Turn on": "Włącz", "Phones scan a new code": "Telefony skanują nowy kod",
-      "Paired phones forgotten. Scan the new code.": "Zapomniano sparowane telefony. Zeskanuj nowy kod.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Skieruj aparat telefonu na kod, a potem stuknij Zainstaluj aplikację, aby mieć Shore Companion w telefonie. Bez internetu otwórz ten adres:"
+      "Paired phones forgotten. Scan the new code.": "Zapomniano sparowane telefony. Zeskanuj nowy kod.", "Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:": "Skieruj aparat telefonu na kod, a potem stuknij Zainstaluj aplikację, aby mieć Shore Companion w telefonie. Bez internetu otwórz ten adres:",
+      "Album art": "Okładka albumu", "After 10 min": "Po 10 min", "After 15 min": "Po 15 min", "Choose Photo in Background to use album art.": "Wybierz Zdjęcie w Tle, aby używać okładek albumów.", "While music plays, its album art becomes the background.": "Gdy gra muzyka, jej okładka staje się tłem.", "Your photos, the clock and what’s playing. Any button wakes Shore.": "Twoje zdjęcia, zegar i to, co gra. Dowolny przycisk wybudza Shore.", "Screensaver settings could not open.": "Nie udało się otworzyć ustawień wygaszacza ekranu.", "The screensaver could not start.": "Nie udało się uruchomić wygaszacza ekranu.",
+      "When idle": "Przy bezczynności", "Screensaver off": "Wygaszacz wyłączony", "Start the screensaver now": "Uruchom wygaszacz teraz"
     }
   };
   /* Composite messages: [English pattern, translation with $1… placeholders]. Captured parts are translated too. */

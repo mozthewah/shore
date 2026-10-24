@@ -1,6 +1,7 @@
 package app.cleanframe.tv;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.provider.Settings;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 import android.webkit.JavascriptInterface;
 
@@ -25,6 +27,7 @@ import java.util.Set;
 /** Implements what device.js does with Tizen APIs, using public Android intents. */
 final class DeviceBridge {
     private final Context context;
+    private final Activity activity; // null for the remote-button service and the screensaver
     private final PackageManager pm;
     private final OnlineWallpapers online;
     private final TopShelf topShelf;
@@ -34,6 +37,7 @@ final class DeviceBridge {
 
     DeviceBridge(Context context, OnlineWallpapers online, TopShelf topShelf, Companion phone) {
         this.context = context.getApplicationContext();
+        this.activity = context instanceof Activity ? (Activity) context : null;
         this.pm = this.context.getPackageManager();
         this.online = online;
         this.topShelf = topShelf;
@@ -227,14 +231,29 @@ final class DeviceBridge {
         return false;
     }
 
-    /** Stand-in for Art Mode: start the system screensaver (Ambient mode on Google TV). */
-    @JavascriptInterface
+    /** Remote-button action: bring Shore to the front with its own screensaver running. */
     public boolean screensaver() {
-        Intent dream = new Intent(Intent.ACTION_MAIN)
-                .setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
-        if (start(dream)) return true;
-        return start(new Intent(Settings.ACTION_DREAM_SETTINGS));
+        return start(new Intent(context, MainActivity.class).putExtra(MainActivity.EXTRA_SAVER, true)
+                .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
     }
+
+    /** True once if Shore was opened to show its screensaver (remote button), so the page can start it. */
+    @JavascriptInterface
+    public boolean saverRequested() { return MainActivity.takeSaverRequest(); }
+
+    /** Keeps the TV's own screensaver away while Shore's screensaver is enabled and Shore is in front. */
+    @JavascriptInterface
+    public void keepAwake(final boolean on) {
+        if (activity == null) return;
+        activity.runOnUiThread(() -> {
+            if (on) activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            else activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        });
+    }
+
+    /** The TV's screensaver settings, where Shore can be picked as the screensaver where the TV allows it. */
+    @JavascriptInterface
+    public boolean screensaverSettings() { return start(new Intent(Settings.ACTION_DREAM_SETTINGS)); }
 
     private boolean start(Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

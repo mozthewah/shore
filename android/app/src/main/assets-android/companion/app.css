@@ -41,3 +41,19 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
 @media (min-width:600px){.grid{grid-template-columns:repeat(4,1fr)}}
 .install-link{display:block;text-align:center;margin:18px 0 0;color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:4px}
 .standalone .install-link{display:none}
+.crop{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:calc(20px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));background:rgba(8,11,14,.94);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.crop[hidden]{display:none}
+.crop>*{width:100%;max-width:720px;margin-left:auto;margin-right:auto}
+.crop-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.crop-head h2{margin:0}
+.crop-hint{margin:0;color:var(--muted);font-size:14px}
+.crop-frame{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:14px;background:#000;touch-action:none;cursor:grab;box-shadow:0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.4)}
+.crop-frame:active{cursor:grabbing}
+.crop-frame img{position:absolute;left:0;top:0;max-width:none;transform-origin:0 0;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;pointer-events:none}
+.crop-grid{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent calc(33.33% - .5px),rgba(255,255,255,.28) calc(33.33% - .5px),rgba(255,255,255,.28) calc(33.33% + .5px),transparent calc(33.33% + .5px),transparent calc(66.66% - .5px),rgba(255,255,255,.28) calc(66.66% - .5px),rgba(255,255,255,.28) calc(66.66% + .5px),transparent calc(66.66% + .5px)),linear-gradient(180deg,transparent calc(33.33% - .5px),rgba(255,255,255,.28) calc(33.33% - .5px),rgba(255,255,255,.28) calc(33.33% + .5px),transparent calc(33.33% + .5px),transparent calc(66.66% - .5px),rgba(255,255,255,.28) calc(66.66% - .5px),rgba(255,255,255,.28) calc(66.66% + .5px),transparent calc(66.66% + .5px))}
+.crop-zoom{width:100%;accent-color:var(--ink)}
+.crop-actions{display:flex;gap:8px}
+.crop-actions .button{flex:1;margin:0;padding:0 12px}
+.crop-actions .button.primary{width:auto}
+.crop-actions .button:disabled{opacity:.5}
+.crop-actions .button{white-space:nowrap;font-size:15px}

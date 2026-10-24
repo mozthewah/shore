@@ -155,19 +155,27 @@
     info: function () {
       var r;
       try { r = JSON.parse(bridge.nowPlaying()); } catch (e) { r = {}; }
-      return { access: !!r.access, playing: !!r.playing && typeof r.title === 'string', title: String(r.title || ''), artist: String(r.artist || ''), app: String(r.app || '') };
+      var img = /^\/nowplaying\/[0-9a-f]+(-b)?\.jpg$/;
+      return { access: !!r.access, playing: !!r.playing && typeof r.title === 'string', title: String(r.title || ''), artist: String(r.artist || ''), app: String(r.app || ''),
+        art: img.test(r.art || '') ? r.art : '', back: img.test(r.back || '') ? r.back : '' };
     },
     openSettings: function (done) { reply(ask('nowPlayingSettings'), done, 'Notification access could not open.'); }
   };
+  /* Shore's own screensaver: keeps the TV's screensaver away while enabled, and starts from a remote button. */
+  var saver = {
+    keepAwake: function (on) { try { bridge.keepAwake(!!on); } catch (e) { } },
+    requested: function () { try { return !!bridge.saverRequested(); } catch (e) { return false; } },
+    openSettings: function (done) { reply(ask('screensaverSettings'), done, 'Screensaver settings could not open.'); }
+  };
   window.FrameDevice = {
-    platform: 'android', phone: phone, nowPlaying: nowPlaying,
+    platform: 'android', phone: phone, nowPlaying: nowPlaying, saver: saver,
     launch: launch, launchApp: launchApp, apps: apps,
     inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */
     packageOf: function (id) { var brand = TIZEN[id] || BRAND[id] || (PACKAGES[id] ? id : ''), pkg = brand === 'youtube' ? FALLBACK.youtube : TIZEN[id] ? PACKAGES[TIZEN[id]] : PACKAGES[id] || id; // YouTube tile shows YouTube's banner
       return /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$/.test(pkg) ? pkg : null; },
-    /* No Art Mode on Android TV: start the system screensaver instead. */
-    art: function (done) { reply(ask('screensaver'), done, 'The screensaver could not start.'); },
+    /* No Art Mode on Android TV: Shore shows its own screensaver (main.js). */
+    art: function (done) { reply(ask('screensaverSettings'), done, 'The screensaver could not start.'); },
     home: function (done) { reply(ask('systemHome'), done, 'The TV’s own Home screen could not open.'); },
     settings: function (done) { reply(ask('settings'), done, 'TV settings could not open.'); }
   };

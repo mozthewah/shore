@@ -874,6 +874,24 @@ try {
     await act('choice.cweather.on'); await ready();
     check('Weather toggles back off', (await stored()).look.cweather === 'off');
   });
+  await run('Screensaver starts when idle and any key wakes Shore', async () => {
+    await page({ minuteMs: 120 }); await group('display');
+    check('Night and idle links to When idle', await current.locator('[data-action="open.idle"]').count() === 1);
+    await act('open.idle');
+    check('Screensaver is off by default in the browser', (await current.evaluate(() => ShoreQA.saver())).on === false && await current.locator('[data-action="choice.saver.off"].is-applied, [data-action="choice.saver.off"]').count() === 1);
+    await act('choice.saver.5'); await ready();
+    check('Screensaver delay persists', (await stored()).look.saver === '5');
+    await nav('back'); await nav('back'); await nav('back');
+    await current.waitForFunction(() => ShoreQA.saver().on, null, { timeout: 5000 });
+    check('Screensaver starts after the idle time', (await current.evaluate(() => ShoreQA.saver())).on);
+    await current.waitForFunction(() => !!ShoreQA.saver().photo, null, { timeout: 5000 });
+    check('Screensaver shows a wallpaper', /wallpapers\//.test((await current.evaluate(() => ShoreQA.saver())).photo));
+    const before = (await state()).view;
+    await current.keyboard.press('ArrowRight');
+    check('First key only wakes Shore', !(await current.evaluate(() => ShoreQA.saver())).on && (await state()).view === before);
+    await current.evaluate(() => ShoreQA.look({ saver: 'off' }));
+    check('Screensaver off stops the timer', !(await current.evaluate(() => ShoreQA.saver())).scheduled || (await current.keyboard.press('ArrowLeft'), !(await current.evaluate(() => ShoreQA.saver())).scheduled));
+  });
   await run('Open rotation and browser fallback', async () => {
     await page({ seed: baseline({ mode: 'open' }) }); check('Open mode advances at cold start', (await state()).wallpaper === walls[1].id);
     const first = (await state()).wallpaper;

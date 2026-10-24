@@ -506,7 +506,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .swatch-dark{background:#0d0d0d;box-shadow:inset 0 0 0 1px rgba(246,241,231,.15)}
 .setting-reason{margin-top:16px;font-size:26px;line-height:36px;color:var(--mute)}
 .is-horizontal .setting-options{flex-direction:row;gap:12px}
-.is-horizontal .setting-choice{flex:1;min-width:0;min-height:92px;padding:12px 20px;gap:16px;font-size:36px}
+.is-horizontal .setting-choice{flex:1;min-width:max-content;min-height:92px;padding:12px 20px;gap:16px;font-size:36px}
 .is-horizontal .setting-tick{width:26px;margin-left:0}
 .is-horizontal .setting-tick .ico{width:26px;height:26px}
 .section-material .setting-choice:last-child{flex:1.4}
@@ -700,3 +700,56 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .setting-qr p{margin:0 0 16px;font-size:26px;line-height:36px;color:rgba(238,241,234,.7)}
 .setting-qr .setting-url{font-size:30px;line-height:40px;font-weight:600;color:#eef1ea;word-break:break-all}
 .section-phonecode{margin:0!important;height:0}
+
+/* Now playing: a small decorative level meter (transform only, paused with the other Home animations). */
+.wave{display:inline-flex;align-items:flex-end;gap:4px;width:30px;height:22px;margin-right:12px;vertical-align:-2px}
+.wave i{display:block;width:4px;height:22px;border-radius:2px;background:currentColor;transform-origin:50% 100%;transform:scaleY(.3);animation:wave 900ms ease-in-out infinite alternate}
+.wave i:nth-child(2){animation-duration:700ms;animation-delay:-300ms}
+.wave i:nth-child(3){animation-duration:1100ms;animation-delay:-600ms}
+.wave i:nth-child(4){animation-duration:800ms;animation-delay:-150ms}
+@keyframes wave{0%{transform:scaleY(.25)}50%{transform:scaleY(1)}100%{transform:scaleY(.45)}}
+.anim-paused:not(.is-saver) .wave i{animation-play-state:paused}
+
+/* Album art background: above the photo and video, below the Top Shelf hero and the scrim. The glass shows it through. */
+.np-bg{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
+.np-img{position:absolute;left:0;top:0;width:1920px;height:1080px;max-width:none;object-fit:cover;opacity:0;transition:opacity 900ms ease}
+.np-img.is-on{opacity:1}
+.is-night .np-img{filter:brightness(var(--night))}
+.has-np-art .mat-img,.has-np-art .mat-scrim,.has-np-art .ph-field{visibility:hidden}
+.has-np-art .mat-veil,.has-np-art .ph-veil{background:rgba(255,255,255,.08)}
+.has-np-art .photo-video{visibility:hidden}
+
+/* Shore's screensaver: covers everything; the Home underneath stops drawing. */
+.saver{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:#000;opacity:0;visibility:hidden;transition:opacity 1200ms ease,visibility 0s linear 1200ms;color:#fff;z-index:50}
+.saver.is-on{opacity:1;visibility:visible;transition:opacity 1200ms ease}
+.is-saver .scene,.is-saver .appearance,.is-saver .sheet,.is-saver .focus-status{visibility:hidden}
+.sv-photos,.sv-art{position:absolute;left:0;top:0;width:1920px;height:1080px}
+.sv-img,.sv-art-img{position:absolute;left:0;top:0;width:1920px;height:1080px;max-width:none;object-fit:cover;opacity:0;transition:opacity 2400ms ease}
+.sv-img.is-on,.sv-art-img.is-on{opacity:1}
+.sv-img.is-out{opacity:0}
+.sv-img.kb-0{transform-origin:20% 30%}.sv-img.kb-1{transform-origin:80% 70%}.sv-img.kb-2{transform-origin:75% 25%}.sv-img.kb-3{transform-origin:25% 75%}
+.sv-img.is-on,.sv-img.is-out{animation:sv-kb 52s linear both}
+@keyframes sv-kb{from{transform:scale(1)}to{transform:scale(1.09)}}
+.sv-art{opacity:0;transition:opacity 1200ms ease}
+.saver.has-art .sv-art{opacity:1}
+.saver.has-art .sv-photos{visibility:hidden}
+.sv-shade{position:absolute;left:0;top:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 40%,rgba(0,0,0,.42)),linear-gradient(to top,rgba(0,0,0,.42),rgba(0,0,0,0) 46%)}
+.sv-night{position:absolute;left:0;top:0;width:1920px;height:1080px;background:#000;opacity:0}
+.is-night .sv-night{opacity:calc(1 - var(--night))}
+.sv-info{position:absolute;display:flex;flex-direction:column;max-width:1100px;text-shadow:0 2px 18px rgba(0,0,0,.42);transition:opacity 900ms ease}
+.sv-info.is-moving{opacity:0}
+.sv-info.pos-0{left:120px;bottom:104px}
+.sv-info.pos-1{right:120px;bottom:104px;align-items:flex-end;text-align:right}
+.sv-info.pos-2{right:120px;top:96px;align-items:flex-end;text-align:right}
+.sv-info.pos-3{left:120px;top:96px}
+.sv-clock{font-size:168px;line-height:176px;font-weight:300;letter-spacing:-4px;font-variant-numeric:tabular-nums}
+.sv-date{font-size:36px;line-height:48px;font-weight:500;opacity:.88}
+.sv-np{display:none;align-items:center;gap:28px;margin-top:36px}
+.sv-np.is-on{display:flex}
+.pos-1 .sv-np,.pos-2 .sv-np{flex-direction:row-reverse}
+.sv-cover{width:168px;height:168px;border-radius:20px;object-fit:cover;box-shadow:0 18px 44px rgba(0,0,0,.45);flex:none}
+.sv-np-text{display:flex;flex-direction:column;gap:6px;min-width:0}
+.sv-title{font-size:44px;line-height:54px;font-weight:600;letter-spacing:-.6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:880px}
+.sv-title .wave{width:36px;height:28px;margin-right:16px}
+.sv-title .wave i{height:28px;width:5px}
+.sv-artist{font-size:30px;line-height:40px;opacity:.82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:880px}

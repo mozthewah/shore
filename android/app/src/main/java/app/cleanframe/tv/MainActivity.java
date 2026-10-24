@@ -20,7 +20,12 @@ import androidx.webkit.WebViewAssetLoader;
 
 /** Full-screen WebView that runs the unchanged CleanFrame UI from the APK's assets. */
 public class MainActivity extends Activity {
-    private static final String ORIGIN = "https://appassets.androidplatform.net";
+    static final String ORIGIN = "https://appassets.androidplatform.net";
+    static final String EXTRA_SAVER = "app.cleanframe.tv.SAVER";
+    private static volatile boolean saverRequest;
+    private boolean loaded;
+
+    static boolean takeSaverRequest() { boolean r = saverRequest; saverRequest = false; return r; }
     private WebView web;
     private TvInputManager tvInputs;
     private OnlineWallpapers online;
@@ -39,6 +44,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        if (getIntent() != null && getIntent().getBooleanExtra(EXTRA_SAVER, false)) saverRequest = true;
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
@@ -79,6 +85,7 @@ public class MainActivity extends Activity {
                 .addPathHandler("/appicon/", new AppIconHandler(this))
                 .addPathHandler("/appbanner/", new AppIconHandler(this, true))
                 .addPathHandler("/topshelf/", topShelf.handler())
+                .addPathHandler("/nowplaying/", NowPlayingService.handler(this))
                 .build();
 
         web.setWebViewClient(new WebViewClient() {
@@ -91,6 +98,9 @@ public class MainActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return true; // Home screen never navigates away.
             }
+
+            @Override
+            public void onPageFinished(WebView view, String url) { loaded = true; }
         });
 
         RemoteKeys.listener = remoteListener = new RemoteKeys.Listener() {
@@ -140,6 +150,10 @@ public class MainActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (web != null) web.requestFocus(); // Home pressed while CleanFrame is the Home app
+        if (intent != null && intent.getBooleanExtra(EXTRA_SAVER, false)) {
+            if (web != null && loaded) web.evaluateJavascript("window.CleanFrameSaver&&window.CleanFrameSaver()", null);
+            else saverRequest = true;
+        }
     }
 
     @Override

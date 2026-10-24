@@ -4,6 +4,8 @@
 
   /* ---------- Bundled data ---------- */
   var ANDROID = !!(window.FrameDevice && FrameDevice.platform === 'android');
+  /* Opened by the TV as its system screensaver (ShoreDream): only the screensaver shows. */
+  var DREAM = /(^|#)screensaver$/.test(location.hash), SAVER_API = window.FrameDevice && FrameDevice.saver || null;
   var TV = ANDROID ? { brand: 'Google TV', home: 'Google TV Home', homeLine: 'Open the Google TV Home screen', art: 'Screensaver' }
     : { brand: 'Samsung', home: 'Samsung Home', homeLine: 'Open Samsung’s Home screen', art: 'Art Mode' };
   var ASSETS = 'assets/', ICONS = ASSETS + 'icons/', WP = ASSETS + 'wallpapers/';
@@ -71,13 +73,13 @@
   var PRIVATE_FONTS = window.CleanFramePrivateFontIDs || [], fontMetrics = {}, unavailableFonts = {}, widthCache = {}, fontsReady = false;
   var LOOK_KEYS = ['bg', 'layout', 'apps', 'font', 'controls', 'focus', 'material'];
   var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], inputs: ['front', 'row'], lstyle: ['glass', 'shelf'], motion: ['still', 'drift'], tweight: ['auto', 'light', 'regular', 'bold'], tsize: ['small', 'default', 'large'],
-    cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
+    cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'] };
-  var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', csize: 'Clock size', cweight: 'Clock weight',
+  var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
-    '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min', c: '°C', f: '°F' };
+    '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min', '10': 'After 10 min', '15': 'After 15 min', c: '°C', f: '°F' };
   VALUE_NAMES.off = 'Off'; VALUE_NAMES.light = VALUE_NAMES.light || 'Light';
   var UTIL = { art: [TV.art, 'art'], apps: ['All apps', 'apps'], arrange: ['Arrange', 'arrange'], settings: ['Settings', 'settings'] };
   var MSG = {
@@ -111,7 +113,7 @@
     writes: 0, failed: 0, log: [], logN: 0, lastLaunch: null, press: null,
     wallShown: null, wallPending: null, wallError: null,
     shown: null, pending: null, lookError: null, bundleKey: null, previewBundle: null, reflow: false, fontSwitch: false,
-    phone: { enabled: false, url: '', qr: '', count: 0, place: '' }, playing: { access: false, playing: false, key: '' },
+    phone: { enabled: false, url: '', qr: '', count: 0, place: '' }, playing: { access: false, playing: false, key: '' }, saver: false,
     remote: { service: false, keys: [], learning: false, missed: false, timer: 0 }
   };
   var scroll = { first: 0, off: 0, photo: 0, photoArrange: 0 };
@@ -120,7 +122,7 @@
     for (var i = 0; i < list.length; i++) if (list[i].toLowerCase() === v) return list[i];
     return fallback;
   }
-  function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, csize: c.csize, cweight: c.cweight,
+  function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
   function derivedTheme() { return S.c.layout === 'list' ? 'list' : 'shore'; }
@@ -389,6 +391,7 @@
       tweight: pick(modern.tweight, LOOK_VALUES.tweight, 'auto'), tsize: pick(modern.tsize, LOOK_VALUES.tsize, 'default'),
       cformat: pick(modern.cformat, LOOK_VALUES.cformat, '12'), cdate: pick(modern.cdate, LOOK_VALUES.cdate, 'off'),
       cweather: pick(modern.cweather, LOOK_VALUES.cweather, 'off'), wunit: pick(modern.wunit, LOOK_VALUES.wunit, window.CleanFrameWeather ? CleanFrameWeather.defaultUnit() : 'c'), cplaying: pick(modern.cplaying, LOOK_VALUES.cplaying, 'on'),
+      cart: pick(modern.cart, LOOK_VALUES.cart, 'on'), saver: pick(modern.saver, LOOK_VALUES.saver, ANDROID ? '10' : 'off'),
       csize: pick(modern.csize, LOOK_VALUES.csize, 'small'), cweight: pick(modern.cweight, LOOK_VALUES.cweight, 'auto'),
       night: pick(modern.night, LOOK_VALUES.night, 'off'), nhours: pick(modern.nhours, LOOK_VALUES.nhours, '22-6'),
       ndim: pick(modern.ndim, LOOK_VALUES.ndim, 'medium'), idle: pick(modern.idle, LOOK_VALUES.idle, 'off'),
@@ -573,7 +576,7 @@
     return { prev: v ? 'up' : 'left', next: v ? 'down' : 'right', out: v ? 'right' : 'up', inn: v ? 'left' : 'down' };
   }
   function utilAction(u) {
-    if (u === 'art') perform(TV.art, FrameDevice.art);
+    if (u === 'art') { if (ANDROID) startSaver(); else perform(TV.art, FrameDevice.art); }
     else if (u === 'apps') openApps();
     else openSettings();
   }
@@ -916,7 +919,7 @@
   function closeEditor() { clearSession(); pop(); }
 
   /* ---------- Settings, Layout and messages ---------- */
-  var PARENT = { rotation: 'background', online: 'background', clockextra: 'clock', unsplash: 'online', animated: 'online', fonts: 'typography', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
+  var PARENT = { rotation: 'background', online: 'background', clockextra: 'clock', idle: 'display', unsplash: 'online', animated: 'online', fonts: 'typography', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
   function subPage(t) { return !!PARENT[t.group]; }
   function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : DETAIL_NAMES[group]; }
   function parentName(t) { return PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
@@ -953,11 +956,11 @@
     else if (id === 'phone') openPhone();
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Online wallpapers', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation and motion', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', clockextra: 'Under the clock' };
+  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Online wallpapers', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation and motion', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', clockextra: 'Under the clock', idle: 'When idle' };
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: SOURCES.filter(function (o) { return o.id === value; })[0].name };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
+      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
   /* "Light" as a font weight differs from the Light background in some languages. */
   function weightLight() { var w = T('Light weight'); return w === 'Light weight' ? 'Light' : w;
@@ -1055,6 +1058,7 @@
   }
   /* ---------- Under the clock: weather (Open-Meteo) and what is playing (Android media sessions) ---------- */
   var WEATHER = window.CleanFrameWeather || null, NOWPLAYING = ANDROID && FrameDevice.nowPlaying ? FrameDevice.nowPlaying : null;
+  function idleSummary() { return S.c.saver === 'off' ? T('Screensaver off') : T('Screensaver') + ' · ' + T(S.c.saver + ' min'); }
   function clockExtraSummary() {
     var on = (S.c.cweather === 'on' ? ['Weather'] : []).concat(NOWPLAYING && S.c.cplaying === 'on' ? ['Now playing'] : []);
     return on.length ? on.join(', ') : 'Nothing';
@@ -1065,18 +1069,126 @@
   }
   function pollPlaying() {
     var info, key;
-    if (!NOWPLAYING || S.c.cplaying !== 'on' || document.hidden) return;
-    info = NOWPLAYING.info(); key = info.access + '|' + (info.playing ? info.title + '|' + info.artist : '');
+    if (!NOWPLAYING || document.hidden || S.c.cplaying !== 'on' && S.c.cart !== 'on' && !S.saver) return;
+    info = NOWPLAYING.info(); key = info.access + '|' + (info.playing ? info.title + '|' + info.artist + '|' + info.art : '');
     if (key === S.playing.key) return;
     info.key = key; S.playing = info;
-    if (top().id === 'home') renderCaption(top(), homeState(top()));
-    else if (isSettingsDetail(top())) render();
+    if (S.saver) renderSaver();
+    if (top().id === 'home' || isSettingsDetail(top())) render();
+  }
+  /* A small looping level meter: decoration only, Shore never hears the audio. */
+  var WAVE = '<span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>';
+  /* Album art as the background: a soft backdrop pre-rendered natively, shown above the photo while music plays. */
+  function npArt() { var p = S.playing; return !!(NOWPLAYING && S.c.cart === 'on' && S.c.bg === 'photo' && p.playing && p.back) && !DREAM; }
+  var npEl = document.createElement('div'), npImgs = [document.createElement('img'), document.createElement('img')], npFront = 0, npSrc = '';
+  npEl.className = 'np-bg'; npEl.setAttribute('aria-hidden', 'true');
+  npImgs.forEach(function (img) { img.className = 'np-img'; img.alt = ''; npEl.appendChild(img); });
+  function crossfade(imgs, front, src, cls) {
+    var back = imgs[1 - front];
+    if (!src) { imgs[0].className = imgs[1].className = cls; return front; }
+    if (imgs[front].getAttribute('src') === src && imgs[front].className.indexOf('is-on') >= 0) return front;
+    back.onload = function () { if (back.getAttribute('src') !== src) return; back.className = cls + ' is-on'; imgs[front].className = cls; };
+    back.onerror = function () { back.className = cls; };
+    if (back.getAttribute('src') === src && back.complete && back.naturalWidth) back.onload(); else back.src = src;
+    return 1 - front;
+  }
+  function syncNpArt() {
+    var src = npArt() ? S.playing.back : '';
+    if (src === npSrc) return;
+    npSrc = src; npFront = crossfade(npImgs, npFront, src, 'np-img');
   }
   function clockExtras() {
     var html = '', p = S.playing, w = S.c.cweather === 'on' && WEATHER ? WEATHER.text(S.c.wunit) : '', date = S.c.cdate === 'on' ? T(dateText()) : '';
     if (date || w) html += '<span class="cap-date">' + escRaw(date && w ? date + ' · ' + w : date || w) + '</span>';
-    if (NOWPLAYING && S.c.cplaying === 'on' && p.playing) html += '<span class="cap-date cap-playing">' + escRaw((p.artist ? '♪ ' : '▶ ') + p.title + (p.artist ? ' · ' + p.artist : '') + (p.app ? ' — ' + p.app : '')) + '</span>';
+    if (NOWPLAYING && S.c.cplaying === 'on' && p.playing) html += '<span class="cap-date cap-playing">' + WAVE + escRaw(p.title + (p.artist ? ' · ' + p.artist : '') + (p.app ? ' — ' + p.app : '')) + '</span>';
     return html;
+  }
+  /* ---------- Screensaver: Shore's own, instead of the TV's ---------- */
+  /* After the chosen idle time Shore fades to a slow slideshow of the wallpapers with a large clock, or the album
+     art while music plays. The clock block moves every few minutes. While it is enabled and Shore is in front,
+     Shore keeps the TV's own screensaver away; after four hours it lets the TV take over (and sleep as usual). */
+  var SAVER_PHOTO_MS = 45000, SAVER_MOVE_EVERY = 4, SAVER_AWAKE_MS = 4 * 3600000;
+  var saverTimer = 0, saverPhotoTimer = 0, saverSrc = '', saverFront = 0, saverStep = 0, saverPos = 0, saverAt = 0, saverSince = 0, awakeOn = null;
+  var saverEl = document.createElement('div');
+  saverEl.className = 'saver'; saverEl.setAttribute('aria-hidden', 'true');
+  saverEl.innerHTML = '<div class="sv-photos"><img class="sv-img" alt=""><img class="sv-img" alt=""></div><div class="sv-art"><img class="sv-art-img" alt=""><img class="sv-art-img" alt=""></div>'
+    + '<div class="sv-shade"></div><div class="sv-night"></div><div class="sv-info"><div class="sv-clock"></div><div class="sv-date"></div><div class="sv-np"></div></div>';
+  var svImgs = saverEl.querySelectorAll('.sv-img'), svArt = saverEl.querySelectorAll('.sv-art-img'), svArtFront = 0, svArtSrc = '', svInfo = saverEl.querySelector('.sv-info');
+  function saverDelay() { return S.c.saver === 'off' ? 0 : +S.c.saver * QA.minuteMs; }
+  function saverReset() {
+    clearTimeout(saverTimer); saverTimer = 0;
+    if (S.saver || DREAM || document.hidden || !saverDelay()) { syncAwake(); return; }
+    saverTimer = setTimeout(function () {
+      saverTimer = 0;
+      if (!saverDelay()) return;
+      if (S.pending || S.remote && S.remote.learning) { saverReset(); return; } // busy: try again after another full wait
+      startSaver();
+    }, saverDelay());
+    syncAwake();
+  }
+  /* FLAG_KEEP_SCREEN_ON while Shore's screensaver is enabled and Shore is in front, for at most four hours of screensaver. */
+  function syncAwake() {
+    var on = !!SAVER_API && !DREAM && !document.hidden && S.c.saver !== 'off' && !(S.saver && Date.now() - saverSince > SAVER_AWAKE_MS);
+    if (on === awakeOn || !SAVER_API) return;
+    awakeOn = on; SAVER_API.keepAwake(on);
+  }
+  function saverPhotos() {
+    return rotationPool().filter(function (w) { return w.src; });
+  }
+  function nextSaverPhoto() {
+    var pool = saverPhotos(), at = -1, i, w, img;
+    clearTimeout(saverPhotoTimer);
+    if (!S.saver) return;
+    saverPhotoTimer = setTimeout(nextSaverPhoto, SAVER_PHOTO_MS);
+    if (!pool.length) return;
+    for (i = 0; i < pool.length; i++) if (pool[i].src === saverSrc) at = i;
+    if (at < 0) for (i = 0; i < pool.length; i++) if (pool[i].id === S.c.wall) at = i - 1;
+    w = pool[(at + 1 + pool.length) % pool.length]; saverSrc = w.src;
+    img = svImgs[1 - saverFront];
+    img.onload = function () {
+      if (!S.saver || img.getAttribute('src') !== w.src) return;
+      saverStep++;
+      img.className = 'sv-img is-on kb-' + (saverStep % 4); svImgs[saverFront].className = svImgs[saverFront].className.replace(' is-on', ' is-out');
+      saverFront = 1 - saverFront;
+      if (saverStep % SAVER_MOVE_EVERY === 0) moveSaverInfo();
+    };
+    img.onerror = function () { if (S.saver && pool.length > 1) { clearTimeout(saverPhotoTimer); saverPhotoTimer = setTimeout(nextSaverPhoto, 1000); } };
+    if (img.getAttribute('src') === w.src && img.complete && img.naturalWidth) img.onload(); else img.src = w.src;
+  }
+  /* Fade out, jump to the next corner, fade in: keeps the clock from sitting on the same pixels for hours. */
+  function moveSaverInfo() {
+    svInfo.className = 'sv-info pos-' + saverPos + ' is-moving';
+    setTimeout(function () { saverPos = (saverPos + 1) % 4; svInfo.className = 'sv-info pos-' + saverPos; }, 900);
+  }
+  function renderSaver() {
+    var p = S.playing, music = !!(NOWPLAYING && p.playing), w = S.c.cweather === 'on' && WEATHER ? WEATHER.text(S.c.wunit) : '', np = '';
+    if (!S.saver) return;
+    setHTML(svInfo.querySelector('.sv-clock'), escRaw(clockText()));
+    setHTML(svInfo.querySelector('.sv-date'), escRaw(T(dateText()) + (w ? ' · ' + w : '')));
+    if (music) np = (p.art ? '<img class="sv-cover" alt="" src="' + escRaw(p.art) + '">' : '')
+      + '<span class="sv-np-text"><span class="sv-title">' + WAVE + escRaw(p.title) + '</span>'
+      + (p.artist || p.app ? '<span class="sv-artist">' + escRaw(p.artist + (p.artist && p.app ? ' — ' : '') + p.app) + '</span>' : '') + '</span>';
+    setHTML(svInfo.querySelector('.sv-np'), np);
+    svInfo.querySelector('.sv-np').className = 'sv-np' + (np ? ' is-on' : '') + (p.art ? ' has-cover' : '');
+    var art = music && p.back ? p.back : '';
+    if (art !== svArtSrc) { svArtSrc = art; svArtFront = crossfade(svArt, svArtFront, art, 'sv-art-img'); }
+    saverEl.className = 'saver is-on' + (art ? ' has-art' : '') + (DREAM ? ' is-dream' : '');
+    syncAwake();
+  }
+  function startSaver() {
+    if (S.saver) return;
+    if (!saverEl.parentNode) stage.appendChild(saverEl);
+    clearTimeout(saverTimer); saverTimer = 0;
+    S.saver = true; saverSince = Date.now(); saverStep = 0; saverSrc = '';
+    svInfo.className = 'sv-info pos-' + saverPos;
+    pollPlaying(); renderSaver(); nextSaverPhoto();
+    render(); syncRotation();
+  }
+  function stopSaver() {
+    if (!S.saver || DREAM) return;
+    S.saver = false; clearTimeout(saverPhotoTimer); saverPhotoTimer = 0;
+    saverEl.className = 'saver';
+    render(); syncRotation(); saverReset();
   }
   /* ---------- My photos: sent from a phone over the local network (Android shell) ---------- */
   var PHONE = ANDROID && FrameDevice.phone && ONLINE_INFO.phone ? FrameDevice.phone : null;
@@ -1127,13 +1239,20 @@
     if (t.group === 'clockextra') return [
       { id: 'cextra', title: 'Show', horizontal: true, items: options('cweather', ['on']).concat(NOWPLAYING ? options('cplaying', ['on']) : []), reason: clockExtraNote() },
       { id: 'wunit', title: 'Temperature', horizontal: true, items: options('wunit', ['c', 'f'], S.c.cweather !== 'on') }]
+      .concat(NOWPLAYING ? [{ id: 'cart', title: 'Background', horizontal: true, items: options('cart', ['on'], flat),
+        reason: flat ? 'Choose Photo in Background to use album art.' : S.c.cart === 'on' ? 'While music plays, its album art becomes the background.' : '' }] : [])
       .concat(NOWPLAYING && S.c.cplaying === 'on' && !S.playing.access ? [{ id: 'nowplaying', title: '', items: [{ action: 'nowplaying.access', label: 'Notification access', description: 'Let Shore see what’s playing' }] }] : []);
     if (t.group === 'display') return [
       { id: 'night', title: 'Night mode', horizontal: true, items: options('night', ['off', 'scheduled', 'always']) },
       { id: 'nhours', title: 'Night hours', horizontal: true, items: options('nhours', ['21-7', '22-6', '23-7'], S.c.night !== 'scheduled') },
       { id: 'ndim', title: 'Night dimming', horizontal: true, items: options('ndim', ['soft', 'medium', 'strong'], S.c.night === 'off') },
+      { id: 'whenidle', title: 'When idle', items: [{ action: 'open.idle', label: idleSummary(), more: true }] }];
+    if (t.group === 'idle') return [
+      { id: 'saver', title: 'Screensaver', horizontal: true, items: options('saver', ['off', '5', '10', '15']),
+        reason: S.c.saver !== 'off' ? 'Your photos, the clock and what’s playing. Any button wakes Shore.' : '' },
       { id: 'idle', title: 'Hide controls when idle', horizontal: true, items: options('idle', ['off', '1', '5']),
-        reason: S.c.idle !== 'off' ? 'The clock and picture stay. Any button brings the controls back.' : '' }];
+        reason: S.c.idle !== 'off' ? 'The clock and picture stay. Any button brings the controls back.' : '' },
+      { id: 'saverstart', title: '', items: [{ action: 'saver.start', label: 'Start the screensaver now' }] }];
     if (t.group === 'focus') return [
       { id: 'focus', title: 'Focus style', horizontal: true, items: options('focus', ['type', 'glass']) },
       { id: 'material', title: 'Material', horizontal: true, items: options('material', ['soft', 'frost', 'tint'], inactive),
@@ -1238,7 +1357,7 @@
     } else if (item.axis === 'mode') applyRotation(item.value);
     else if (item.axis === 'source') applySource(item.value);
     else if (item.axis === 'layout') setLook({ layout: item.value === 'list' ? 'list' : 'dock', lstyle: item.value === 'shelf' ? 'shelf' : 'glass' }, { row: 'layout' });
-    else if (item.axis === 'cdate' || item.axis === 'cweather' || item.axis === 'cplaying') { patch[item.axis] = S.c[item.axis] === 'on' ? 'off' : 'on'; setLook(patch, { row: item.axis }); }
+    else if (item.axis === 'cdate' || item.axis === 'cweather' || item.axis === 'cplaying' || item.axis === 'cart') { patch[item.axis] = S.c[item.axis] === 'on' ? 'off' : 'on'; setLook(patch, { row: item.axis }); }
     else if (item.axis) { patch[item.axis] = item.value; setLook(patch, { row: item.axis }); }
     else if (item.action === 'background.wallpaper') openWallpaper();
     else if (item.action === 'background.rotation') openAppearance('rotation');
@@ -1247,6 +1366,8 @@
     else if (item.action === 'open.unsplash') openAppearance('unsplash');
     else if (item.action === 'open.animated') openAppearance('animated');
     else if (item.action === 'open.clockextra') openAppearance('clockextra');
+    else if (item.action === 'open.idle') openAppearance('idle');
+    else if (item.action === 'saver.start') startSaver();
     else if (item.action === 'phone.toggle') { PHONE.enable(!S.phone.enabled); S.phone = PHONE.info(); }
     else if (item.action === 'phone.forget') { PHONE.forget(); S.phone = PHONE.info(); S.note = 'Paired phones forgotten. Scan the new code.'; }
     else if (item.action === 'phone.clear') { PHONE.clear(); S.phone.count = 0; }
@@ -1371,7 +1492,7 @@
     if (S.idleHidden) { S.idleHidden = false; render(); }
     idleTimer = S.c.idle === 'off' ? 0 : setTimeout(function () { idleTimer = 0; if (S.c.idle !== 'off' && top().id === 'home' && !document.hidden) { S.idleHidden = true; render(); } }, +S.c.idle * QA.minuteMs);
   }
-  function animationsPaused() { return document.hidden || top().id !== 'home'; }
+  function animationsPaused() { return document.hidden || top().id !== 'home' || S.saver; }
   function driftNow() { return (driftPausedAt || Date.now()) - driftOffset; }
   function syncPause() {
     var paused = animationsPaused();
@@ -1416,13 +1537,13 @@
     });
   }
   function render() {
-    var t = top(), sheet = !!V[t.id].sheet, shown = wall(S.shown ? S.shown.wall : S.c.wall), palette = ADAPTIVE_INK[shown.id];
-    var adaptive = applyAdaptiveInk(palette), tr = adaptive && palette.tr ? palette.tr.pol : shown.ut.tr, br = adaptive && palette.br ? palette.br.pol : shown.ut.br;
-    stage.className = 'stage bg-' + S.c.bg + ' l-' + S.c.layout + ' v-' + S.variant + ' m-' + (materialApplies() ? S.c.material : 'none') + ' f-' + S.c.focus + ' a-' + S.c.apps + ' u-' + S.c.controls + ' g-' + S.geom + ' tone-' + shown.tone + ' tr-' + tr + ' br-' + br + wallClasses(shown) + inkRungClasses(palette, adaptive) + ' at-' + t.id + ' font-' + homeFont() + (homeFont() !== 'manrope' ? ' font-custom' : '') + (S.fontSwitch ? ' is-font-switch' : '') + (adaptive ? ' has-adaptive-ink adaptive-tl-' + palette.tl.pol : '') + (!adaptive && shown.clockInk ? ' has-clock-ink' : '') + (!adaptive && shown.dockClockInk ? ' has-dock-clock-ink' : '') + (registeredMaterial(shown.id) ? ' registered-material' : '') + (sheet ? ' is-sheet' : '') + (S.reflow ? ' is-reflow' : '') + ' mo-' + (S.c.bg === 'photo' && !animated(shown) ? S.c.motion : 'still') + (syncPause() ? ' anim-paused' : '') + (nightActive() ? ' is-night nd-' + S.c.ndim : '') + (S.idleHidden && top().id === 'home' ? ' is-idle' : '')
+    var t = top(), sheet = !!V[t.id].sheet, shown = wall(S.shown ? S.shown.wall : S.c.wall), np = npArt(), palette = np ? null : ADAPTIVE_INK[shown.id];
+    var adaptive = applyAdaptiveInk(palette), tr = np ? 'light' : adaptive && palette.tr ? palette.tr.pol : shown.ut.tr, br = np ? 'light' : adaptive && palette.br ? palette.br.pol : shown.ut.br;
+    stage.className = 'stage bg-' + S.c.bg + ' l-' + S.c.layout + ' v-' + S.variant + ' m-' + (materialApplies() ? S.c.material : 'none') + ' f-' + S.c.focus + ' a-' + S.c.apps + ' u-' + S.c.controls + ' g-' + S.geom + ' tone-' + (np ? 'dark' : shown.tone) + ' tr-' + tr + ' br-' + br + wallClasses(shown) + inkRungClasses(palette, adaptive) + ' at-' + t.id + ' font-' + homeFont() + (homeFont() !== 'manrope' ? ' font-custom' : '') + (S.fontSwitch ? ' is-font-switch' : '') + (adaptive ? ' has-adaptive-ink adaptive-tl-' + palette.tl.pol : '') + (!adaptive && !np && shown.clockInk ? ' has-clock-ink' : '') + (!adaptive && !np && shown.dockClockInk ? ' has-dock-clock-ink' : '') + (np ? ' has-np-art' : '') + (S.saver ? ' is-saver' : '') + (registeredMaterial(shown.id) ? ' registered-material' : '') + (sheet ? ' is-sheet' : '') + (S.reflow ? ' is-reflow' : '') + ' mo-' + (S.c.bg === 'photo' && !animated(shown) ? S.c.motion : 'still') + (syncPause() ? ' anim-paused' : '') + (nightActive() ? ' is-night nd-' + S.c.ndim : '') + (S.idleHidden && top().id === 'home' ? ' is-idle' : '')
       + ' ls-' + (isShelf() ? 'shelf' : 'glass') + ' cs-' + S.c.csize + ' cw-' + S.c.cweight + ' tw-' + S.c.tweight + ' ts-' + S.c.tsize;
-    if (!adaptive && shown.clockInk) stage.style.setProperty('--clock-ink', shown.clockInk);
+    if (!adaptive && !np && shown.clockInk) stage.style.setProperty('--clock-ink', shown.clockInk);
     else stage.style.removeProperty('--clock-ink');
-    if (!adaptive && shown.dockClockInk) stage.style.setProperty('--dock-clock-ink', shown.dockClockInk);
+    if (!adaptive && !np && shown.dockClockInk) stage.style.setProperty('--dock-clock-ink', shown.dockClockInk);
     else stage.style.removeProperty('--dock-clock-ink');
     applyHomeFont();
     if (!sheet) renderHome(t);
@@ -1432,6 +1553,8 @@
     renderFocusStatus(t);
     syncDrift();
     syncVideo(shown);
+    syncNpArt();
+    if (!S.saver && !saverTimer !== !saverDelay() && !document.hidden) saverReset(); // the delay was switched on or off
   }
 
   function applyHomeFont() {
@@ -1641,6 +1764,7 @@
   heroImgs.forEach(function (img) { img.className = 'hero-img'; img.alt = ''; heroEl.appendChild(img); });
   heroEl.appendChild(document.createElement('div')).className = 'hero-shade';
   IMG.photo.parentNode.insertBefore(heroEl, IMG.photo.parentNode.querySelector('.scrim')); // above photo and video, below the scrim
+  IMG.photo.parentNode.insertBefore(npEl, heroEl); // album art: above the photo, below a Top Shelf hero
   heroText.className = 'hero-text'; heroText.setAttribute('aria-live', 'polite');
   recsEl.className = 'recs'; recsTrack.className = 'recs-track'; recsTitle.className = 'recs-title';
   recsEl.appendChild(recsTrack); recsEl.appendChild(recsTitle);
@@ -2268,7 +2392,7 @@
 
   /* ---------- Lifecycle and remote input ---------- */
   var clockTimer = 0, rotationTimer = 0, activeSince = 0, activeMs = 0, rotationKey = '';
-  function rotationActive() { return !document.hidden && top().id === 'home' && S.c.bg === 'photo' && !S.pending && mode().min > 0; }
+  function rotationActive() { return !document.hidden && !S.saver && top().id === 'home' && S.c.bg === 'photo' && !S.pending && mode().min > 0; }
   function pauseRotation() {
     if (activeSince) { activeMs += Date.now() - activeSince; activeSince = 0; }
     clearTimeout(rotationTimer); rotationTimer = 0;
@@ -2293,6 +2417,8 @@
     if (S.c.idle !== 'off' && !idleTimer && !S.idleHidden) idleReset();
     if (WEATHER && S.c.cweather === 'on') WEATHER.refresh(false);
     if (top().id === 'home' || isSettingsDetail(top())) renderCaption(top(), homeState(top()));
+    if (S.saver) renderSaver(); else if (!saverTimer) saverReset();
+    syncAwake();
     clockTimer = setTimeout(updateClock, 60000 - (Date.now() % 60000) + 30);
   }
   function focusStage() { try { stage.focus({ preventScroll: true }); } catch (e) { stage.focus(); } }
@@ -2354,6 +2480,8 @@
     var el = ev.target;
     while (el && el !== stage && !(el.getAttribute && el.getAttribute('data-z'))) el = el.parentNode;
     focusStage();
+    if (S.saver) { stopSaver(); return; }
+    saverReset();
     if (!el || el === stage) return;
     pointAt(el);
   });
@@ -2363,6 +2491,8 @@
     if (code === 9) { ev.preventDefault(); return; }
     if (!k || ev.metaKey || ev.ctrlKey || ev.altKey) return;
     ev.preventDefault();
+    if (S.saver) { if (!ev.repeat) stopSaver(); return; } // the first press only wakes Shore
+    saverReset();
     if (S.idleHidden) { idleReset(); return; } // the first press only brings the controls back
     idleReset();
     if (k === 'ok' || k === 'back') { if (ev.repeat || heldKeys[code]) return; heldKeys[code] = true; }
@@ -2373,8 +2503,8 @@
   window.addEventListener('focus', function () { release(); focusStage(); after(); updateClock(); });
   document.addEventListener('visibilitychange', function () {
     heldKeys = {};
-    if (document.hidden) { pauseRotation(); clearTimeout(clockTimer); VIDEO.pause(); }
-    else { shelfAsked = ''; release(); after(); updateClock(); focusStage(); }
+    if (document.hidden) { pauseRotation(); clearTimeout(clockTimer); VIDEO.pause(); if (S.saver && !DREAM) stopSaver(); clearTimeout(saverTimer); saverTimer = 0; syncAwake(); }
+    else { shelfAsked = ''; release(); after(); updateClock(); focusStage(); saverReset(); pollPlaying(); }
   });
   window.addEventListener('resize', fit);
 
@@ -2406,6 +2536,7 @@
   QA.look = function (patch) { setLook(patch, {}); return QA.state(); };
   QA.scene = function (name) { if (['home', 'apps', 'settings', 'appearance', 'editor'].indexOf(name) < 0) throw new Error('Unknown view'); goScene(name); return QA.state(); };
   QA.activate = function (action) { return activate(action) ? QA.state() : null; };
+  QA.saver = function (on) { if (on === true) startSaver(); else if (on === false) stopSaver(); return { on: S.saver, scheduled: !!saverTimer, awake: awakeOn, photo: saverSrc }; };
   QA.actions = function () { var view = isSettingsDetail(top()) ? appearanceEl : sheetEl.hidden ? homeEl : sheetEl; return Array.prototype.filter.call(view.querySelectorAll('[data-action]'), renderedAction).map(function (el) { return el.getAttribute('data-action'); }); };
 
   /* ---------- Start ---------- */
@@ -2413,7 +2544,7 @@
   initialise();
   if (FrameDevice.onInputs) { FrameDevice.onInputs(refreshInputs); refreshInputs(); }
   if (WEATHER) WEATHER.onChange(function () { if (S.c.cweather === 'on' && (top().id === 'home' || isSettingsDetail(top()))) renderCaption(top(), homeState(top())); });
-  if (NOWPLAYING) { pollPlaying(); setInterval(pollPlaying, 10000); }
+  if (NOWPLAYING) { pollPlaying(); setInterval(pollPlaying, 5000); }
   if (PHONE) { S.phone = PHONE.info(); PHONE.onChange(function (count) { S.phone.count = count; if (isSettingsDetail(top()) || top().id === 'settings') render(); }); }
   if (REMOTE) {
     REMOTE.onLearned(remoteLearned);
@@ -2423,4 +2554,6 @@
   if (ONLINE) { ONLINE.onChange(onlineChanged); if (S.c.source !== 'off') ONLINE.select(S.c.source, false); }
   setLook({}, { transient: true, startup: true });
   norm(); render(); fit(); focusStage(); updateClock(); syncRotation();
+  window.CleanFrameSaver = function () { startSaver(); };
+  if (DREAM || SAVER_API && SAVER_API.requested()) startSaver();
 })();

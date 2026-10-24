@@ -110,7 +110,7 @@ The service only sees remote keys and which app is in front. It never reads scre
 *Settings → Google TV → Remote buttons* (needs the accessibility service). Choose **Assign a button…**, press a button on the remote, then pick what it does:
 
 - **Default**: what the TV normally does. This removes the assignment.
-- **Shore Home**, **Do nothing** or **Screensaver**.
+- **Shore Home**, **Do nothing** or **Screensaver** (Shore's own, see below).
 - A **connected HDMI input**, or **an app** from your Home screen.
 
 Assignments work everywhere, including inside other apps.
@@ -138,7 +138,28 @@ Shore uses the TV's system language: German, French, Spanish, Dutch and Polish a
 *Settings → Clock → Under the clock.*
 
 - **Weather** shows the temperature and sky, such as *12 °C Cloudy*, next to the date. It comes from [Open-Meteo](https://open-meteo.com), which needs no key or account. The place is the city of the TV's time zone (*Europe/Berlin* → Berlin), or the place you type in the [phone companion](#phone-companion). Choose **°C or °F** under *Temperature*. Shore refreshes the weather every 30 minutes, and it is off until you turn it on.
-- **Now playing** shows *♪ Title · Artist — App* for music, or *▶ Title — App* for video and TV, while something plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings → Apps → Special app access → Notification access*; the Clock page has a shortcut. Shore reads only the active media session and ignores notifications themselves.
+- **Now playing** shows a small moving level meter and *Title · Artist — App* while something plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings → Apps → Special app access → Notification access*; the Clock page has a shortcut. Shore reads only the active media session and ignores notifications themselves. The level meter is decoration: Shore never hears the audio.
+- **Album art** (*Background*): while music with a cover plays, the cover becomes the background, softly blurred and dimmed, and the glass shows it through. It needs a Photo background and goes back to your wallpaper when the music stops. The blur is made once per track on the TV's CPU, not live in the page.
+
+### Screensaver
+
+*Settings → Night and idle → When idle.* Shore has its own screensaver instead of the TV's: after 5, 10 (default) or 15 minutes without a button press it fades to a slow slideshow of your wallpapers (the current rotation source, including My photos) with a large clock, the date and weather. While music plays it shows the album art, the cover, title and artist. The clock moves to another corner every few minutes so nothing sits on the same pixels for hours. Any button wakes Shore without doing anything else. *Start the screensaver now* is on the same page, and the **Screensaver** button on Home and the *Screensaver* remote-button action start it too.
+
+While Shore's screensaver is on and Shore is in front, Shore keeps the TV's own screensaver away. After four hours of screensaver it lets go, so the TV's usual sleep timer still turns the TV off. Choose *Off* to leave everything to the TV.
+
+<details>
+<summary>Use Shore as the screensaver everywhere (optional)</summary>
+
+The APK also contains Shore as a system screensaver (`ShoreDream`), for when the TV goes idle inside another app. Google TV doesn't list third-party screensavers in its settings, so it can only be picked over ADB. Note the current value first so you can restore it:
+
+```bash
+adb shell settings get secure screensaver_components
+adb shell settings put secure screensaver_components app.cleanframe.tv/.ShoreDream
+```
+
+To undo, put back the value from the first command.
+
+</details>
 
 <details>
 <summary>Google TV hides Notification access</summary>
@@ -157,7 +178,7 @@ To undo, run the same command with `disallow_listener`.
 
 *Settings → Phone → Phone companion.* Turn it on and the TV shows a QR code. Scan it with your phone's camera and tap **Install app**: Shore Companion lands on your home screen. Opening it takes you to a small web app served by the TV itself, styled like the launcher, with your current wallpaper behind glass cards.
 
-- **Send to your TV**: pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. They appear under **My photos**, a wallpaper source like the others. Glass is rendered once, rotation cycles through them, and GIFs and clips play animated. Choose *Settings → Phone → My photos* to use them.
+- **Send to your TV**: pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. Each photo first opens in a 16:9 frame, the TV's shape: drag to move it, pinch or use the slider to zoom, then **Send**. *Whole photo* sends it uncropped, *Skip* leaves it out. The crop is made on the phone at the photo's own resolution (up to 3840 px wide). They appear under **My photos**, a wallpaper source like the others. Glass is rendered once, rotation cycles through them, and GIFs and clips play animated. Choose *Settings → Phone → My photos* to use them.
 - **My photos**: see what's stored and delete single photos or all of them. Shore keeps the newest 30, in its private storage on the TV.
 - **Weather place**: the city for the weather under the clock.
 - **Install it**: the QR code opens [taynotfound.github.io/shore/app](https://taynotfound.github.io/shore/app/), a tiny installable page (HTTPS, manifest, offline cache). It remembers your TV and opens it whenever you start the app. If your browser shows no install button, use its menu: *Install app* or *Add to Home screen*. On iPhone: *Share → Add to Home Screen*.
@@ -269,9 +290,9 @@ Live TV, inputs, settings, the remote, casting, updates and Google TV itself are
 
 ## Ideas
 
-Built since the last list: weather with °C/°F, Now playing, HDMI-CEC names, the phone companion, and German, French, Spanish, Dutch and Polish. Next up:
+Built since the last list: weather with °C/°F, Now playing with album art, Shore's own screensaver, cropping in the phone companion, HDMI-CEC names, and German, French, Spanish, Dutch and Polish. Next up:
 
-- Album art and play/pause for Now playing
+- Play/pause and skip for Now playing
 - A sleep timer on a remote button
 - Use the phone companion as a remote and keyboard
 - Calendar events under the clock (ICS link)
