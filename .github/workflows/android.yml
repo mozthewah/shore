@@ -1,6 +1,8 @@
 name: Android TV APK
 
-# Every push to main builds a keyless APK and publishes it as a GitHub release (v0.8.<commit count>).
+# Every push to main builds one keyless APK and publishes it as a GitHub release (v0.8.<commit count>).
+# A push with several commits makes one release whose notes cover all of them; a newer push cancels an older
+# build that is still running, so only the newest code is released.
 # The public APK never contains API keys: online sources that need one stay off, and people who want
 # them build Shore themselves (see the README).
 on:
@@ -13,7 +15,7 @@ permissions:
 
 concurrency:
   group: release
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   apk:
@@ -63,5 +65,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # A newer push supersedes this one: let its build publish everything instead.
+          git fetch -q origin "$GITHUB_REF"
+          if [ "$(git rev-parse FETCH_HEAD)" != "$GITHUB_SHA" ]; then echo "A newer push is on main; skipping this release."; exit 0; fi
           node scripts/release-notes.mjs "$VERSION" "shore-$VERSION.apk" > notes.md
           gh release create "v$VERSION" "shore-$VERSION.apk" --title "Shore $VERSION" --notes-file notes.md --target "$GITHUB_SHA" --latest
