@@ -1218,10 +1218,11 @@
   }
   /* Like Home: the rotation pool, topped up when small. Everything: the current online source (or My photos) and Shore's own. */
   function saverPool() {
-    var builtIn = WALLS.filter(function (w) { return !w.online; }), pool;
-    if (S.c.svsrc === 'builtin') return builtIn;
-    if (S.c.svsrc === 'every') return WALLS.slice();
-    pool = rotationPool();
+    var shown = WALLS.filter(function (w) { return !isHidden(w); }), builtIn = shown.filter(function (w) { return !w.online; }), pool;
+    if (!shown.length) shown = builtIn = WALLS.slice(); // everything hidden: show something rather than nothing
+    if (S.c.svsrc === 'builtin') return builtIn.length ? builtIn : shown;
+    if (S.c.svsrc === 'every') return shown;
+    pool = rotationPool().filter(function (w) { return !isHidden(w); });
     return pool.length >= SAVER_MIN_PHOTOS ? pool : pool.concat(builtIn.filter(function (w) { return pool.indexOf(w) < 0; }));
   }
   /* The rotation pool in a shuffled order that starts with the wallpaper on Home. */
