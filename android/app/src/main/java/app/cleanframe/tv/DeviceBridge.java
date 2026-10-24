@@ -1,5 +1,6 @@
 package app.cleanframe.tv;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.media.tv.TvContract;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.provider.Settings;
+import android.view.accessibility.AccessibilityManager;
 import android.webkit.JavascriptInterface;
 
 import org.json.JSONArray;
@@ -123,6 +125,44 @@ final class DeviceBridge {
     public boolean openInput(String id) {
         if (id == null || id.isEmpty()) return false;
         return start(new Intent(Intent.ACTION_VIEW, TvContract.buildChannelUriForPassthroughInput(id)));
+    }
+
+    /** {service, learning, keys:[{code, name, action}]}: whether the button service is on, a learn step is waiting, and the saved assignments. */
+    @JavascriptInterface
+    public String remoteInfo() {
+        try {
+            return new JSONObject().put("service", remoteServiceOn()).put("learning", RemoteKeys.learning()).put("keys", RemoteKeys.list(context)).toString();
+        } catch (Exception e) { return "{}"; }
+    }
+
+    private boolean remoteServiceOn() {
+        if (HomeButtonService.connected) return true;
+        AccessibilityManager am = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
+        if (am == null) return false;
+        for (AccessibilityServiceInfo info : am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)) {
+            if (info.getResolveInfo() != null && info.getResolveInfo().serviceInfo != null
+                    && context.getPackageName().equals(info.getResolveInfo().serviceInfo.packageName)) return true;
+        }
+        return false;
+    }
+
+    /** Starts (or cancels) the learn step: the next non-navigation button is reported to the page instead of acting. */
+    @JavascriptInterface
+    public boolean remoteLearn(boolean on) {
+        RemoteKeys.learn(on && remoteServiceOn());
+        return RemoteKeys.learning();
+    }
+
+    /** Saves what a button does; "default" restores the TV's own behaviour. */
+    @JavascriptInterface
+    public void remoteSet(int keyCode, String name, String action) {
+        if (keyCode <= 0 || RemoteKeys.navigation(keyCode)) return;
+        RemoteKeys.put(context, keyCode, name, action);
+    }
+
+    @JavascriptInterface
+    public boolean accessibilitySettings() {
+        return start(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) || settings();
     }
 
     @JavascriptInterface

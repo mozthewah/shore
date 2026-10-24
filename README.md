@@ -79,7 +79,24 @@ Google TV always sends Home to its own launcher and ignores Android's "default h
 - **Hold Home** (about a second): the original Google TV Home. *Settings → Google TV → Google TV Home* inside CleanFrame does the same.
 - If Google TV Home appears by itself (for example after leaving an app), CleanFrame takes over, unless you opened it on purpose.
 
-The service only listens for the Home key and which app is in front. It never reads screen content, and nothing is disabled. Turn the switch off to undo.
+The service only listens for remote keys and which app is in front. It never reads screen content, and nothing is disabled. Turn the switch off to undo.
+
+### Reassign remote buttons
+
+*Settings → Google TV → Remote buttons* (needs the accessibility service above). Choose **Assign a button…**, press the button on the remote, then pick what it does:
+
+- **Default**: what the TV normally does (removes the assignment).
+- **CleanFrame Home**, **Do nothing** or **Screensaver**.
+- A **connected HDMI input**, or **an app** from your Home screen.
+
+Assignments are stored on the TV and work everywhere, including inside other apps. Choose a button in the list to change it.
+
+Limits:
+
+- Only buttons that reach Android's accessibility key filter can be reassigned. If the TV firmware handles a button first, CleanFrame never sees it and the page says *No button arrived* instead of pretending.
+- Navigation, OK, Back, Home, volume and power are never captured (Home already has its own behaviour above).
+- Two physical buttons that send the same Android key code share one assignment.
+- Verified on the TCL RC833 remote: *not yet tested on hardware.*
 
 ### HDMI inputs
 

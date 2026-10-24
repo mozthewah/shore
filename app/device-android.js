@@ -84,6 +84,39 @@
     onChange: function (fn) { onlineListeners.push(fn); }
   };
   window.CleanFrameInputsChanged = function () { inputListeners.forEach(function (fn) { try { fn(); } catch (e) { } }); };
+  /* Remote button assignments, applied natively by HomeButtonService (accessibility, enabled by the user). */
+  var remoteListeners = [], learnListeners = [], installed = null, installedAt = 0;
+  window.CleanFrameRemoteChanged = function () { remoteListeners.forEach(function (fn) { try { fn(); } catch (e) { } }); };
+  window.CleanFrameRemoteLearned = function (key) {
+    if (!key || typeof key.code !== 'number') return;
+    learnListeners.forEach(function (fn) { try { fn(key); } catch (e) { } });
+  };
+  function isInstalled(pkg) {
+    if (!installed || Date.now() - installedAt > 30000) {
+      installed = {}; installedAt = Date.now();
+      try { JSON.parse(bridge.apps()).forEach(function (a) { installed[a.appId] = true; }); } catch (e) { }
+    }
+    return !!installed[pkg];
+  }
+  var remote = {
+    info: function () {
+      var info;
+      try { info = JSON.parse(bridge.remoteInfo()); } catch (e) { info = {}; }
+      return { service: !!info.service, learning: !!info.learning, keys: (info.keys || []).filter(function (k) { return k && typeof k.code === 'number' && typeof k.action === 'string'; }) };
+    },
+    learn: function (on) { try { return !!bridge.remoteLearn(!!on); } catch (e) { return false; } },
+    set: function (code, name, action) { try { bridge.remoteSet(code, String(name), String(action)); return true; } catch (e) { return false; } },
+    /* The package a Home entry launches, so a button opens the same app as its tile. */
+    appTarget: function (id) {
+      var pkg = TIZEN[id] ? PACKAGES[TIZEN[id]] : PACKAGES[id] || id, brand = BRAND[pkg];
+      if (!/^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$/.test(pkg)) return null;
+      if (FALLBACK[brand] && !isInstalled(pkg)) pkg = FALLBACK[brand];
+      return pkg;
+    },
+    openSettings: function (done) { reply(ask('accessibilitySettings'), done, 'Accessibility settings could not open.'); },
+    onChange: function (fn) { remoteListeners.push(fn); },
+    onLearned: function (fn) { learnListeners.push(fn); }
+  };
   /* Top Shelf (Shelf layout): recommendations fetched and pre-rendered natively, keyed by package. */
   var shelfListeners = [];
   function hasApp(pkg) { try { return JSON.parse(bridge.apps()).some(function (a) { return a.appId === pkg; }); } catch (e) { return false; } }
@@ -104,7 +137,7 @@
   window.FrameDevice = {
     platform: 'android',
     launch: launch, launchApp: launchApp, apps: apps,
-    inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, topShelf: topShelf,
+    inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */
     packageOf: function (id) { var brand = TIZEN[id] || BRAND[id] || (PACKAGES[id] ? id : ''), pkg = brand === 'youtube' ? FALLBACK.youtube : TIZEN[id] ? PACKAGES[TIZEN[id]] : PACKAGES[id] || id; // YouTube tile shows YouTube's banner
       return /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$/.test(pkg) ? pkg : null; },

@@ -25,6 +25,7 @@ public class MainActivity extends Activity {
     private TvInputManager tvInputs;
     private OnlineWallpapers online;
     private TopShelf topShelf;
+    private RemoteKeys.Listener remoteListener;
 
     /** Tells the page when an HDMI device is plugged in, powered on or switched off. */
     private final TvInputManager.TvInputCallback inputCallback = new TvInputManager.TvInputCallback() {
@@ -85,6 +86,13 @@ public class MainActivity extends Activity {
             }
         });
 
+        RemoteKeys.listener = remoteListener = new RemoteKeys.Listener() {
+            @Override public void learned(int keyCode, String name, int scanCode) {
+                String json = "{\"code\":" + keyCode + ",\"name\":" + org.json.JSONObject.quote(name) + ",\"scan\":" + scanCode + "}";
+                runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFrameRemoteLearned&&window.CleanFrameRemoteLearned(" + json + ")", null); });
+            }
+            @Override public void changed() { runOnUiThread(MainActivity.this::remoteChanged); }
+        };
         web.addJavascriptInterface(new DeviceBridge(this, online, topShelf), "CleanFrameAndroid");
         web.loadUrl(ORIGIN + "/assets/index.html");
         tvInputs = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
@@ -110,6 +118,10 @@ public class MainActivity extends Activity {
         if (web != null) web.evaluateJavascript("window.CleanFrameInputsChanged&&window.CleanFrameInputsChanged()", null);
     }
 
+    private void remoteChanged() {
+        if (web != null) web.evaluateJavascript("window.CleanFrameRemoteChanged&&window.CleanFrameRemoteChanged()", null);
+    }
+
     private void sendKey(String type) {
         if (web == null) return;
         web.evaluateJavascript("(function(){var e=new KeyboardEvent('" + type + "',{key:'Escape',code:'Escape',bubbles:true,cancelable:true});"
@@ -126,12 +138,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (web != null) { web.onResume(); web.resumeTimers(); web.requestFocus(); inputsChanged(); }
+        if (web != null) { web.onResume(); web.resumeTimers(); web.requestFocus(); inputsChanged(); remoteChanged(); }
         if (online != null) online.refreshIfStale();
     }
 
     @Override
     protected void onPause() {
+        RemoteKeys.learn(false); // never capture a button while another app is in front
         if (web != null) web.onPause(); // stops wallpaper rotation work while an app is open
         super.onPause();
     }
@@ -141,6 +154,7 @@ public class MainActivity extends Activity {
         if (tvInputs != null) tvInputs.unregisterCallback(inputCallback);
         if (online != null) online.setListener(null);
         if (topShelf != null) topShelf.setListener(null);
+        if (RemoteKeys.listener == remoteListener) { RemoteKeys.listener = null; RemoteKeys.learn(false); }
         if (web != null) { web.removeJavascriptInterface("CleanFrameAndroid"); web.destroy(); web = null; }
         super.onDestroy();
     }

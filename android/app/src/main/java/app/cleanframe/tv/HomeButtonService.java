@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 
@@ -12,6 +13,7 @@ import android.view.accessibility.AccessibilityEvent;
  * Google TV always resolves Home to its own launcher and ignores the default-home setting.
  * This service (enabled by the user in Settings > Accessibility) sends Home to CleanFrame:
  * a short press opens CleanFrame, a long press opens the original Google TV Home.
+ * It also applies the remote button assignments in RemoteKeys and captures a button for the learn step.
  */
 public class HomeButtonService extends AccessibilityService {
     static final String GOOGLE_HOME = "com.google.android.apps.tv.launcherx";
@@ -22,17 +24,32 @@ public class HomeButtonService extends AccessibilityService {
 
     /** Set by DeviceBridge.systemHome() so a deliberate trip to Google TV Home is not undone. */
     static volatile long allowSystemHomeUntil;
+    /** True while Android has this service bound, i.e. it is enabled and receiving keys. */
+    static volatile boolean connected;
+    private static final String TAG = "CleanFrameKeys";
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean inSystemHome, longFired;
+    /** Key code whose press was captured by the learn step; its key-up is swallowed too. */
+    private int learnedCode = -1;
     private final Runnable longPress = new Runnable() {
         @Override public void run() { longFired = true; openSystemHome(); }
     };
 
     @Override
+    protected void onServiceConnected() { connected = true; RemoteKeys.notifyChanged(); }
+
+    @Override
+    public boolean onUnbind(Intent intent) { connected = false; RemoteKeys.notifyChanged(); return super.onUnbind(intent); }
+
+    @Override
     protected boolean onKeyEvent(KeyEvent event) {
-        if (event.getKeyCode() != KeyEvent.KEYCODE_HOME) return false;
-        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+        int code = event.getKeyCode();
+        boolean down = event.getAction() == KeyEvent.ACTION_DOWN, up = event.getAction() == KeyEvent.ACTION_UP;
+        if (RemoteKeys.learning()) Log.i(TAG, (down ? "down " : up ? "up " : "other ") + code + " " + KeyEvent.keyCodeToString(code)
+                + " scan=" + event.getScanCode() + " repeat=" + event.getRepeatCount() + " device=" + event.getDeviceId() + " source=0x" + Integer.toHexString(event.getSource()));
+        if (code != KeyEvent.KEYCODE_HOME) return remoteKey(event, code, down, up);
+        if (down && event.getRepeatCount() == 0) {
             longFired = false;
             handler.postDelayed(longPress, LONG_PRESS_MS);
         } else if (event.getAction() == KeyEvent.ACTION_UP) {
@@ -40,6 +57,35 @@ public class HomeButtonService extends AccessibilityService {
             if (!longFired) openCleanFrame();
         }
         return true;
+    }
+
+    /** Learn step and saved assignments for every key except Home. Navigation keys always pass through. */
+    private boolean remoteKey(KeyEvent event, int code, boolean down, boolean up) {
+        if (code == learnedCode) { if (up) learnedCode = -1; return true; }
+        if (RemoteKeys.navigation(code)) return false;
+        if (RemoteKeys.learning()) {
+            if (down && event.getRepeatCount() == 0) {
+                RemoteKeys.learn(false);
+                learnedCode = code;
+                RemoteKeys.Listener l = RemoteKeys.listener;
+                if (l != null) l.learned(code, KeyEvent.keyCodeToString(code), event.getScanCode());
+            }
+            return true;
+        }
+        String action = RemoteKeys.action(this, code);
+        if (action == null) return false;
+        if (up && !event.isCanceled()) perform(action);
+        return true;
+    }
+
+    private void perform(String action) {
+        DeviceBridge bridge = new DeviceBridge(this);
+        boolean ok = true;
+        if (action.equals("home")) openCleanFrame();
+        else if (action.equals("screensaver")) ok = bridge.screensaver();
+        else if (action.startsWith("app:")) ok = bridge.launch(action.substring(4));
+        else if (action.startsWith("input:")) ok = bridge.openInput(action.substring(6));
+        if (!ok) Log.w(TAG, "Could not perform " + action);
     }
 
     @Override
