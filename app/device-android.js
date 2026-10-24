@@ -146,12 +146,12 @@
   var phoneListeners = [];
   window.CleanFramePhoneChanged = function (count) { phoneListeners.forEach(function (fn) { try { fn(count); } catch (e) { } }); };
   var phone = {
-    /* {enabled, url, qr, count, place}: url and qr are empty while off or offline. */
+    /* {enabled, url, qr, count, place, feed}: url and qr are empty while off or offline. */
     info: function () {
       var r;
       try { r = JSON.parse(bridge.phoneInfo()); } catch (e) { r = {}; }
       return { enabled: !!r.enabled, url: typeof r.url === 'string' ? r.url : '', qr: /^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(r.qr || '') ? r.qr : '',
-        count: +r.count || 0, place: typeof r.place === 'string' ? r.place : '' };
+        count: +r.count || 0, place: typeof r.place === 'string' ? r.place : '', feed: typeof r.feed === 'string' ? r.feed : '' };
     },
     enable: function (on) { try { bridge.phoneEnable(!!on); } catch (e) { } },
     /* Settings model for the companion's settings screens; the companion sends choices back through CleanFrameCompanionSet. */
@@ -161,6 +161,16 @@
     clear: function () { try { bridge.phoneClear(); } catch (e) { } },
     onChange: function (fn) { phoneListeners.push(fn); }
   };
+  /* Headlines for the clock and the screensaver (News.java): Google News for the TV's language, or the companion's feed. */
+  var news = bridge.newsInfo ? {
+    info: function () {
+      var r;
+      try { r = JSON.parse(bridge.newsInfo()); } catch (e) { r = {}; }
+      var items = (r.items instanceof Array ? r.items : []).filter(function (i) { return i && typeof i.t === 'string' && i.t; }).map(function (i) { return { title: i.t, source: String(i.s || ''), time: +i.d || 0 }; });
+      return { at: +r.at || 0, items: items, error: !!r.error };
+    },
+    refresh: function (feed, force) { try { bridge.newsRefresh(String(feed || ''), !!force); } catch (e) { } }
+  } : null;
   var nowPlaying = {
     /* lookup: allow a sharper cover and a wide artist picture from the internet (artist, title and album are sent). */
     info: function (lookup) {
@@ -199,7 +209,7 @@
     openSettings: function (done) { reply(ask('screensaverSettings'), done, 'Screensaver settings could not open.'); }
   };
   window.FrameDevice = {
-    platform: 'android', phone: phone, nowPlaying: nowPlaying, saver: saver, update: update,
+    platform: 'android', phone: phone, news: news, nowPlaying: nowPlaying, saver: saver, update: update,
     launch: launch, launchApp: launchApp, apps: apps, appInfo: appInfo,
     inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */

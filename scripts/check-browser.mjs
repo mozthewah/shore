@@ -948,6 +948,16 @@ try {
     await group('clock'); await act('open.clockextra');
     check('Clock details offer Weather effects', (await current.evaluate(() => ShoreQA.actions())).includes('choice.wfx.on'));
   });
+  await run('Headlines under the clock', async () => {
+    await page({ seed: baseline({ bg: 'photo', cnews: 'on' }) });
+    check('No headline line without news', await current.evaluate(() => document.querySelector('.cap-news-line').textContent === ''));
+    const first = await current.evaluate(() => ShoreQA.news([{ title: 'First story', source: 'Wire', time: Date.now() }, { title: 'Second story', source: 'Paper', time: 0 }, { title: 'Too old', source: 'Old', time: Date.now() - 40 * 3600000 }]));
+    check('Headline shows with its source', first === 'WireFirst story', first);
+    const same = await current.evaluate(() => { const el = document.querySelector('.cap-news'); ShoreQA.look({ csec: 'on' }); return document.querySelector('.cap-news') === el; });
+    check('Clock updates keep the headline element (no replayed fade)', same);
+    await current.evaluate(() => ShoreQA.look({ cnews: 'off' }));
+    check('Turning Headlines off removes the line', await current.evaluate(() => document.querySelector('.cap-news-line').textContent === ''));
+  });
   await run('Favourite and hidden wallpapers', async () => {
     await page({ seed: baseline({ mode: 'open', hide: [walls[1].id] }) });
     check('Open rotation skips a hidden wallpaper', (await state()).wallpaper !== walls[1].id, (await state()).wallpaper);

@@ -44,6 +44,14 @@ final class DeviceBridge {
         this.phone = phone;
     }
 
+    /** Cached headlines: {at, feed, items:[{t, s, d}], error}. */
+    @JavascriptInterface
+    public String newsInfo() { return News.get(context).info(); }
+
+    /** Fetches headlines in the background if the cache is stale; feed is the companion's RSS URL or empty for Google News. */
+    @JavascriptInterface
+    public void newsRefresh(String feed, boolean force) { News.get(context).refresh(feed, force); }
+
     /** Keeps (or releases) a favourite online photo across refreshes. */
     @JavascriptInterface
     public void onlineKeep(String id, boolean on) { if (online != null && id != null && id.matches("[A-Za-z0-9._-]{1,160}")) online.keep(id, on); }

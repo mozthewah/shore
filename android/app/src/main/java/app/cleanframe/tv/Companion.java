@@ -106,6 +106,8 @@ final class Companion {
 
     /** Place name typed on the phone for the weather line; empty when none was set. */
     String place() { return prefs.getString("place", ""); }
+    /** RSS or Atom feed typed on the phone for the headlines; empty means Google News for the TV's language. */
+    String feed() { return prefs.getString("feed", ""); }
 
     /** Starts the server when switched on; called when Shore opens. */
     synchronized void resume() { if (enabled() && (server == null || server.isClosed())) try { open(); } catch (IOException ignored) { } }
@@ -135,7 +137,7 @@ final class Companion {
             url = address == null ? "" : "http://" + address + ":" + s.getLocalPort(); // follows a new IP address
             String link = url.isEmpty() ? "" : PAIR_URL + "#tv=" + java.net.URLEncoder.encode(url, "UTF-8") + "&k=" + key();
             return new JSONObject().put("enabled", enabled()).put("url", url).put("qr", link.isEmpty() ? "" : qr(link))
-                    .put("count", count()).put("place", place()).toString();
+                    .put("count", count()).put("place", place()).put("feed", feed()).toString();
         } catch (Exception e) { return "{}"; }
     }
 
@@ -282,6 +284,14 @@ final class Companion {
             if (method.equals("POST") && api.startsWith("delete/") && api.substring(7).matches(NAME)) {
                 new File(dir, api.substring(7)).delete(); notifyChanged(); send(out, 200, "application/json", apiInfo()); return;
             }
+            if (method.equals("POST") && api.equals("feed")) {
+                String feed = param(query, "url").trim();
+                if (!feed.isEmpty() && !feed.matches("(?i)https?://\\S{4,500}")) { send(out, 400, "application/json", "{\"error\":\"feed\"}"); return; }
+                prefs.edit().putString("feed", feed).apply();
+                notifyChanged();
+                send(out, 200, "application/json", apiInfo());
+                return;
+            }
             if (method.equals("POST") && api.equals("place")) {
                 String place = param(query, "name").trim();
                 if (place.length() > 80) place = place.substring(0, 80);
@@ -307,7 +317,7 @@ final class Companion {
         JSONArray photos = new JSONArray();
         File[] all = files();
         for (int i = all.length - 1; i >= 0; i--) photos.put(all[i].getName());
-        return new JSONObject().put("name", "Shore").put("install", PAIR_URL).put("count", all.length).put("max", MAX_FILES).put("place", place()).put("photos", photos).toString();
+        return new JSONObject().put("name", "Shore").put("install", PAIR_URL).put("count", all.length).put("max", MAX_FILES).put("place", place()).put("feed", feed()).put("photos", photos).toString();
     }
 
     private void asset(OutputStream out, String name) throws IOException {
