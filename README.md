@@ -6,7 +6,7 @@
 
 **A calm home screen for Google TV: your apps, your HDMI devices, a beautiful picture and the time. Nothing else.**
 
-[Website](https://taynotfound.github.io/CleanFrame-TCL/) · [Install](#install) · [Features](#features) · [Phone companion](#phone-companion) · [Wallpapers](#online-and-animated-wallpapers) · [Top Shelf](#top-shelf) · [Build](#build-from-source)
+[Website](https://taynotfound.github.io/shore/) · [Install](#install) · [Features](#features) · [Phone companion](#phone-companion) · [Wallpapers](#online-and-animated-wallpapers) · [Top Shelf](#top-shelf) · [Build](#build-from-source)
 
 ![Shore on a TCL 55C6KS](docs/images/tcl/home.jpg)
 
@@ -78,10 +78,10 @@ You need a computer on the same Wi-Fi with [Android platform tools](https://deve
    ```
 
    The TV asks "Allow debugging?". Tick **Always allow from this computer** and press OK.
-4. **Install** the APK from [Releases](https://github.com/taynotfound/CleanFrame-TCL/releases) or [build it](#build-from-source):
+4. **Install** the APK from [Releases](https://github.com/taynotfound/shore/releases) or [build it](#build-from-source):
 
    ```sh
-   adb install -r CleanFrame-TCL.apk
+   adb install -r Shore.apk
    ```
 
 Shore now appears in your apps. Open it once; it remembers everything on the TV.
@@ -233,8 +233,8 @@ Apps without recommendations show their own banner, softly blurred. Keys go in `
 You need JDK 17 and the Android SDK (platform 35), or Android Studio.
 
 ```sh
-git clone https://github.com/taynotfound/CleanFrame-TCL.git
-cd CleanFrame-TCL
+git clone https://github.com/taynotfound/shore.git
+cd shore
 echo "sdk.dir=$HOME/Android/Sdk" > android/local.properties
 gradle -p android assembleRelease
 adb install -r android/app/build/outputs/apk/release/app-release.apk
@@ -278,7 +278,7 @@ Built since the last list: weather with °C/°F, Now playing, HDMI-CEC names, th
 ## Credits and licences
 
 - **CleanFrame** by Nathan Clark, MIT. This fork keeps the original [licence](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md).
-- Android TV port and TCL additions: CleanFrame-TCL contributors, MIT.
+- Android TV port and TCL additions: Shore contributors, MIT.
 - App logos: [Simple Icons](https://simpleicons.org) (CC0) and public-domain wordmarks from Wikimedia Commons; see `app/assets/icons/SOURCES.json`. Trademarks belong to their owners.
 - Fonts: SIL Open Font License; see `app/assets/fonts/`.
 - Online wallpapers belong to their authors and are shown under each provider's terms: [NASA APOD](https://apod.nasa.gov), [Bing](https://www.bing.com), [Wikimedia Commons](https://commons.wikimedia.org), [Lorem Picsum](https://picsum.photos), [Unsplash](https://unsplash.com), [Pexels](https://www.pexels.com) and [KLIPY](https://klipy.com) ("Powered by KLIPY").

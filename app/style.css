@@ -615,7 +615,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .anim-paused .photo,.anim-paused .mat-img,.anim-paused .ph-field-img{animation-play-state:paused}
 .detail-fonts .setting-choice{min-height:76px}
 .detail-fonts .appearance-rows{top:260px}
-/* ---------- CleanFrame-TCL customisation ---------- */
+/* ---------- Shore customisation ---------- */
 /* Clock size (base 48px) and weight; the baseline shift and digit cells scale with the clock. */
 .cs-medium .home .clock{font-size:80px;line-height:96px;--clock-k:1.6667}
 .cs-large .home .clock{font-size:120px;line-height:136px;--clock-k:2.5}

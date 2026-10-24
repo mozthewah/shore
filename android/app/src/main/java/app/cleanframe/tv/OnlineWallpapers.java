@@ -53,7 +53,7 @@ final class OnlineWallpapers {
             "loops", "pexels-ocean", "pexels-rain", "pexels-clouds", "pexels-city", "klipy-lofi", "klipy-rain", "klipy-space", "phone" };
     private static final int MAX_PHOTOS = 8, W = 1920, H = 1080;
     private static final long REFRESH_MS = 6L * 60 * 60 * 1000;
-    static final String UA = "CleanFrame-TCL/1.0 (Android TV home screen; https://github.com/taynotfound/CleanFrame-TCL)";
+    static final String UA = "Shore/1.0 (Android TV home screen; https://github.com/taynotfound/shore)";
 
     private final Context context;
     private final File root, wallDir, matDir, index;
@@ -253,7 +253,7 @@ final class OnlineWallpapers {
                 if (!n.endsWith(".mp4")) continue;
                 String base = n.substring(0, n.length() - 4);
                 out.add(new Photo("loop-" + base, base.substring(0, 1).toUpperCase(Locale.ROOT) + base.substring(1).replace('-', ' '),
-                        "asset:loops/" + n, "CleanFrame-TCL · generated loop").loop());
+                        "asset:loops/" + n, "Shore · generated loop").loop());
             }
         } else if (source.startsWith("pexels-") && pexelsAvailable()) {
             String query = source.equals("pexels-city") ? "city night timelapse" : source.equals("pexels-clouds") ? "clouds timelapse" : source.equals("pexels-rain") ? "rain window" : "ocean waves";
