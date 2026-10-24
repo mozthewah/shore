@@ -859,11 +859,18 @@ try {
   });
   await run('Clock weather toggle and browser-only extras', async () => {
     await page(); await group('clock');
-    check('Clock offers weather under the clock', await current.locator('[data-action="choice.cweather.on"]').count() === 1);
+    check('Clock links to Under the clock', await current.locator('[data-action="open.clockextra"]').count() === 1);
+    await act('open.clockextra');
+    check('Under the clock offers weather', await current.locator('[data-action="choice.cweather.on"]').count() === 1);
+    check('Temperature unit waits for weather', await current.locator('[data-action="choice.wunit.f"].is-disabled').count() === 1);
     check('Now playing is Android-only', await current.locator('[data-action="choice.cplaying.on"]').count() === 0);
     await act('choice.cweather.on'); await ready();
     check('Weather toggle persists', (await stored()).look.cweather === 'on');
     check('Weather note credits Open-Meteo', /Open-Meteo/.test(await current.locator('#stage').innerText()));
+    await act('choice.wunit.f'); await ready();
+    check('Fahrenheit persists', (await stored()).look.wunit === 'f');
+    await act('choice.wunit.c'); await ready();
+    check('Celsius persists', (await stored()).look.wunit === 'c');
     await act('choice.cweather.on'); await ready();
     check('Weather toggles back off', (await stored()).look.cweather === 'off');
   });

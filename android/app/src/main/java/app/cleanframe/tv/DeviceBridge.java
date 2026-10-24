@@ -28,11 +28,11 @@ final class DeviceBridge {
     private final PackageManager pm;
     private final OnlineWallpapers online;
     private final TopShelf topShelf;
-    private final PhoneUpload phone;
+    private final Companion phone;
 
     DeviceBridge(Context context) { this(context, null, null, null); }
 
-    DeviceBridge(Context context, OnlineWallpapers online, TopShelf topShelf, PhoneUpload phone) {
+    DeviceBridge(Context context, OnlineWallpapers online, TopShelf topShelf, Companion phone) {
         this.context = context.getApplicationContext();
         this.pm = this.context.getPackageManager();
         this.online = online;
@@ -50,19 +50,21 @@ final class DeviceBridge {
         return start(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")) || settings();
     }
 
-    /** Starts the phone upload page: {url, qr, count, until}. */
+    /** Shore Companion: {enabled, url, qr, count, place}. */
     @JavascriptInterface
-    public String phoneStart() { return phone == null ? "{}" : phone.start(); }
+    public String phoneInfo() { return phone == null ? "{}" : phone.info(); }
 
+    /** Switches the companion server on or off (remembered across restarts). */
     @JavascriptInterface
-    public void phoneStop() { if (phone != null) phone.stop(); }
+    public void phoneEnable(boolean on) { if (phone != null) phone.setEnabled(on); }
 
-    /** {count, place}: stored phone photos and the weather place typed on the phone. */
+    /** New pairing key; phones have to scan the code again. */
     @JavascriptInterface
-    public String phoneInfo() {
-        try { return new JSONObject().put("count", phone == null ? 0 : phone.count()).put("place", phone == null ? "" : phone.place()).toString(); }
-        catch (Exception e) { return "{}"; }
-    }
+    public void phoneForget() { if (phone != null) phone.forget(); }
+
+    /** Wallpaper id shown on the TV, used as the companion's background. */
+    @JavascriptInterface
+    public void phoneWallpaper(String id) { if (phone != null) phone.setWallpaper(id); }
 
     @JavascriptInterface
     public void phoneClear() { if (phone != null) phone.clear(); }

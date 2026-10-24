@@ -1,16 +1,18 @@
 <div align="center">
 
-# CleanFrame for TCL Google TV
+<img src="site/icon.png" width="96" alt="">
 
-**A calm home screen for your TV: your apps, your HDMI devices, a beautiful picture and the time. Nothing else.**
+# Shore
 
-[Install](#install) · [Features](#features) · [Wallpapers](#online-and-animated-wallpapers) · [Top Shelf](#top-shelf) · [Build](#build-from-source)
+**A calm home screen for Google TV: your apps, your HDMI devices, a beautiful picture and the time. Nothing else.**
 
-![CleanFrame on a TCL 55C6KS](docs/images/tcl/home.jpg)
+[Website](https://taynotfound.github.io/CleanFrame-TCL/) · [Install](#install) · [Features](#features) · [Phone companion](#phone-companion) · [Wallpapers](#online-and-animated-wallpapers) · [Top Shelf](#top-shelf) · [Build](#build-from-source)
+
+![Shore on a TCL 55C6KS](docs/images/tcl/home.jpg)
 
 </div>
 
-CleanFrame-TCL brings [Nathan Clark's CleanFrame](https://github.com/nthnclrk/CleanFrame), originally made for Samsung The Frame, to **Android TV and Google TV**. It is tuned and tested on a **TCL 55C6KS** (55" Mini LED, 4K, Android TV 12). The interface is the original HTML/CSS app; a small Java shell runs it full screen and connects it to the TV.
+Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://github.com/nthnclrk/CleanFrame), originally made for Samsung The Frame, to **Android TV and Google TV**. It is tuned and tested on a **TCL 55C6KS** (55" Mini LED, 4K, Android TV 12). The interface is the original HTML/CSS app; a small Java shell runs it full screen and connects it to the TV.
 
 > [!NOTE]
 > **Unofficial.** Not affiliated with TCL, Google, Samsung or any streaming service. Everything here is reversible, and each step says how.
@@ -23,12 +25,12 @@ CleanFrame-TCL brings [Nathan Clark's CleanFrame](https://github.com/nthnclrk/Cl
 - **Three layouts.** *Dock* and *List* draw every app logo in one consistent style. *Shelf* is an Apple TV–style row of each app's colourful banner, with a [Top Shelf](#top-shelf) above it.
 - **Your apps, found automatically.** Pick and order up to nine for Home.
 - **HDMI devices appear by themselves**, named by HDMI-CEC ("PlayStation 5" instead of "HDMI 1"). Switch on a console or set-top box and its tile shows up; switch it off and it disappears. Show inputs first on Home or in their own row.
-- **Speaks your language.** The launcher follows the TV's system language (*Settings → System → Language*). German, French, Spanish and Dutch are included; anything else falls back to English.
+- **Speaks your language.** The launcher follows the TV's system language (*Settings → System → Language*). German, French, Spanish, Dutch and Polish are included; anything else falls back to English.
 
 **The picture**
 - **15 photographs** with pre-rendered glass, plus **online wallpapers** from NASA, Bing, Wikimedia, Picsum and Unsplash.
 - **Animated wallpapers**: bundled seamless loops, Pexels video loops and Klipy GIFs.
-- **[My photos](#my-photos-from-your-phone)**: send photos, GIFs and short videos from your phone by scanning a QR code.
+- **[Phone companion](#phone-companion)**: scan a QR code and send photos, GIFs and short videos to the TV, from a web app styled like the launcher.
 - **Drift**: a slow Ken Burns zoom where the photo and its glass move together.
 - **Rotation**: a new picture each time Home opens, or every 5, 15 or 60 minutes.
 - **Night mode** dims everything on a timer (21–07, 22–06, 23–07) or all the time, in three strengths.
@@ -36,12 +38,12 @@ CleanFrame-TCL brings [Nathan Clark's CleanFrame](https://github.com/nthnclrk/Cl
 **Make it yours**
 - **Eight open-licence fonts**, with text weight and app-name size.
 - **Clock**: 12- or 24-hour, optional date, four sizes and weights.
-- **[Under the clock](#under-the-clock-weather-and-now-playing)**: the current weather (Open-Meteo, no key) and what's playing in Spotify, YouTube or any other app.
+- **[Under the clock](#under-the-clock-weather-and-now-playing)**: the current weather in °C or °F (Open-Meteo, no key) and what's playing in Spotify, YouTube or any other app.
 - **Hide controls when idle**: after 1 or 5 minutes only the picture and clock stay.
 - Focus style and glass materials.
 
 **Fits the TV**
-- **The Home button opens CleanFrame.** Hold Home for the original Google TV Home.
+- **The Home button opens Shore.** Hold Home for the original Google TV Home.
 - **Reassign remote buttons** such as the app shortcut keys or the TV button.
 - Animations pause outside Home, so menus stay snappy.
 - An optional, reversible **debloat** list for TCL's preinstalled extras.
@@ -82,7 +84,7 @@ You need a computer on the same Wi-Fi with [Android platform tools](https://deve
    adb install -r CleanFrame-TCL.apk
    ```
 
-CleanFrame now appears in your apps. Open it once; it remembers everything on the TV.
+Shore now appears in your apps. Open it once; it remembers everything on the TV.
 
 <details>
 <summary>Android 14 builds with "Wireless debugging"</summary>
@@ -91,15 +93,15 @@ Open *Wireless debugging → Pair device with pairing code*, then run `adb pair 
 
 </details>
 
-### Make the Home button open CleanFrame
+### Make the Home button open Shore
 
-Google TV always sends Home to its own launcher and ignores the "default home app" setting. CleanFrame includes a small accessibility service that catches the Home key instead, the same approach launchers like Projectivy use. Turn it on yourself:
+Google TV always sends Home to its own launcher and ignores the "default home app" setting. Shore includes a small accessibility service that catches the Home key instead, the same approach launchers like Projectivy use. Turn it on yourself:
 
-**Settings → System → Accessibility → CleanFrame Home button → On**
+**Settings → System → Accessibility → Shore Home button → On**
 
-- **Press Home** to open CleanFrame.
-- **Hold Home** for about a second to open the original Google TV Home. *Settings → Google TV → Google TV Home* in CleanFrame does the same.
-- If Google TV Home appears by itself, for example after leaving an app, CleanFrame takes over. It won't do that if you opened Google TV Home on purpose.
+- **Press Home** to open Shore.
+- **Hold Home** for about a second to open the original Google TV Home. *Settings → Google TV → Google TV Home* in Shore does the same.
+- If Google TV Home appears by itself, for example after leaving an app, Shore takes over. It won't do that if you opened Google TV Home on purpose.
 
 The service only sees remote keys and which app is in front. It never reads screen content. Turn the switch off to undo.
 
@@ -108,7 +110,7 @@ The service only sees remote keys and which app is in front. It never reads scre
 *Settings → Google TV → Remote buttons* (needs the accessibility service). Choose **Assign a button…**, press a button on the remote, then pick what it does:
 
 - **Default**: what the TV normally does. This removes the assignment.
-- **CleanFrame Home**, **Do nothing** or **Screensaver**.
+- **Shore Home**, **Do nothing** or **Screensaver**.
 - A **connected HDMI input**, or **an app** from your Home screen.
 
 Assignments work everywhere, including inside other apps.
@@ -116,7 +118,7 @@ Assignments work everywhere, including inside other apps.
 <details>
 <summary>Limits</summary>
 
-- CleanFrame only sees buttons that reach Android's accessibility key filter. If the TV firmware handles a button first, the page says *No button arrived*.
+- Shore only sees buttons that reach Android's accessibility key filter. If the TV firmware handles a button first, the page says *No button arrived*.
 - Navigation, OK, Back, Home, volume and power are never captured.
 - Two buttons that send the same Android key code share one assignment.
 - Not yet tested on the TCL RC833 remote itself.
@@ -129,14 +131,14 @@ Inputs come from Android's TV Input Framework. A device that is **plugged in and
 
 ### Language
 
-CleanFrame uses the TV's system language: German, French, Spanish and Dutch are built in, and anything else shows English. Change it in *Settings → System → Language* on the TV, then reopen CleanFrame. Translations live in [`app/i18n.js`](app/i18n.js): one dictionary per language, keyed by the English text, so adding a language means adding one block. In the browser preview, `?lang=de` picks a language.
+Shore uses the TV's system language: German, French, Spanish, Dutch and Polish are built in, and anything else shows English. Change it in *Settings → System → Language* on the TV, then reopen Shore. Translations live in [`app/i18n.js`](app/i18n.js): one dictionary per language, keyed by the English text, so adding a language means adding one block. In the browser preview, `?lang=de` picks a language.
 
 ### Under the clock: weather and Now playing
 
 *Settings → Clock → Under the clock.*
 
-- **Weather** shows the temperature and sky, such as *12° Cloudy*, next to the date. It comes from [Open-Meteo](https://open-meteo.com), which needs no key or account. The place is the city of the TV's time zone (*Europe/Berlin* → Berlin). You can type a different place on the [My photos](#my-photos-from-your-phone) phone page. CleanFrame refreshes the weather every 30 minutes, uses °F only for US English, and the weather is off until you turn it on.
-- **Now playing** shows *♪ Title · Artist — App* while music or video plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **CleanFrame Now playing** under *Settings → Apps → Special app access → Notification access*; the Clock page has a shortcut. CleanFrame reads only the active media session and ignores notifications themselves.
+- **Weather** shows the temperature and sky, such as *12 °C Cloudy*, next to the date. It comes from [Open-Meteo](https://open-meteo.com), which needs no key or account. The place is the city of the TV's time zone (*Europe/Berlin* → Berlin), or the place you type in the [phone companion](#phone-companion). Choose **°C or °F** under *Temperature*. Shore refreshes the weather every 30 minutes, and it is off until you turn it on.
+- **Now playing** shows *♪ Title · Artist — App* while music or video plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings → Apps → Special app access → Notification access*; the Clock page has a shortcut. Shore reads only the active media session and ignores notifications themselves.
 
 <details>
 <summary>Google TV hides Notification access</summary>
@@ -151,14 +153,20 @@ To undo, run the same command with `disallow_listener`.
 
 </details>
 
-## My photos from your phone
+## Phone companion
 
-*Settings → Background → Online wallpapers → My photos.* The TV shows a QR code. Scan it with your phone's camera to open a small upload page served by the TV itself. From there, pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. They appear under **My photos**, which works like any other wallpaper source: glass is rendered once, rotation cycles through them, and GIFs and clips play animated.
+*Settings → Phone → Phone companion.* Turn it on and the TV shows a QR code. Scan it with your phone's camera: a small web app opens, served by the TV itself and styled like the launcher, with your current wallpaper behind glass cards.
 
-- The page only works on the same Wi-Fi. The address has a random code and stops working after 15 minutes, or when CleanFrame closes.
-- Nothing goes through the internet. Files stay in CleanFrame's private storage on the TV, up to the newest 30. *Remove all my photos* deletes them, on the TV or on the phone page.
-- Landscape pictures fill the screen best; portrait photos are centre-cropped. Phone rotation (EXIF) is respected.
-- The phone page also sets the place for the weather.
+- **Send to your TV**: pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. They appear under **My photos**, a wallpaper source like the others. Glass is rendered once, rotation cycles through them, and GIFs and clips play animated. Choose *Settings → Phone → My photos* to use them.
+- **My photos**: see what's stored and delete single photos or all of them. Shore keeps the newest 30, in its private storage on the TV.
+- **Weather place**: the city for the weather under the clock.
+- **Keep it as an app**: in the phone's browser menu, choose *Add to Home screen*. The page has a web app manifest and icons, so it opens full screen like an app.
+
+**Privacy and limits**
+
+- Nothing goes through the internet. Phone and TV must be on the same Wi-Fi, and the companion only runs while it's switched on.
+- The QR code carries a random pairing key, which the phone keeps. Without it the TV answers nothing but the page itself. *Forget paired phones* makes a new key, and every phone has to scan again.
+- The page is plain `http://` on your network, so browsers treat it as an ordinary website: *Add to Home screen* works, but offline use and full PWA install need HTTPS, which a TV can't offer on a home network. If the TV's IP address changes, scan the code again. A DHCP reservation in your router avoids that.
 
 ## Online and animated wallpapers
 
@@ -184,7 +192,7 @@ Credits for each picture appear in the wallpaper gallery, as the sources' terms 
 
 *Settings → Layout → Shelf.* As on Apple TV, the focused app fills the screen with what is trending there. **Down** opens a row of recommendations. **OK** opens an item directly in YouTube, Twitch, ZDF or ARTE, and opens the app itself for the others. **Up** or **Back** returns to the apps.
 
-Google TV doesn't share its recommendations with other launchers, so CleanFrame reads public catalogues about once an hour, over HTTPS only:
+Google TV doesn't share its recommendations with other launchers, so Shore reads public catalogues about once an hour, over HTTPS only:
 
 | Apps | Source | Key |
 | --- | --- | --- |
@@ -192,6 +200,31 @@ Google TV doesn't share its recommendations with other launchers, so CleanFrame 
 | Netflix, Disney+, Prime Video, Joyn, waipu.tv, Apple TV | [TMDB](https://www.themoviedb.org) watch providers for Germany | `tmdb.token` |
 | YouTube | YouTube Data API v3 | `youtube.apiKey` |
 | Twitch | Twitch Helix API | `twitch.clientId`, `twitch.clientSecret` |
+
+<details>
+<summary>Getting the Twitch keys (no login or user token needed)</summary>
+
+Shore asks Twitch for an **app access token** by itself (the *client credentials* flow), so you never sign in or paste a token. You need two values from your own Twitch application:
+
+1. Open the [Twitch developer console](https://dev.twitch.tv/console/apps) and choose **Register Your Application**. Turn on two-factor authentication first if Twitch asks for it.
+2. **Name**: anything unique, for example `Shore-TV-yourname`. **OAuth Redirect URLs**: `http://localhost`. Twitch requires one, but Shore never uses it. **Category**: *Application Integration*. **Client type**: *Confidential*.
+3. Open the application with **Manage**. Copy the **Client ID**, then choose **New Secret** and copy the **Client Secret**. Twitch shows it only once.
+4. Add both to `android/local.properties` and rebuild:
+
+   ```properties
+   twitch.clientId=your-client-id
+   twitch.clientSecret=your-client-secret
+   ```
+
+To check the pair before building, ask Twitch for a token yourself. A JSON reply with `access_token` means the keys work:
+
+```bash
+curl -X POST "https://id.twitch.tv/oauth2/token" -d "client_id=YOUR_ID" -d "client_secret=YOUR_SECRET" -d "grant_type=client_credentials"
+```
+
+Authorize links (`https://id.twitch.tv/oauth2/authorize?…`) and token generator websites create *user* tokens, which Shore doesn't use. Never paste a user token anywhere: it can act as your account. If you made one, revoke it under twitch.tv → *Settings → Connections*.
+
+</details>
 
 Apps without recommendations show their own banner, softly blurred. Keys go in `android/local.properties`, or the environment variables `TMDB_TOKEN`, `YOUTUBE_API_KEY`, `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` (also used as GitHub Actions secrets).
 
@@ -213,7 +246,7 @@ The interface also runs in a desktop browser for design work: `npm ci && npm run
 
 | Path | What it is |
 | --- | --- |
-| `app/` | The CleanFrame interface, shared with the Samsung version |
+| `app/` | The Shore interface, shared with the Samsung version |
 | `app/device-android.js` | Android adapter: apps, inputs, wallpapers, remote buttons |
 | `app/i18n.js` | Translations |
 | `android/` | Java shell: WebView, app and input bridge, Home button service, wallpaper and Top Shelf downloaders |
@@ -234,12 +267,13 @@ Live TV, inputs, settings, the remote, casting, updates and Google TV itself are
 
 ## Ideas
 
-Everything from the earlier list is now built: weather, Now playing, HDMI-CEC names, My photos and more languages. Next up:
+Built since the last list: weather with °C/°F, Now playing, HDMI-CEC names, the phone companion, and German, French, Spanish, Dutch and Polish. Next up:
 
 - Album art and play/pause for Now playing
 - A sleep timer on a remote button
-- Italian, Polish and Turkish translations
+- Use the phone companion as a remote and keyboard
 - Calendar events under the clock (ICS link)
+- Italian and Turkish translations
 
 ## Credits and licences
 
@@ -250,4 +284,5 @@ Everything from the earlier list is now built: weather, Now playing, HDMI-CEC na
 - Online wallpapers belong to their authors and are shown under each provider's terms: [NASA APOD](https://apod.nasa.gov), [Bing](https://www.bing.com), [Wikimedia Commons](https://commons.wikimedia.org), [Lorem Picsum](https://picsum.photos), [Unsplash](https://unsplash.com), [Pexels](https://www.pexels.com) and [KLIPY](https://klipy.com) ("Powered by KLIPY").
 - The bundled animated loops were generated for this project.
 - Weather data by [Open-Meteo](https://open-meteo.com) (CC BY 4.0). QR codes are generated with [ZXing](https://github.com/zxing/zxing) (Apache 2.0).
+- Shore name, icon and website: this fork. Shore is not affiliated with the original CleanFrame project.
 - Top Shelf: this product uses the TMDB API but is not endorsed or certified by TMDB. Recommendations and images come from [TMDB](https://www.themoviedb.org), [ARD Mediathek](https://www.ardmediathek.de), [ZDF](https://www.zdf.de), [ARTE](https://www.arte.tv), [YouTube](https://www.youtube.com) and [Twitch](https://www.twitch.tv) under their terms. Titles and artwork belong to their owners.

@@ -138,14 +138,17 @@
   var phoneListeners = [];
   window.CleanFramePhoneChanged = function (count) { phoneListeners.forEach(function (fn) { try { fn(count); } catch (e) { } }); };
   var phone = {
-    start: function () {
+    /* {enabled, url, qr, count, place}: url and qr are empty while off or offline. */
+    info: function () {
       var r;
-      try { r = JSON.parse(bridge.phoneStart()); } catch (e) { r = {}; }
-      return { url: typeof r.url === 'string' ? r.url : '', qr: /^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(r.qr || '') ? r.qr : '', count: +r.count || 0 };
+      try { r = JSON.parse(bridge.phoneInfo()); } catch (e) { r = {}; }
+      return { enabled: !!r.enabled, url: typeof r.url === 'string' ? r.url : '', qr: /^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(r.qr || '') ? r.qr : '',
+        count: +r.count || 0, place: typeof r.place === 'string' ? r.place : '' };
     },
-    stop: function () { try { bridge.phoneStop(); } catch (e) { } },
+    enable: function (on) { try { bridge.phoneEnable(!!on); } catch (e) { } },
+    forget: function () { try { bridge.phoneForget(); } catch (e) { } },
+    wallpaper: function (id) { try { bridge.phoneWallpaper(String(id)); } catch (e) { } },
     clear: function () { try { bridge.phoneClear(); } catch (e) { } },
-    info: function () { var r; try { r = JSON.parse(bridge.phoneInfo()); } catch (e) { r = {}; } return { count: +r.count || 0, place: typeof r.place === 'string' ? r.place : '' }; },
     onChange: function (fn) { phoneListeners.push(fn); }
   };
   var nowPlaying = {

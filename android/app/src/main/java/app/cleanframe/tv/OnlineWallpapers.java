@@ -61,7 +61,7 @@ final class OnlineWallpapers {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private volatile Listener listener;
     private volatile boolean busy, again;
-    private volatile PhoneUpload phone;
+    private volatile Companion phone;
 
     OnlineWallpapers(Context context) {
         this.context = context.getApplicationContext();
@@ -76,7 +76,7 @@ final class OnlineWallpapers {
     void setListener(Listener l) { listener = l; }
 
     /** Uploads from the phone page become the "phone" source. */
-    void setPhone(PhoneUpload p) { phone = p; }
+    void setPhone(Companion p) { phone = p; }
 
     static boolean unsplashAvailable() { return !BuildConfig.UNSPLASH_ACCESS_KEY.isEmpty(); }
     static boolean pexelsAvailable() { return !BuildConfig.PEXELS_API_KEY.isEmpty(); }
@@ -122,7 +122,7 @@ final class OnlineWallpapers {
                 List<Photo> photos = fetch(source);
                 JSONArray entries = new JSONArray();
                 Set<String> keep = new HashSet<>();
-                int limit = source.equals("phone") ? PhoneUpload.MAX_FILES : MAX_PHOTOS;
+                int limit = source.equals("phone") ? Companion.MAX_FILES : MAX_PHOTOS;
                 for (Photo p : photos) {
                     if (entries.length() >= limit) break;
                     if (!source.equals(source())) return; // superseded by another choice
@@ -304,7 +304,7 @@ final class OnlineWallpapers {
     private void build(Photo p) throws IOException {
         if (p.video) { buildLoop(p); return; }
         boolean local = p.url.startsWith("file:");
-        byte[] data = local ? readFile(p.url.substring(5), PhoneUpload.MAX_BYTES) : download(p.url, 25 * 1024 * 1024);
+        byte[] data = local ? readFile(p.url.substring(5), Companion.MAX_BYTES) : download(p.url, 25 * 1024 * 1024);
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(data, 0, data.length, bounds);
@@ -355,7 +355,7 @@ final class OnlineWallpapers {
         File video = new File(wallDir, p.id + ".mp4"), tmp = new File(wallDir, p.id + ".mp4.part");
         try (FileOutputStream out = new FileOutputStream(tmp)) {
             if (p.url.startsWith("asset:")) { try (InputStream in = context.getAssets().open(p.url.substring(6))) { out.write(readAll(in, 120 * 1024 * 1024)); } }
-            else if (p.url.startsWith("file:")) out.write(readFile(p.url.substring(5), PhoneUpload.MAX_BYTES));
+            else if (p.url.startsWith("file:")) out.write(readFile(p.url.substring(5), Companion.MAX_BYTES));
             else out.write(download(p.url, 120 * 1024 * 1024));
         }
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();

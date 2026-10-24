@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#18222a">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Shore">
+<title>Shore</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"><img id="wall" alt=""></div>
+<main>
+  <header>
+    <img class="mark" src="/icon-192.png" alt="">
+    <div><h1>Shore</h1><p id="status" data-t="Connecting to your TV…">Connecting to your TV…</p></div>
+  </header>
+
+  <section id="unpaired" class="card" hidden>
+    <h2 data-t="Pair this phone">Pair this phone</h2>
+    <p data-t="On the TV, open Shore › Settings › Phone and scan the code with your camera.">On the TV, open Shore › Settings › Phone and scan the code with your camera.</p>
+  </section>
+
+  <div id="paired" hidden>
+    <section class="card">
+      <h2 data-t="Send to your TV">Send to your TV</h2>
+      <p data-t="Photos, GIFs and short videos become wallpapers under My photos. Landscape fills the screen best.">Photos, GIFs and short videos become wallpapers under My photos. Landscape fills the screen best.</p>
+      <label class="button primary"><span data-t="Choose photos">Choose photos</span><input id="files" type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4"></label>
+      <ul id="queue" class="queue"></ul>
+    </section>
+
+    <section class="card">
+      <div class="row"><h2 data-t="My photos">My photos</h2><span id="count" class="count"></span></div>
+      <div id="grid" class="grid"></div>
+      <p id="empty" class="quiet" data-t="Nothing here yet.">Nothing here yet.</p>
+      <button id="clear" class="button quiet-button" type="button" data-t="Remove all">Remove all</button>
+    </section>
+
+    <section class="card">
+      <h2 data-t="Weather place">Weather place</h2>
+      <p data-t="The clock shows the weather for this city. Leave it empty to use the TV’s time zone.">The clock shows the weather for this city. Leave it empty to use the TV’s time zone.</p>
+      <form id="placeForm" class="inline"><input id="place" type="text" autocomplete="address-level2" placeholder="Berlin"><button class="button" type="submit" data-t="Save">Save</button></form>
+    </section>
+  </div>
+  <footer><span data-t="Works on your home Wi-Fi only. Nothing leaves your network.">Works on your home Wi-Fi only. Nothing leaves your network.</span></footer>
+</main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-/* CleanFrame Home. Static materials, local preferences and public Tizen app controls. */
+/* Shore Home. Static materials, local preferences and public Tizen app controls. */
 (function () {
   'use strict';
 
@@ -44,7 +44,7 @@
     { id: 'klipy-rain', name: 'Klipy · Cozy rain', key: 'klipy', page: 'animated' }, { id: 'klipy-space', name: 'Klipy · Space', key: 'klipy', page: 'animated' },
     { id: 'phone', name: 'My photos', key: 'phone', page: 'phone' }];
   SOURCES.forEach(function (o) { if (o.unsplash) { o.key = 'unsplash'; o.page = 'unsplash'; } else if (!o.page) o.page = 'online'; });
-  var ONLINE_STATUS = { loading: 'Downloading wallpapers…', error: 'Couldn’t reach this source. CleanFrame tries again later.', empty: 'No suitable landscape photos right now.', ready: 'New wallpapers arrive every few hours.', off: '' };
+  var ONLINE_STATUS = { loading: 'Downloading wallpapers…', error: 'Couldn’t reach this source. Shore tries again later.', empty: 'No suitable landscape photos right now.', ready: 'New wallpapers arrive every few hours.', off: '' };
 
   var ADAPTIVE_INK = window.CleanFrameAdaptiveInk || {};
   WALLS.forEach(function (w) { w.ut = w.ut || { tr: 'light', br: 'light' }; w.frostVeil = w.frostVeil || .12; });
@@ -71,13 +71,13 @@
   var PRIVATE_FONTS = window.CleanFramePrivateFontIDs || [], fontMetrics = {}, unavailableFonts = {}, widthCache = {}, fontsReady = false;
   var LOOK_KEYS = ['bg', 'layout', 'apps', 'font', 'controls', 'focus', 'material'];
   var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], inputs: ['front', 'row'], lstyle: ['glass', 'shelf'], motion: ['still', 'drift'], tweight: ['auto', 'light', 'regular', 'bold'], tsize: ['small', 'default', 'large'],
-    cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], cplaying: ['off', 'on'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
+    cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'] };
-  var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', cplaying: 'Now playing', csize: 'Clock size', cweight: 'Clock weight',
+  var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
-    '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min' };
+    '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min', c: '°C', f: '°F' };
   VALUE_NAMES.off = 'Off'; VALUE_NAMES.light = VALUE_NAMES.light || 'Light';
   var UTIL = { art: [TV.art, 'art'], apps: ['All apps', 'apps'], arrange: ['Arrange', 'arrange'], settings: ['Settings', 'settings'] };
   var MSG = {
@@ -111,7 +111,7 @@
     writes: 0, failed: 0, log: [], logN: 0, lastLaunch: null, press: null,
     wallShown: null, wallPending: null, wallError: null,
     shown: null, pending: null, lookError: null, bundleKey: null, previewBundle: null, reflow: false, fontSwitch: false,
-    phone: { url: '', qr: '', count: 0 }, playing: { access: false, playing: false, key: '' },
+    phone: { enabled: false, url: '', qr: '', count: 0, place: '' }, playing: { access: false, playing: false, key: '' },
     remote: { service: false, keys: [], learning: false, missed: false, timer: 0 }
   };
   var scroll = { first: 0, off: 0, photo: 0, photoArrange: 0 };
@@ -120,7 +120,7 @@
     for (var i = 0; i < list.length; i++) if (list[i].toLowerCase() === v) return list[i];
     return fallback;
   }
-  function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, cplaying: c.cplaying, csize: c.csize, cweight: c.cweight,
+  function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
   function derivedTheme() { return S.c.layout === 'list' ? 'list' : 'shore'; }
@@ -388,7 +388,7 @@
       apps: pick(modern.apps, LOOK_VALUES.apps, legacyList ? 'text' : 'both'), controls: pick(modern.controls, LOOK_VALUES.controls, 'both'), inputs: pick(modern.inputs, LOOK_VALUES.inputs, 'front'), lstyle: pick(modern.lstyle, LOOK_VALUES.lstyle, 'glass'), motion: pick(modern.motion, LOOK_VALUES.motion, 'still'),
       tweight: pick(modern.tweight, LOOK_VALUES.tweight, 'auto'), tsize: pick(modern.tsize, LOOK_VALUES.tsize, 'default'),
       cformat: pick(modern.cformat, LOOK_VALUES.cformat, '12'), cdate: pick(modern.cdate, LOOK_VALUES.cdate, 'off'),
-      cweather: pick(modern.cweather, LOOK_VALUES.cweather, 'off'), cplaying: pick(modern.cplaying, LOOK_VALUES.cplaying, 'on'),
+      cweather: pick(modern.cweather, LOOK_VALUES.cweather, 'off'), wunit: pick(modern.wunit, LOOK_VALUES.wunit, window.CleanFrameWeather ? CleanFrameWeather.defaultUnit() : 'c'), cplaying: pick(modern.cplaying, LOOK_VALUES.cplaying, 'on'),
       csize: pick(modern.csize, LOOK_VALUES.csize, 'small'), cweight: pick(modern.cweight, LOOK_VALUES.cweight, 'auto'),
       night: pick(modern.night, LOOK_VALUES.night, 'off'), nhours: pick(modern.nhours, LOOK_VALUES.nhours, '22-6'),
       ndim: pick(modern.ndim, LOOK_VALUES.ndim, 'medium'), idle: pick(modern.idle, LOOK_VALUES.idle, 'off'),
@@ -916,7 +916,7 @@
   function closeEditor() { clearSession(); pop(); }
 
   /* ---------- Settings, Layout and messages ---------- */
-  var PARENT = { rotation: 'background', online: 'background', phone: 'online', unsplash: 'online', animated: 'online', fonts: 'typography', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
+  var PARENT = { rotation: 'background', online: 'background', clockextra: 'clock', unsplash: 'online', animated: 'online', fonts: 'typography', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
   function subPage(t) { return !!PARENT[t.group]; }
   function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : DETAIL_NAMES[group]; }
   function parentName(t) { return PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
@@ -931,7 +931,8 @@
       { id: 'display', label: 'Night and idle', value: S.c.night === 'off' ? 'Night mode off' : S.c.night === 'always' ? 'Always dimmed' : 'Dimmed ' + VALUE_NAMES[S.c.nhours] },
       { id: 'focus', label: 'Focus', value: VALUE_NAMES[S.c.focus] + (materialApplies() ? ', ' + VALUE_NAMES[S.c.material] : '') },
       { id: 'editor', label: 'Apps on Home', value: n + (n === 1 ? ' app' : ' apps') },
-      { id: 'samsung', label: TV.brand, value: 'Home and TV settings' }];
+      { id: 'samsung', label: TV.brand, value: 'Home and TV settings' }]
+      .concat(PHONE ? [{ id: 'phone', label: 'Phone', value: !S.phone.enabled ? 'Phone companion off' : S.phone.count ? (S.phone.count === 1 ? '1 photo' : S.phone.count + ' photos') : 'Phone companion on' }] : []);
   }
   function settingsIds() { return settingsRows().map(function (r) { return r.id; }); }
   V.settings = {
@@ -949,9 +950,10 @@
   };
   function settingsOk(id) {
     if (id === 'editor') openEditor('settings');
+    else if (id === 'phone') openPhone();
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Online wallpapers', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation and motion', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'My photos' };
+  var DETAIL_NAMES = { fonts: 'Font', clock: 'Clock', display: 'Night and idle', online: 'Online wallpapers', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Background', layout: 'Layout', typography: 'Text', focus: 'Focus', rotation: 'Rotation and motion', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', clockextra: 'Under the clock' };
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: SOURCES.filter(function (o) { return o.id === value; })[0].name };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
@@ -979,7 +981,7 @@
   }
   function actionName(action) {
     var a;
-    if (action === 'home') return 'CleanFrame Home';
+    if (action === 'home') return 'Shore Home';
     if (action === 'none') return 'Does nothing';
     if (action === 'screensaver') return TV.art;
     a = remoteTarget(action);
@@ -1032,9 +1034,9 @@
       items.push({ action: 'remote.learn', label: r.learning ? 'Press a button on the remote…' : 'Assign a button…', disabled: !r.service });
       if (!r.service) items.push({ action: 'remote.service', label: 'Accessibility settings' });
       return [{ id: 'remote', title: '', items: items,
-        reason: !r.service ? 'Turn on “CleanFrame Home button” in Settings › System › Accessibility to assign buttons.'
+        reason: !r.service ? 'Turn on “Shore Home button” in Settings › System › Accessibility to assign buttons.'
           : r.learning ? 'Waiting for a button. Any other key cancels.'
-          : r.missed ? 'No button arrived. The TV handles that button before CleanFrame sees it, so it can’t be reassigned.'
+          : r.missed ? 'No button arrived. The TV handles that button before Shore sees it, so it can’t be reassigned.'
           : r.keys.length ? 'Assigned buttons work everywhere, even inside apps.' : 'Assign the app buttons or the TV button to something else.' }];
     }
     current = remoteAction(t.key);
@@ -1044,7 +1046,7 @@
       return [{ id: 'apps', title: '', items: items.length ? items : [{ action: 'remote.none', label: 'No apps on Home', disabled: true }],
         reason: apps.length > 8 ? 'Showing your first 8 Home apps.' : 'These are the apps on your Home screen.' }];
     }
-    choices = [choose('default', 'Default'), choose('home', 'CleanFrame Home'), choose('none', 'Do nothing'), choose('screensaver', TV.art)];
+    choices = [choose('default', 'Default'), choose('home', 'Shore Home'), choose('none', 'Do nothing'), choose('screensaver', TV.art)];
     inputs = LIVE.slice(0, 3).map(function (id) { return choose('input:' + app(id).appId, app(id).name); });
     return [{ id: 'action', title: 'Action', items: choices }]
       .concat(inputs.length ? [{ id: 'inputs', title: 'Inputs', horizontal: true, items: inputs }] : [])
@@ -1053,9 +1055,13 @@
   }
   /* ---------- Under the clock: weather (Open-Meteo) and what is playing (Android media sessions) ---------- */
   var WEATHER = window.CleanFrameWeather || null, NOWPLAYING = ANDROID && FrameDevice.nowPlaying ? FrameDevice.nowPlaying : null;
+  function clockExtraSummary() {
+    var on = (S.c.cweather === 'on' ? ['Weather'] : []).concat(NOWPLAYING && S.c.cplaying === 'on' ? ['Now playing'] : []);
+    return on.length ? on.join(', ') : 'Nothing';
+  }
   function clockExtraNote() {
-    if (NOWPLAYING && S.c.cplaying === 'on' && !S.playing.access) return 'Allow “CleanFrame Now playing” in Notification access to show what’s playing.';
-    return S.c.cweather === 'on' ? PHONE ? 'Weather by Open-Meteo. Set your place on the My photos page of your phone.' : 'Weather by Open-Meteo.' : '';
+    if (NOWPLAYING && S.c.cplaying === 'on' && !S.playing.access) return 'Allow “Shore Now playing” in Notification access to show what’s playing.';
+    return S.c.cweather === 'on' ? PHONE ? 'Weather by Open-Meteo. Set your place in the phone companion.' : 'Weather by Open-Meteo.' : '';
   }
   function pollPlaying() {
     var info, key;
@@ -1067,20 +1073,27 @@
     else if (isSettingsDetail(top())) render();
   }
   function clockExtras() {
-    var html = '', p = S.playing, w = S.c.cweather === 'on' && WEATHER ? WEATHER.text() : '', date = S.c.cdate === 'on' ? T(dateText()) : '';
+    var html = '', p = S.playing, w = S.c.cweather === 'on' && WEATHER ? WEATHER.text(S.c.wunit) : '', date = S.c.cdate === 'on' ? T(dateText()) : '';
     if (date || w) html += '<span class="cap-date">' + escRaw(date && w ? date + ' · ' + w : date || w) + '</span>';
     if (NOWPLAYING && S.c.cplaying === 'on' && p.playing) html += '<span class="cap-date cap-playing">' + escRaw('♪ ' + p.title + (p.artist ? ' · ' + p.artist : '') + (p.app ? ' — ' + p.app : '')) + '</span>';
     return html;
   }
   /* ---------- My photos: sent from a phone over the local network (Android shell) ---------- */
   var PHONE = ANDROID && FrameDevice.phone && ONLINE_INFO.phone ? FrameDevice.phone : null;
-  function openPhone() { S.phone = PHONE.start(); openAppearance('phone'); }
+  var phoneWall = '';
+  function openPhone() { S.phone = PHONE.info(); openAppearance('phone'); }
+  /* Settings › Phone: the Shore Companion web app, paired by QR code, and the photos it sent. */
   function phoneSections(flat) {
     var p = S.phone, n = p.count;
-    return [{ id: 'phoneuse', title: '', items: [choice('source', 'phone', flat || !n)].concat(n ? [{ action: 'phone.clear', label: 'Remove all my photos', description: n === 1 ? '1 photo' : n + ' photos' }] : []),
-      reason: flat ? 'Choose Photo in Background to use online wallpapers.' : !n ? 'Send a photo from your phone first.' : S.c.source === 'phone' && S.onlineStatus ? ONLINE_STATUS[S.onlineStatus] || '' : '' },
-      { id: 'phonecode', title: 'From your phone', items: [], qr: p.qr, url: p.url,
-        reason: p.url ? 'Scan the code with your phone’s camera, or open this address. Your phone must be on the same Wi-Fi. The code works for 15 minutes.' : 'Connect the TV to your Wi-Fi to send photos.' }];
+    var sections = [{ id: 'companion', title: '', items: [{ action: 'phone.toggle', label: 'Phone companion', description: 'Photos and weather from your phone', tick: true, applied: p.enabled }],
+      reason: p.enabled ? '' : 'The companion runs on your home Wi-Fi only and needs this code to pair.' }];
+    if (p.enabled) sections.push({ id: 'phonecode', title: '', items: [], qr: p.qr || ' ', url: p.url,
+      qrNote: p.url ? 'Point your phone’s camera at the code. Add the page to your home screen to keep it as an app.' : 'Connect the TV to your Wi-Fi to use the companion.' });
+    sections.push({ id: 'phoneuse', title: 'Wallpaper', items: [choice('source', 'phone', flat || !n)]
+      .concat(n ? [{ action: 'phone.clear', label: 'Remove all my photos', description: n === 1 ? '1 photo' : n + ' photos' }] : [])
+      .concat(p.enabled ? [{ action: 'phone.forget', label: 'Forget paired phones' }] : []),
+      reason: flat ? 'Choose Photo in Background to use online wallpapers.' : !n ? 'Send a photo from your phone first.' : S.c.source === 'phone' && S.onlineStatus ? ONLINE_STATUS[S.onlineStatus] || '' : '' });
+    return sections;
   }
   function detailSections(t) {
     var flat = S.c.bg !== 'photo', inactive = !materialApplies();
@@ -1110,8 +1123,11 @@
       { id: 'cformat', title: 'Format', horizontal: true, items: options('cformat', ['12', '24']).concat(options('cdate', ['on'])) },
       { id: 'csize', title: 'Clock size', horizontal: true, items: options('csize', ['small', 'medium', 'large', 'huge']) },
       { id: 'cweight', title: 'Clock weight', horizontal: true, items: options('cweight', ['auto', 'thin', 'light', 'bold']) },
-      { id: 'cextra', title: 'Under the clock', horizontal: true, items: options('cweather', ['on']).concat(NOWPLAYING ? options('cplaying', ['on']) : []), reason: clockExtraNote() }]
-      .concat(NOWPLAYING && S.c.cplaying === 'on' && !S.playing.access ? [{ id: 'nowplaying', title: '', items: [{ action: 'nowplaying.access', label: 'Notification access', description: 'Let CleanFrame see what’s playing' }] }] : []);
+      { id: 'cextra', title: 'Under the clock', items: [{ action: 'open.clockextra', label: clockExtraSummary(), more: true }] }];
+    if (t.group === 'clockextra') return [
+      { id: 'cextra', title: 'Show', horizontal: true, items: options('cweather', ['on']).concat(NOWPLAYING ? options('cplaying', ['on']) : []), reason: clockExtraNote() },
+      { id: 'wunit', title: 'Temperature', horizontal: true, items: options('wunit', ['c', 'f'], S.c.cweather !== 'on') }]
+      .concat(NOWPLAYING && S.c.cplaying === 'on' && !S.playing.access ? [{ id: 'nowplaying', title: '', items: [{ action: 'nowplaying.access', label: 'Notification access', description: 'Let Shore see what’s playing' }] }] : []);
     if (t.group === 'display') return [
       { id: 'night', title: 'Night mode', horizontal: true, items: options('night', ['off', 'scheduled', 'always']) },
       { id: 'nhours', title: 'Night hours', horizontal: true, items: options('nhours', ['21-7', '22-6', '23-7'], S.c.night !== 'scheduled') },
@@ -1129,8 +1145,7 @@
       var missing = SOURCES.filter(function (o) { return o.page === t.group && o.key && !ONLINE_INFO[o.key]; }).map(function (o) { return o.key; });
       if (t.group === 'online') items = items.concat([
         { action: 'open.unsplash', label: source().page === 'unsplash' ? source().name : 'Unsplash themes', more: true, disabled: flat },
-        { action: 'open.animated', label: source().page === 'animated' ? source().name : 'Animated wallpapers', more: true, disabled: flat }]
-        .concat(PHONE ? [{ action: 'open.phone', label: 'My photos', description: 'Send photos and GIFs from your phone', more: true, disabled: flat }] : []));
+        { action: 'open.animated', label: source().page === 'animated' ? source().name : 'Animated wallpapers', more: true, disabled: flat }]);
       return [{ id: 'source', title: '', items: items,
         reason: flat ? 'Choose Photo in Background to use online wallpapers.' : S.onlineStatus ? ONLINE_STATUS[S.onlineStatus] || ''
           : missing.length ? keyNote(missing) : '' }];
@@ -1231,7 +1246,9 @@
     else if (item.action === 'typography.fonts') openAppearance('fonts');
     else if (item.action === 'open.unsplash') openAppearance('unsplash');
     else if (item.action === 'open.animated') openAppearance('animated');
-    else if (item.action === 'open.phone') openPhone();
+    else if (item.action === 'open.clockextra') openAppearance('clockextra');
+    else if (item.action === 'phone.toggle') { PHONE.enable(!S.phone.enabled); S.phone = PHONE.info(); }
+    else if (item.action === 'phone.forget') { PHONE.forget(); S.phone = PHONE.info(); S.note = 'Paired phones forgotten. Scan the new code.'; }
     else if (item.action === 'phone.clear') { PHONE.clear(); S.phone.count = 0; }
     else if (item.action === 'nowplaying.access') perform('Notification access', NOWPLAYING.openSettings);
     else if (item.action === 'samsung.home') perform(TV.home, FrameDevice.home);
@@ -1240,7 +1257,7 @@
   V.appearance = {
     norm: function (t) {
       var rows = detailRows(t), exists = false, applied = null;
-      var axis = { background: 'bg', layout: 'layout', typography: 'tweight', focus: 'focus', rotation: 'mode', online: 'source', unsplash: 'source', animated: 'source', phone: 'source', fonts: 'font', clock: 'cformat', display: 'night' }[t.group];
+      var axis = { background: 'bg', layout: 'layout', typography: 'tweight', focus: 'focus', rotation: 'mode', online: 'source', unsplash: 'source', animated: 'source', fonts: 'font', clock: 'cformat', display: 'night' }[t.group];
       rows.forEach(function (items) { items.forEach(function (item) {
         if (item.action === t.f.action) exists = true;
         if (axis ? item.axis === axis && item.value === S.c[axis] : item.applied) applied = item;
@@ -1381,6 +1398,7 @@
   }
   function syncVideo(shown) {
     syncGif(shown);
+    if (PHONE && shown && shown.id !== phoneWall) { phoneWall = shown.id; PHONE.wallpaper(shown.id); }
     var src = S.c.bg === 'photo' && shown && shown.video ? shown.video : '';
     if (!VIDEO.parentNode && IMG.photo.parentNode) IMG.photo.parentNode.insertBefore(VIDEO, IMG.photo.nextSibling);
     if (VIDEO._src !== src) {
@@ -1897,7 +1915,8 @@
     setHTML(appearanceRows, detailSections(t).map(function (section) {
       return '<section class="setting-section' + (section.horizontal ? ' is-horizontal' : '') + ' section-' + section.id + '">'
         + (section.title ? '<h3 class="setting-label" id="setting-' + section.id + '">' + esc(section.title) + '</h3>' : '')
-        + (section.qr ? '<div class="setting-qr"><img src="' + section.qr + '" alt=""><p class="setting-url">' + escRaw(section.url.replace(/^http:\/\//, '')) + '</p></div>' : '')
+        + (section.qr ? '<div class="setting-qr">' + (section.qr.length > 1 ? '<img src="' + section.qr + '" alt="">' : '') + '<div class="setting-qr-copy"><h3>' + esc('Scan with your phone') + '</h3>'
+          + (section.url ? '<p class="setting-url">' + escRaw(section.url.replace(/^http:\/\//, '')) + '</p>' : '') + '<p>' + esc(section.qrNote) + '</p></div></div>' : '')
         + '<div class="setting-options"' + (section.items[0] && section.items[0].axis ? ' role="radiogroup" aria-label="' + esc(section.title || LOOK_NAMES[section.id] || DETAIL_NAMES[t.group]) + '"' : '') + '>'
         + section.items.map(function (item) {
           var swatch = item.axis === 'bg', body = '';
@@ -1917,7 +1936,7 @@
         + command({ action: 'settings.retry', label: 'Try again' }, '<span>Try again</span>', 'setting-retry');
     }
     setHTML(appearanceStatus, status);
-    hint = selected.disabled ? '' : remoteHint(selected) || (selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.action === 'open.phone' ? 'Show the code for your phone' : selected.action === 'phone.clear' ? 'Remove all my photos' : selected.action === 'nowplaying.access' ? 'Open Notification access' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : 'Open on the TV');
+    hint = selected.disabled ? '' : remoteHint(selected) || (selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.action === 'phone.toggle' ? (S.phone.enabled ? 'Turn off' : 'Turn on') : selected.action === 'phone.forget' ? 'Phones scan a new code' : selected.action === 'phone.clear' ? 'Remove all my photos' : selected.action === 'nowplaying.access' ? 'Open Notification access' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : 'Open on the TV');
     setHTML(appearanceDesc, hint ? '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>' : '');
   }
   function remoteHint(item) {
@@ -2109,8 +2128,8 @@
       el.otherAfter.className = 'row-cue editor-after' + (afterRows ? ' is-on' : '');
     },
     settings: function (t, el) {
-      var html = '';
-      settingsRows().forEach(function (r) {
+      var html = '', rows = settingsRows();
+      rows.forEach(function (r) {
         html += '<button type="button" tabindex="-1" class="settings-group' + (r.id === t.f.id ? ' is-focus' : '') + '" data-z="row" data-i="0" data-id="' + r.id + '" data-action="settings.' + (r.id === 'editor' ? 'editor' : 'group.' + r.id) + '"><span class="settings-group-copy"><span class="settings-group-name">' + esc(r.label) + '</span><span class="settings-group-value">' + esc(r.value) + '</span></span>' + icon('right') + '</button>';
       });
       setHTML(el.list, html);
@@ -2395,7 +2414,7 @@
   if (FrameDevice.onInputs) { FrameDevice.onInputs(refreshInputs); refreshInputs(); }
   if (WEATHER) WEATHER.onChange(function () { if (S.c.cweather === 'on' && (top().id === 'home' || isSettingsDetail(top()))) renderCaption(top(), homeState(top())); });
   if (NOWPLAYING) { pollPlaying(); setInterval(pollPlaying, 10000); }
-  if (PHONE) PHONE.onChange(function (count) { S.phone.count = count; if (top().id === 'appearance' && top().group === 'phone') render(); });
+  if (PHONE) { S.phone = PHONE.info(); PHONE.onChange(function (count) { S.phone.count = count; if (isSettingsDetail(top()) || top().id === 'settings') render(); }); }
   if (REMOTE) {
     REMOTE.onLearned(remoteLearned);
     REMOTE.onChange(function () { refreshRemote(); if (top().id === 'appearance') render(); });

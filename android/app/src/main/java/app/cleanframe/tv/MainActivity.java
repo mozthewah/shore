@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
     private TvInputManager tvInputs;
     private OnlineWallpapers online;
     private TopShelf topShelf;
-    private PhoneUpload phone;
+    private Companion phone;
     private RemoteKeys.Listener remoteListener;
 
     /** Tells the page when an HDMI device is plugged in, powered on or switched off. */
@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
         topShelf.setListener(index -> runOnUiThread(() -> {
             if (web != null) web.evaluateJavascript("window.CleanFrameTopShelfChanged&&window.CleanFrameTopShelfChanged(" + index + ")", null);
         }));
-        phone = new PhoneUpload(this);
+        phone = new Companion(this);
         online.setPhone(phone);
         phone.setListener(count -> {
             online.phoneChanged();
@@ -147,6 +147,7 @@ public class MainActivity extends Activity {
         super.onResume();
         if (web != null) { web.onResume(); web.resumeTimers(); web.requestFocus(); inputsChanged(); remoteChanged(); }
         if (online != null) online.refreshIfStale();
+        if (phone != null) phone.resume();
     }
 
     @Override

@@ -43,6 +43,7 @@ Development dependencies retain the licences in their npm packages. They are not
 | Bundled animated loops (`android/app/src/main/assets-android/loops/`) | Generated procedurally with ffmpeg for this project; MIT with the code. |
 | Online wallpapers (NASA, Bing, Wikimedia, Picsum, Unsplash, Pexels, Klipy) | Downloaded on the TV at runtime, never redistributed; each provider's terms apply and credits appear in the gallery. |
 | AndroidX WebKit (`androidx.webkit:webkit`) | Apache License 2.0; compiled into the Android APK. |
-| ZXing core (`com.google.zxing:core`), QR codes for My photos | Apache License 2.0; compiled into the Android APK. https://github.com/zxing/zxing |
+| ZXing core (`com.google.zxing:core`), QR codes for the phone companion | Apache License 2.0; compiled into the Android APK. https://github.com/zxing/zxing |
 | Weather (Open-Meteo) | Fetched on the TV at runtime when Weather is on; data CC BY 4.0, credited in Settings › Clock. |
-| Photos sent from a phone (My photos) | The user's own files, stored privately on the TV; never redistributed. |
+| Photos sent from the phone companion (My photos) | The user's own files, stored privately on the TV; never redistributed. |
+| Shore icon, banner and website (`site/`) | Made for this project; MIT with the code. The companion page uses Manrope (SIL OFL, `app/assets/manrope-OFL.txt`). |

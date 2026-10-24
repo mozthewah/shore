@@ -24,7 +24,7 @@
     </queries>
 
     <application
-        android:label="CleanFrame"
+        android:label="Shore"
         android:icon="@drawable/icon"
         android:banner="@drawable/banner"
         android:allowBackup="true"
