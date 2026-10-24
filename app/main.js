@@ -74,15 +74,15 @@
   var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], inputs: ['front', 'row'], lstyle: ['glass', 'shelf'], motion: ['still', 'drift'], tweight: ['auto', 'light', 'regular', 'bold'], tsize: ['small', 'default', 'large'],
     cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], clook: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'],
-    svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], ncalm: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
+    svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], ncalm: ['off', 'on'], svphoto: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
     cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'] };
   /* Newer axes with their defaults: stored, migrated and validated like the others. */
-  var MORE_LOOK = { ncalm: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move' };
+  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move' };
   /* On/off settings that OK flips. */
-  var TOGGLES = ['ncalm', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec'];
+  var TOGGLES = ['svphoto', 'ncalm', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec'];
   var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', clook: 'Artist pictures', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material',
-    ncalm: 'Calmer photos at night', iask: 'Ask to switch', svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
+    svphoto: 'Photo title', ncalm: 'Calmer photos at night', iask: 'Ask to switch', svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
     cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
@@ -147,7 +147,7 @@
   }
   function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, clook: c.clook, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material, svsrc: c.svsrc, svlay: c.svlay, svtime: c.svtime,
-      svmotion: c.svmotion, iask: c.iask, ncalm: c.ncalm, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
+      svmotion: c.svmotion, iask: c.iask, ncalm: c.ncalm, svphoto: c.svphoto, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
       cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
   function derivedTheme() { return S.c.layout === 'list' ? 'list' : 'shore'; }
@@ -1063,7 +1063,7 @@
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
+      label: axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm|svphoto)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
   /* "Seconds" in the Format row, abbreviated where the word is long. */
   /* "Ask" (to switch inputs), short enough to share the Inputs row in every language. */
@@ -1228,11 +1228,11 @@
   /* Below this many photos, "Like Home" tops the slideshow up with Shore's own wallpapers. */
   var SAVER_MIN_PHOTOS = 6;
   function saverSlideMs() { return +S.c.svtime * 1000 * (QA.slideScale || 1); }
-  var saverTimer = 0, saverPhotoTimer = 0, saverSrc = '', saverFront = 0, saverStep = 0, saverPos = 0, saverOrder = [], saverAt = 0, saverSince = 0, awakeOn = null, saverMotion = 0;
+  var saverTimer = 0, saverPhotoTimer = 0, saverSrc = '', saverShown = '', saverFront = 0, saverStep = 0, saverPos = 0, saverOrder = [], saverAt = 0, saverSince = 0, awakeOn = null, saverMotion = 0;
   var saverEl = document.createElement('div');
   saverEl.className = 'saver'; saverEl.setAttribute('aria-hidden', 'true');
   saverEl.innerHTML = '<div class="sv-slide"></div><div class="sv-slide"></div>'
-    + '<div class="sv-shade"></div><div class="sv-night"></div><div class="sv-info"><div class="sv-clock"></div><div class="sv-date"></div><div class="sv-np"></div></div>';
+    + '<div class="sv-shade"></div><div class="sv-night"></div><div class="sv-info"><div class="sv-clock"></div><div class="sv-date"></div><div class="sv-np"></div><div class="sv-photo"></div></div>';
   var svSlides = saverEl.querySelectorAll('.sv-slide'), svInfo = saverEl.querySelector('.sv-info');
   function saverDelay() { return S.c.saver === 'off' ? 0 : +S.c.saver * QA.minuteMs; }
   function saverReset() {
@@ -1300,7 +1300,7 @@
     function show() {
       if (!S.saver || slide !== svSlides[1 - saverFront]) return;
       slide.className = 'sv-slide l-' + layout + ' is-on'; svSlides[saverFront].className = svSlides[saverFront].className.replace(' is-on', ' is-out');
-      saverFront = 1 - saverFront; saverStep++;
+      saverFront = 1 - saverFront; saverStep++; saverShown = photos[0]; renderSaver();
       if (saverStep % SAVER_MOVE_EVERY === 0 && S.c.svpos === 'move') moveSaverInfo();
     }
   }
@@ -1319,6 +1319,9 @@
       + '<span class="sv-np-text"><span class="sv-title">' + wave() + escRaw(p.title) + '</span>'
       + (p.artist || p.app ? '<span class="sv-artist">' + escRaw(p.artist + (p.artist && p.app ? ' — ' : '') + p.app) + '</span>' : '') + '</span>';
     setHTML(svInfo.querySelector('.sv-np'), np);
+    // The main photo's title and credit (Photo title in Motion and clock).
+    var shownWall = S.c.svphoto === 'on' ? WALLS.filter(function (w) { return w.src === saverShown; })[0] : null;
+    setHTML(svInfo.querySelector('.sv-photo'), shownWall ? escRaw(T(shownWall.name)) + (shownWall.credit ? '<span class="sv-credit">' + escRaw(shownWall.credit) + '</span>' : '') : '');
     svInfo.querySelector('.sv-np').className = 'sv-np' + (np ? ' is-on' : '') + (p.art ? ' has-cover' : '');
     saverEl.className = 'saver is-on' + (DREAM ? ' is-dream' : '');
     syncAwake();
@@ -1327,7 +1330,7 @@
     if (S.saver) return;
     if (!saverEl.parentNode) stage.appendChild(saverEl);
     clearTimeout(saverTimer); saverTimer = 0;
-    S.saver = true; saverSince = Date.now(); saverStep = 0; saverSrc = ''; saverOrder = []; saverAt = 0;
+    S.saver = true; saverSince = Date.now(); saverStep = 0; saverSrc = ''; saverShown = ''; saverOrder = []; saverAt = 0;
     svInfo.className = 'sv-info pos-' + saverPos;
     pollPlaying(); renderSaver(); nextSaverPhoto();
     render(); syncRotation();
@@ -1422,7 +1425,7 @@
     ['Clock', ['cformat', 'csec', 'cdate', 'csize', 'cweight', 'cpos', 'cweather', 'wunit', 'wicon', 'cplaying', 'cwave']],
     ['Focus', ['focus', 'material', 'tint', 'dglass', 'motion']],
     ['Night and idle', ['night', 'nhours', 'ndim', 'ncalm', 'idle', 'saver']],
-    ['Screensaver', ['svsrc', 'svlay', 'svtime', 'svmotion', 'svpos', 'svclock', 'svdate', 'svmusic']]];
+    ['Screensaver', ['svsrc', 'svlay', 'svtime', 'svmotion', 'svpos', 'svclock', 'svdate', 'svmusic', 'svphoto']]];
   var companionTimer = 0, companionLast = '';
   function companionAxis(axis) {
     var out;
@@ -1556,8 +1559,7 @@
     if (t.group === 'saverlook') return [
       { id: 'svmotion', title: 'Photo motion', horizontal: true, items: options('svmotion', ['drift', 'still']) },
       { id: 'svpos', title: 'Clock on the screensaver', horizontal: true, items: options('svpos', ['move', 'fixed']) },
-      { id: 'svshow', title: 'Show', items: options('svclock', ['on']).concat(options('svdate', ['on'])).concat(NOWPLAYING ? options('svmusic', ['on']) : []),
-        reason: 'With everything off, only the photos remain.' }];
+      { id: 'svshow', title: 'Show', items: options('svclock', ['on']).concat(options('svdate', ['on'])).concat(NOWPLAYING ? options('svmusic', ['on']) : []).concat(options('svphoto', ['on'])) }];
     if (t.group === 'focus') return [
       { id: 'focus', title: 'Focus style', horizontal: true, items: options('focus', ['type', 'glass']) },
       { id: 'material', title: 'Material', horizontal: true, items: options('material', ['soft', 'frost', 'tint'], inactive),

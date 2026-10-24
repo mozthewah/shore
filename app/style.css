@@ -748,6 +748,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .sv-info.pos-3{left:120px;top:96px}
 .sv-clock{font-size:168px;line-height:176px;font-weight:300;letter-spacing:-4px;font-variant-numeric:tabular-nums}
 .sv-date{font-size:36px;line-height:48px;font-weight:500;opacity:.88}
+.sv-photo{max-width:900px;margin-top:14px;font-size:26px;line-height:34px;font-weight:500;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-photo:empty{display:none}
+.sv-credit{display:block;font-size:20px;line-height:28px;opacity:.75;overflow:hidden;text-overflow:ellipsis}
 .sv-np{display:none;align-items:center;gap:28px;margin-top:36px}
 .sv-np.is-on{display:flex}
 .pos-1 .sv-np,.pos-2 .sv-np{flex-direction:row-reverse}
