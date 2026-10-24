@@ -25,6 +25,7 @@ public class MainActivity extends Activity {
     private TvInputManager tvInputs;
     private OnlineWallpapers online;
     private TopShelf topShelf;
+    private PhoneUpload phone;
     private RemoteKeys.Listener remoteListener;
 
     /** Tells the page when an HDMI device is plugged in, powered on or switched off. */
@@ -66,6 +67,12 @@ public class MainActivity extends Activity {
         topShelf.setListener(index -> runOnUiThread(() -> {
             if (web != null) web.evaluateJavascript("window.CleanFrameTopShelfChanged&&window.CleanFrameTopShelfChanged(" + index + ")", null);
         }));
+        phone = new PhoneUpload(this);
+        online.setPhone(phone);
+        phone.setListener(count -> {
+            online.phoneChanged();
+            runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.CleanFramePhoneChanged&&window.CleanFramePhoneChanged(" + count + ")", null); });
+        });
         final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/assets/", online.handler()) // online photos, then bundled files
                 .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
@@ -93,7 +100,7 @@ public class MainActivity extends Activity {
             }
             @Override public void changed() { runOnUiThread(MainActivity.this::remoteChanged); }
         };
-        web.addJavascriptInterface(new DeviceBridge(this, online, topShelf), "CleanFrameAndroid");
+        web.addJavascriptInterface(new DeviceBridge(this, online, topShelf, phone), "CleanFrameAndroid");
         web.loadUrl(ORIGIN + "/assets/index.html");
         tvInputs = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
         if (tvInputs != null) tvInputs.registerCallback(inputCallback, new Handler(Looper.getMainLooper()));
@@ -154,6 +161,7 @@ public class MainActivity extends Activity {
         if (tvInputs != null) tvInputs.unregisterCallback(inputCallback);
         if (online != null) online.setListener(null);
         if (topShelf != null) topShelf.setListener(null);
+        if (phone != null) { phone.setListener(null); phone.stop(); }
         if (RemoteKeys.listener == remoteListener) { RemoteKeys.listener = null; RemoteKeys.learn(false); }
         if (web != null) { web.removeJavascriptInterface("CleanFrameAndroid"); web.destroy(); web = null; }
         super.onDestroy();

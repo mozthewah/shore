@@ -50,7 +50,7 @@ final class OnlineWallpapers {
     interface Listener { void changed(String entriesJson, String status); }
 
     static final String[] SOURCES = { "off", "nasa", "bing", "wikimedia", "picsum", "unsplash-nature", "unsplash-city", "unsplash-space",
-            "loops", "pexels-ocean", "pexels-rain", "pexels-clouds", "pexels-city", "klipy-lofi", "klipy-rain", "klipy-space" };
+            "loops", "pexels-ocean", "pexels-rain", "pexels-clouds", "pexels-city", "klipy-lofi", "klipy-rain", "klipy-space", "phone" };
     private static final int MAX_PHOTOS = 8, W = 1920, H = 1080;
     private static final long REFRESH_MS = 6L * 60 * 60 * 1000;
     static final String UA = "CleanFrame-TCL/1.0 (Android TV home screen; https://github.com/taynotfound/CleanFrame-TCL)";
@@ -60,7 +60,8 @@ final class OnlineWallpapers {
     private final SharedPreferences prefs;
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private volatile Listener listener;
-    private volatile boolean busy;
+    private volatile boolean busy, again;
+    private volatile PhoneUpload phone;
 
     OnlineWallpapers(Context context) {
         this.context = context.getApplicationContext();
@@ -73,6 +74,9 @@ final class OnlineWallpapers {
     }
 
     void setListener(Listener l) { listener = l; }
+
+    /** Uploads from the phone page become the "phone" source. */
+    void setPhone(PhoneUpload p) { phone = p; }
 
     static boolean unsplashAvailable() { return !BuildConfig.UNSPLASH_ACCESS_KEY.isEmpty(); }
     static boolean pexelsAvailable() { return !BuildConfig.PEXELS_API_KEY.isEmpty(); }
@@ -95,6 +99,7 @@ final class OnlineWallpapers {
         boolean changed = !source.equals(source());
         prefs.edit().putString("source", source).apply();
         if (source.equals("off")) { worker.execute(() -> { writeIndex(new JSONArray()); clean(new HashSet<>()); notifyChanged("off"); }); return; }
+        if (source.equals("phone")) { refresh(); return; } // local files: always rebuild the list
         long age = System.currentTimeMillis() - prefs.getLong("refreshed", 0);
         if (changed || force || age > REFRESH_MS) refresh();
     }
@@ -103,8 +108,11 @@ final class OnlineWallpapers {
         if (!source().equals("off") && System.currentTimeMillis() - prefs.getLong("refreshed", 0) > REFRESH_MS) refresh();
     }
 
+    /** A new upload arrived: rebuild the list when "My photos" is the chosen source. */
+    void phoneChanged() { if (source().equals("phone")) refresh(); }
+
     private void refresh() {
-        if (busy) return;
+        if (busy) { again = true; return; }
         busy = true;
         final String source = source();
         notifyStatus("loading");
@@ -114,17 +122,21 @@ final class OnlineWallpapers {
                 List<Photo> photos = fetch(source);
                 JSONArray entries = new JSONArray();
                 Set<String> keep = new HashSet<>();
+                int limit = source.equals("phone") ? PhoneUpload.MAX_FILES : MAX_PHOTOS;
                 for (Photo p : photos) {
-                    if (entries.length() >= MAX_PHOTOS) break;
+                    if (entries.length() >= limit) break;
                     if (!source.equals(source())) return; // superseded by another choice
                     try {
-                        if (!new File(wallDir, p.id + ".jpg").exists() || p.video && !new File(wallDir, p.id + ".mp4").exists()) build(p);
+                        if (!new File(wallDir, p.id + ".jpg").exists() || p.video && !new File(wallDir, p.id + ".mp4").exists()
+                                || p.gif && !new File(wallDir, p.id + ".gif").exists()) build(p);
                         entries.put(entry(p));
                         keep.add(p.id);
                     } catch (Exception ignored) { /* skip one bad photo, keep the rest */ }
                 }
-                if (entries.length() == 0) status = "empty";
-                else {
+                if (entries.length() == 0) {
+                    status = "empty";
+                    if (source.equals("phone")) { writeIndex(entries); clean(keep); }
+                } else {
                     writeIndex(entries);
                     clean(keep);
                     prefs.edit().putLong("refreshed", System.currentTimeMillis()).apply();
@@ -135,6 +147,7 @@ final class OnlineWallpapers {
                 busy = false;
             }
             notifyChanged(status);
+            if (again) { again = false; refresh(); }
         });
     }
 
@@ -147,7 +160,7 @@ final class OnlineWallpapers {
 
     private static final class Photo {
         String id, name, url, credit;
-        boolean video; // MP4 loop: url is https:// or asset:<path>
+        boolean video, gif; // MP4 loop or animated GIF: url is https://, asset:<path> or file:<path>
         Photo(String id, String name, String url, String credit) { this.id = id; this.name = name; this.url = url; this.credit = credit; }
         Photo loop() { video = true; return this; }
     }
@@ -224,6 +237,16 @@ final class OnlineWallpapers {
                 // Unsplash API guidelines: report the download.
                 try { get(p.getJSONObject("links").getString("download_location") + "&client_id=" + BuildConfig.UNSPLASH_ACCESS_KEY); } catch (Exception ignored) { }
             }
+        } else if (source.equals("phone") && phone != null) {
+            File[] files = phone.files();
+            for (int i = files.length - 1; i >= 0; i--) { // newest first
+                File f = files[i];
+                String name = f.getName(), id = name.substring(0, name.lastIndexOf('.'));
+                Photo p = new Photo(id, "My photo " + (i + 1), "file:" + f.getPath(), "Sent from your phone");
+                if (name.endsWith(".mp4")) p.loop();
+                else if (name.endsWith(".gif")) p.gif = true;
+                out.add(p);
+            }
         } else if (source.equals("loops")) {
             String[] names = context.getAssets().list("loops");
             if (names != null) for (String n : names) {
@@ -280,18 +303,20 @@ final class OnlineWallpapers {
 
     private void build(Photo p) throws IOException {
         if (p.video) { buildLoop(p); return; }
-        byte[] data = download(p.url, 25 * 1024 * 1024);
+        boolean local = p.url.startsWith("file:");
+        byte[] data = local ? readFile(p.url.substring(5), PhoneUpload.MAX_BYTES) : download(p.url, 25 * 1024 * 1024);
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(data, 0, data.length, bounds);
         if (bounds.outWidth <= 0) throw new IOException("Not an image");
-        if (bounds.outWidth < 1280 || bounds.outHeight < 700) throw new IOException("Too small for a 4K screen");
+        if (local ? bounds.outWidth < 320 || bounds.outHeight < 180 : bounds.outWidth < 1280 || bounds.outHeight < 700) throw new IOException("Too small for a 4K screen");
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inSampleSize = 1;
         while (bounds.outWidth / (opts.inSampleSize * 2) >= W && bounds.outHeight / (opts.inSampleSize * 2) >= H) opts.inSampleSize *= 2;
         opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap src = BitmapFactory.decodeByteArray(data, 0, data.length, opts);
         if (src == null) throw new IOException("Decode failed");
+        if (local) src = upright(src, data);
 
         // Centred 16:9 crop, the same rule as the bundled gallery.
         Bitmap photo = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888);
@@ -300,6 +325,29 @@ final class OnlineWallpapers {
         new Canvas(photo).drawBitmap(src, from, new Rect(0, 0, W, H), new Paint(Paint.FILTER_BITMAP_FLAG));
         src.recycle();
         bundle(p.id, photo);
+        if (p.gif) { // the animation plays over the still bundle built from its first frame
+            File gif = new File(wallDir, p.id + ".gif"), tmp = new File(wallDir, p.id + ".gif.part");
+            try (FileOutputStream out = new FileOutputStream(tmp)) { out.write(data); }
+            if (!tmp.renameTo(gif)) throw new IOException("Rename failed");
+        }
+    }
+
+    /** Phone photos carry their rotation in EXIF. */
+    private static Bitmap upright(Bitmap src, byte[] data) {
+        try {
+            int o = new android.media.ExifInterface(new ByteArrayInputStream(data)).getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION, 1);
+            int deg = o == 6 ? 90 : o == 3 ? 180 : o == 8 ? 270 : 0;
+            if (deg == 0) return src;
+            android.graphics.Matrix m = new android.graphics.Matrix();
+            m.postRotate(deg);
+            Bitmap r = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), m, true);
+            if (r != src) src.recycle();
+            return r;
+        } catch (Exception e) { return src; }
+    }
+
+    private static byte[] readFile(String path, int limit) throws IOException {
+        try (InputStream in = new FileInputStream(path)) { return readAll(in, limit); }
     }
 
     /** Animated wallpaper: keep the MP4 and render the still bundle from its first frame (the glass stays still). */
@@ -307,6 +355,7 @@ final class OnlineWallpapers {
         File video = new File(wallDir, p.id + ".mp4"), tmp = new File(wallDir, p.id + ".mp4.part");
         try (FileOutputStream out = new FileOutputStream(tmp)) {
             if (p.url.startsWith("asset:")) { try (InputStream in = context.getAssets().open(p.url.substring(6))) { out.write(readAll(in, 120 * 1024 * 1024)); } }
+            else if (p.url.startsWith("file:")) out.write(readFile(p.url.substring(5), PhoneUpload.MAX_BYTES));
             else out.write(download(p.url, 120 * 1024 * 1024));
         }
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
@@ -447,6 +496,7 @@ final class OnlineWallpapers {
                 .put("tone", "dark").put("ut", new JSONObject().put("tr", "light").put("br", "light"))
                 .put("frostVeil", .2).put("listColumn", 0).put("dockQuiet", false).put("clockMist", true);
         if (p.video) e.put("video", "assets/wallpapers/" + p.id + ".mp4");
+        if (p.gif) e.put("gif", "assets/wallpapers/" + p.id + ".gif");
         String meta = prefs.getString("meta-" + p.id, null);
         if (meta != null) {
             JSONObject m = new JSONObject(meta);
@@ -472,7 +522,7 @@ final class OnlineWallpapers {
             File[] files = dir.listFiles();
             if (files == null) continue;
             for (File f : files) {
-                String name = f.getName(), id = name.replaceAll("(-thumb|-panel|-field-blur|-field-frost|-field-clear|-study-soft)?\\.(jpg|mp4)(\\.part)?$", "");
+                String name = f.getName(), id = name.replaceAll("(-thumb|-panel|-field-blur|-field-frost|-field-clear|-study-soft)?\\.(jpg|mp4|gif)(\\.part)?$", "");
                 if (!keep.contains(id)) { f.delete(); edit.remove("meta-" + id); }
             }
         }
@@ -489,9 +539,9 @@ final class OnlineWallpapers {
                     String js = "/* Written by the Android shell from its online photo cache. */\nwindow.CleanFrameOnlineWallpapers = " + entries() + ";\n";
                     return new WebResourceResponse("text/javascript", "utf-8", new ByteArrayInputStream(js.getBytes(StandardCharsets.UTF_8)));
                 }
-                if (!path.matches("(wallpapers|materials)/[A-Za-z0-9_-]+\\.(jpg|mp4)")) return null;
+                if (!path.matches("(wallpapers|materials)/[A-Za-z0-9_-]+\\.(jpg|mp4|gif)")) return null;
                 File f = new File(root, path);
-                return f.exists() ? new WebResourceResponse(path.endsWith(".mp4") ? "video/mp4" : "image/jpeg", null, new FileInputStream(f)) : null;
+                return f.exists() ? new WebResourceResponse(path.endsWith(".mp4") ? "video/mp4" : path.endsWith(".gif") ? "image/gif" : "image/jpeg", null, new FileInputStream(f)) : null;
             } catch (IOException e) { return null; }
         };
     }

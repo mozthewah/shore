@@ -28,15 +28,44 @@ final class DeviceBridge {
     private final PackageManager pm;
     private final OnlineWallpapers online;
     private final TopShelf topShelf;
+    private final PhoneUpload phone;
 
-    DeviceBridge(Context context) { this(context, null, null); }
+    DeviceBridge(Context context) { this(context, null, null, null); }
 
-    DeviceBridge(Context context, OnlineWallpapers online, TopShelf topShelf) {
+    DeviceBridge(Context context, OnlineWallpapers online, TopShelf topShelf, PhoneUpload phone) {
         this.context = context.getApplicationContext();
         this.pm = this.context.getPackageManager();
         this.online = online;
         this.topShelf = topShelf;
+        this.phone = phone;
     }
+
+    /** {access, playing, title, artist, app, pkg} from the active media sessions (needs notification access). */
+    @JavascriptInterface
+    public String nowPlaying() { return NowPlayingService.info(context); }
+
+    /** Opens the screen where the user allows CleanFrame to read what is playing. */
+    @JavascriptInterface
+    public boolean nowPlayingSettings() {
+        return start(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")) || settings();
+    }
+
+    /** Starts the phone upload page: {url, qr, count, until}. */
+    @JavascriptInterface
+    public String phoneStart() { return phone == null ? "{}" : phone.start(); }
+
+    @JavascriptInterface
+    public void phoneStop() { if (phone != null) phone.stop(); }
+
+    /** {count, place}: stored phone photos and the weather place typed on the phone. */
+    @JavascriptInterface
+    public String phoneInfo() {
+        try { return new JSONObject().put("count", phone == null ? 0 : phone.count()).put("place", phone == null ? "" : phone.place()).toString(); }
+        catch (Exception e) { return "{}"; }
+    }
+
+    @JavascriptInterface
+    public void phoneClear() { if (phone != null) phone.clear(); }
 
     /** Top Shelf recommendations already on disk: {pkg: {service, items:[{title, sub, card, hero, url}]}}. */
     @JavascriptInterface
@@ -60,7 +89,7 @@ final class DeviceBridge {
     public String onlineInfo() {
         try {
             return new JSONObject().put("source", online == null ? "off" : online.source()).put("unsplash", OnlineWallpapers.unsplashAvailable())
-                    .put("pexels", OnlineWallpapers.pexelsAvailable()).put("klipy", OnlineWallpapers.klipyAvailable()).toString();
+                    .put("pexels", OnlineWallpapers.pexelsAvailable()).put("klipy", OnlineWallpapers.klipyAvailable()).put("phone", phone != null).toString();
         } catch (Exception e) { return "{}"; }
     }
 
@@ -108,13 +137,23 @@ final class DeviceBridge {
         JSONArray out = new JSONArray();
         TvInputManager tv = (TvInputManager) context.getSystemService(Context.TV_INPUT_SERVICE);
         if (tv == null) return out.toString();
-        for (TvInputInfo info : tv.getTvInputList()) {
-            if (!info.isPassthroughInput() || info.isHidden(context)) continue;
+        List<TvInputInfo> all = tv.getTvInputList();
+        // HDMI-CEC devices appear as child inputs of their port; their label is the device's own name ("PlayStation 5").
+        java.util.Map<String, String> cec = new java.util.HashMap<>();
+        for (TvInputInfo info : all) {
+            if (info.getParentId() == null) continue;
+            CharSequence label = info.loadLabel(context);
+            if (label != null && label.length() > 0 && !cec.containsKey(info.getParentId())) cec.put(info.getParentId(), label.toString());
+        }
+        for (TvInputInfo info : all) {
+            if (!info.isPassthroughInput() || info.isHidden(context) || info.getParentId() != null) continue;
             try {
                 CharSequence custom = info.loadCustomLabel(context), label = info.loadLabel(context);
-                String name = custom != null && custom.length() > 0 ? custom.toString() : label != null ? label.toString() : info.getId();
+                String device = cec.get(info.getId());
+                String name = custom != null && custom.length() > 0 ? custom.toString() : device != null ? device : label != null ? label.toString() : info.getId();
                 out.put(new JSONObject().put("id", info.getId()).put("name", name)
-                        .put("type", info.getType()).put("state", tv.getInputState(info.getId())));
+                        .put("type", info.getType()).put("state", tv.getInputState(info.getId()))
+                        .put("port", label != null ? label.toString() : ""));
             } catch (Exception ignored) { }
         }
         return out.toString();

@@ -857,6 +857,16 @@ try {
     const clock = await current.locator('#caption .clock').textContent();
     check('Live 12-hour clock has no AM/PM', /^\s*\d{1,2}:\d{2}\s*$/.test(clock), clock);
   });
+  await run('Clock weather toggle and browser-only extras', async () => {
+    await page(); await group('clock');
+    check('Clock offers weather under the clock', await current.locator('[data-action="choice.cweather.on"]').count() === 1);
+    check('Now playing is Android-only', await current.locator('[data-action="choice.cplaying.on"]').count() === 0);
+    await act('choice.cweather.on'); await ready();
+    check('Weather toggle persists', (await stored()).look.cweather === 'on');
+    check('Weather note credits Open-Meteo', /Open-Meteo/.test(await current.locator('#stage').innerText()));
+    await act('choice.cweather.on'); await ready();
+    check('Weather toggles back off', (await stored()).look.cweather === 'off');
+  });
   await run('Open rotation and browser fallback', async () => {
     await page({ seed: baseline({ mode: 'open' }) }); check('Open mode advances at cold start', (await state()).wallpaper === walls[1].id);
     const first = (await state()).wallpaper;

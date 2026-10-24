@@ -22,12 +22,13 @@ CleanFrame-TCL brings [Nathan Clark's CleanFrame](https://github.com/nthnclrk/Cl
 **Home, your way**
 - **Three layouts.** *Dock* and *List* draw every app logo in one consistent style. *Shelf* is an Apple TV–style row of each app's colourful banner, with a [Top Shelf](#top-shelf) above it.
 - **Your apps, found automatically.** Pick and order up to nine for Home.
-- **HDMI devices appear by themselves.** Switch on a console or set-top box and its tile shows up; switch it off and it disappears. Show inputs first on Home or in their own row.
-- **Speaks your language.** The launcher follows the TV's system language (*Settings → System → Language*). German is included; anything else falls back to English.
+- **HDMI devices appear by themselves**, named by HDMI-CEC ("PlayStation 5" instead of "HDMI 1"). Switch on a console or set-top box and its tile shows up; switch it off and it disappears. Show inputs first on Home or in their own row.
+- **Speaks your language.** The launcher follows the TV's system language (*Settings → System → Language*). German, French, Spanish and Dutch are included; anything else falls back to English.
 
 **The picture**
 - **15 photographs** with pre-rendered glass, plus **online wallpapers** from NASA, Bing, Wikimedia, Picsum and Unsplash.
 - **Animated wallpapers**: bundled seamless loops, Pexels video loops and Klipy GIFs.
+- **[My photos](#my-photos-from-your-phone)**: send photos, GIFs and short videos from your phone by scanning a QR code.
 - **Drift**: a slow Ken Burns zoom where the photo and its glass move together.
 - **Rotation**: a new picture each time Home opens, or every 5, 15 or 60 minutes.
 - **Night mode** dims everything on a timer (21–07, 22–06, 23–07) or all the time, in three strengths.
@@ -35,6 +36,7 @@ CleanFrame-TCL brings [Nathan Clark's CleanFrame](https://github.com/nthnclrk/Cl
 **Make it yours**
 - **Eight open-licence fonts**, with text weight and app-name size.
 - **Clock**: 12- or 24-hour, optional date, four sizes and weights.
+- **[Under the clock](#under-the-clock-weather-and-now-playing)**: the current weather (Open-Meteo, no key) and what's playing in Spotify, YouTube or any other app.
 - **Hide controls when idle**: after 1 or 5 minutes only the picture and clock stay.
 - Focus style and glass materials.
 
@@ -123,11 +125,40 @@ Assignments work everywhere, including inside other apps.
 
 ### HDMI inputs
 
-Inputs come from Android's TV Input Framework. A device that is **plugged in and switched on** gets a tile; standby or unplugged devices are hidden. OK switches the TV to that input, and inputs you rename in the TV settings keep their name. Choose *Settings → Layout → Inputs → First in Home* or *Own row*.
+Inputs come from Android's TV Input Framework. A device that is **plugged in and switched on** gets a tile; standby or unplugged devices are hidden. OK switches the TV to that input, and inputs you rename in the TV settings keep their name. Otherwise a tile uses the name the device announces over HDMI-CEC, such as *PlayStation 5* or *Apple TV*. CEC must be on in the TV settings (TCL calls it *T-Link*); without it the port name, such as *HDMI 1*, is shown. Choose *Settings → Layout → Inputs → First in Home* or *Own row*.
 
 ### Language
 
-CleanFrame uses the TV's system language. Change it in *Settings → System → Language* on the TV, then reopen CleanFrame. Translations live in [`app/i18n.js`](app/i18n.js): one dictionary per language, keyed by the English text, so adding a language means adding one block. In the browser preview, `?lang=de` picks a language.
+CleanFrame uses the TV's system language: German, French, Spanish and Dutch are built in, and anything else shows English. Change it in *Settings → System → Language* on the TV, then reopen CleanFrame. Translations live in [`app/i18n.js`](app/i18n.js): one dictionary per language, keyed by the English text, so adding a language means adding one block. In the browser preview, `?lang=de` picks a language.
+
+### Under the clock: weather and Now playing
+
+*Settings → Clock → Under the clock.*
+
+- **Weather** shows the temperature and sky, such as *12° Cloudy*, next to the date. It comes from [Open-Meteo](https://open-meteo.com), which needs no key or account. The place is the city of the TV's time zone (*Europe/Berlin* → Berlin). You can type a different place on the [My photos](#my-photos-from-your-phone) phone page. CleanFrame refreshes the weather every 30 minutes, uses °F only for US English, and the weather is off until you turn it on.
+- **Now playing** shows *♪ Title · Artist — App* while music or video plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **CleanFrame Now playing** under *Settings → Apps → Special app access → Notification access*; the Clock page has a shortcut. CleanFrame reads only the active media session and ignores notifications themselves.
+
+<details>
+<summary>Google TV hides Notification access</summary>
+
+Some Google TV builds don't show the Notification access page. In that case you can allow it once from a computer on the same network, using ADB:
+
+```bash
+adb shell cmd notification allow_listener app.cleanframe.tv/app.cleanframe.tv.NowPlayingService
+```
+
+To undo, run the same command with `disallow_listener`.
+
+</details>
+
+## My photos from your phone
+
+*Settings → Background → Online wallpapers → My photos.* The TV shows a QR code. Scan it with your phone's camera to open a small upload page served by the TV itself. From there, pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. They appear under **My photos**, which works like any other wallpaper source: glass is rendered once, rotation cycles through them, and GIFs and clips play animated.
+
+- The page only works on the same Wi-Fi. The address has a random code and stops working after 15 minutes, or when CleanFrame closes.
+- Nothing goes through the internet. Files stay in CleanFrame's private storage on the TV, up to the newest 30. *Remove all my photos* deletes them, on the TV or on the phone page.
+- Landscape pictures fill the screen best; portrait photos are centre-cropped. Phone rotation (EXIF) is respected.
+- The phone page also sets the place for the weather.
 
 ## Online and animated wallpapers
 
@@ -203,11 +234,12 @@ Live TV, inputs, settings, the remote, casting, updates and Google TV itself are
 
 ## Ideas
 
-- Weather on the clock (Open-Meteo, no key needed)
-- A "Now playing" card from whatever is playing
-- HDMI-CEC device names, such as "PlayStation 5" instead of "HDMI 1"
-- Send your own photos and GIFs from your phone over Wi-Fi
-- More languages
+Everything from the earlier list is now built: weather, Now playing, HDMI-CEC names, My photos and more languages. Next up:
+
+- Album art and play/pause for Now playing
+- A sleep timer on a remote button
+- Italian, Polish and Turkish translations
+- Calendar events under the clock (ICS link)
 
 ## Credits and licences
 
@@ -217,4 +249,5 @@ Live TV, inputs, settings, the remote, casting, updates and Google TV itself are
 - Fonts: SIL Open Font License; see `app/assets/fonts/`.
 - Online wallpapers belong to their authors and are shown under each provider's terms: [NASA APOD](https://apod.nasa.gov), [Bing](https://www.bing.com), [Wikimedia Commons](https://commons.wikimedia.org), [Lorem Picsum](https://picsum.photos), [Unsplash](https://unsplash.com), [Pexels](https://www.pexels.com) and [KLIPY](https://klipy.com) ("Powered by KLIPY").
 - The bundled animated loops were generated for this project.
+- Weather data by [Open-Meteo](https://open-meteo.com) (CC BY 4.0). QR codes are generated with [ZXing](https://github.com/zxing/zxing) (Apache 2.0).
 - Top Shelf: this product uses the TMDB API but is not endorsed or certified by TMDB. Recommendations and images come from [TMDB](https://www.themoviedb.org), [ARD Mediathek](https://www.ardmediathek.de), [ZDF](https://www.zdf.de), [ARTE](https://www.arte.tv), [YouTube](https://www.youtube.com) and [Twitch](https://www.twitch.tv) under their terms. Titles and artwork belong to their owners.

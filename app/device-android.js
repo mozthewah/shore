@@ -134,8 +134,30 @@
       if (ok) reply(true, done); else launchApp(id, done);
     }
   };
+  /* Photos sent from a phone on the same network (PhoneUpload), and what is playing (NowPlayingService). */
+  var phoneListeners = [];
+  window.CleanFramePhoneChanged = function (count) { phoneListeners.forEach(function (fn) { try { fn(count); } catch (e) { } }); };
+  var phone = {
+    start: function () {
+      var r;
+      try { r = JSON.parse(bridge.phoneStart()); } catch (e) { r = {}; }
+      return { url: typeof r.url === 'string' ? r.url : '', qr: /^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(r.qr || '') ? r.qr : '', count: +r.count || 0 };
+    },
+    stop: function () { try { bridge.phoneStop(); } catch (e) { } },
+    clear: function () { try { bridge.phoneClear(); } catch (e) { } },
+    info: function () { var r; try { r = JSON.parse(bridge.phoneInfo()); } catch (e) { r = {}; } return { count: +r.count || 0, place: typeof r.place === 'string' ? r.place : '' }; },
+    onChange: function (fn) { phoneListeners.push(fn); }
+  };
+  var nowPlaying = {
+    info: function () {
+      var r;
+      try { r = JSON.parse(bridge.nowPlaying()); } catch (e) { r = {}; }
+      return { access: !!r.access, playing: !!r.playing && typeof r.title === 'string', title: String(r.title || ''), artist: String(r.artist || ''), app: String(r.app || '') };
+    },
+    openSettings: function (done) { reply(ask('nowPlayingSettings'), done, 'Notification access could not open.'); }
+  };
   window.FrameDevice = {
-    platform: 'android',
+    platform: 'android', phone: phone, nowPlaying: nowPlaying,
     launch: launch, launchApp: launchApp, apps: apps,
     inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */

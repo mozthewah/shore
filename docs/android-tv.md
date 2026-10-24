@@ -75,9 +75,13 @@ try this; a factory reset also restores it. A gentler alternative is a key-remap
 - Home: `cmd role add-role-holder android.app.role.HOME` and `cmd package set-home-activity` are accepted but
   ignored (launcherx has system priority 2). `HomeButtonService` (accessibility, user-enabled) catches the Home key instead.
 - Remote buttons: `HomeButtonService` also applies `RemoteKeys` assignments (SharedPreferences `remote_keys`, keyCode → action). The learn step captures the next non-navigation key and logs every key to logcat tag `CleanFrameKeys` (`adb logcat -s CleanFrameKeys`). Key layout files are unreadable and `dumpsys input` shows no key codes on this build, so learning is the only way to find a button's code.
-- Language: the WebView reports the system locale as `navigator.language`; `app/i18n.js` translates through `esc()`/`T()` in `main.js`. English is the source text, so new UI strings need a dictionary entry per language.
+- Language (de, fr, es, nl): the WebView reports the system locale as `navigator.language`; `app/i18n.js` translates through `esc()`/`T()` in `main.js`. English is the source text, so new UI strings need a dictionary entry per language.
 - Online wallpapers are downloaded and pre-rendered natively (`OnlineWallpapers.java`), then served at the same
   `assets/wallpapers` and `assets/materials` paths as bundled photos, so the runtime still never blurs.
+- HDMI-CEC names: CEC devices are child `TvInputInfo`s (`getParentId()` = the HDMI port). `DeviceBridge.inputs()` hides the children and labels the port with the child's label unless the user renamed the input; `port` keeps the port name.
+- Now playing: `NowPlayingService` is an empty `NotificationListenerService`; it only exists so `MediaSessionManager.getActiveSessions()` is allowed. The page polls `nowPlaying()` every 10 s while visible. Without notification access the call throws `SecurityException` and `access` is false.
+- My photos: `PhoneUpload` is a tiny HTTP server (ports 8642–8645) that runs only while the QR page was opened in the last 15 minutes, under a random path. Uploads are type-checked by magic bytes (JPEG, PNG, WebP, GIF, MP4), capped at 60 MB and 30 files, and land in `files/phone/`. The `phone` source in `OnlineWallpapers` renders them like any online photo; GIFs keep a `.gif` that `main.js` plays in an `<img>` above the still bundle.
+- Weather: `app/weather.js` calls Open-Meteo's geocoding and forecast APIs from the WebView (CORS allowed), only when *Under the clock → Weather* is on, and caches the line in `localStorage` for 30 minutes.
 - WebView persists `localStorage` asynchronously: when editing it over DevTools, wait a few seconds before
   force-stopping the app. `location.reload()` is blocked by `shouldOverrideUrlLoading`; restart the activity instead.
 
