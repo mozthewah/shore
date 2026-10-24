@@ -180,7 +180,8 @@ final class DeviceBridge {
     @JavascriptInterface
     public String remoteInfo() {
         try {
-            return new JSONObject().put("service", remoteServiceOn()).put("learning", RemoteKeys.learning()).put("keys", RemoteKeys.list(context)).toString();
+            boolean on = remoteServiceOn();
+            return new JSONObject().put("service", on).put("blocked", !on && remoteServiceListed()).put("learning", RemoteKeys.learning()).put("keys", RemoteKeys.list(context)).toString();
         } catch (Exception e) { return "{}"; }
     }
 
@@ -193,6 +194,15 @@ final class DeviceBridge {
                     && context.getPackageName().equals(info.getResolveInfo().serviceInfo.packageName)) return true;
         }
         return false;
+    }
+
+    /**
+     * Switched on in Settings but not running. On TCL TVs the boot manager refuses to bind the
+     * service after a restart unless Shore may auto start, and the toggle then stays on.
+     */
+    private boolean remoteServiceListed() {
+        String list = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        return list != null && list.contains(context.getPackageName() + "/");
     }
 
     /** Starts (or cancels) the learn step: the next non-navigation button is reported to the page instead of acting. */

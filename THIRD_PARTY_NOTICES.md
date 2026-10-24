@@ -45,5 +45,7 @@ Development dependencies retain the licences in their npm packages. They are not
 | AndroidX WebKit (`androidx.webkit:webkit`) | Apache License 2.0; compiled into the Android APK. |
 | ZXing core (`com.google.zxing:core`), QR codes for the phone companion | Apache License 2.0; compiled into the Android APK. https://github.com/zxing/zxing |
 | Weather (Open-Meteo) | Fetched on the TV at runtime when Weather is on; data CC BY 4.0, credited in Settings › Clock. |
+| Artist pictures and covers (TheAudioDB, iTunes Search API) | Fetched on the TV at runtime when *Sharper pictures* is on, cached privately for 30 days and never redistributed; each provider's terms apply. |
+| Brand files (`docs/brand/`, `scripts/brand/`) | Made for this project; MIT with the code. They embed Manrope (SIL OFL) and screenshots of Shore with an invented track and cover. |
 | Photos sent from the phone companion (My photos) | The user's own files, stored privately on the TV; never redistributed. |
 | Shore icon, banner and website (`site/`) | Made for this project; MIT with the code. The companion page uses Manrope (SIL OFL, `app/assets/manrope-OFL.txt`). |

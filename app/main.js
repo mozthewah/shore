@@ -1009,7 +1009,7 @@
   function refreshRemote() {
     var info = REMOTE.info(), r = S.remote;
     if (r.learning && !info.learning) { r.learning = false; r.missed = true; clearTimeout(r.timer); }
-    r.service = info.service; r.keys = info.keys;
+    r.service = info.service; r.blocked = !!info.blocked; r.keys = info.keys;
   }
   function remotePage(t) { return t.id === 'appearance' && PARENT[t.group] && (t.group === 'remote' || PARENT[t.group] === 'remote' || PARENT[t.group] === 'remotepick'); }
   function openRemote() { refreshRemote(); S.remote.missed = false; openAppearance('remote'); }
@@ -1048,7 +1048,8 @@
       items.push({ action: 'remote.learn', label: r.learning ? 'Press a button on the remote…' : 'Assign a button…', disabled: !r.service });
       if (!r.service) items.push({ action: 'remote.service', label: 'Accessibility settings' });
       return [{ id: 'remote', title: '', items: items,
-        reason: !r.service ? 'Turn on “Shore Home button” in Settings › System › Accessibility to assign buttons.'
+        reason: r.blocked ? 'The TV stopped “Shore Home button” after a restart. Allow Shore to auto start in TV Guard, then switch the service off and on again.'
+          : !r.service ? 'Turn on “Shore Home button” in Settings › System › Accessibility to assign buttons.'
           : r.learning ? 'Waiting for a button. Any other key cancels.'
           : r.missed ? 'No button arrived. The TV handles that button before Shore sees it, so it can’t be reassigned.'
           : r.keys.length ? 'Assigned buttons work everywhere, even inside apps.' : 'Assign the app buttons or the TV button to something else.' }];

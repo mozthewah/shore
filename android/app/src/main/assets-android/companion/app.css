@@ -57,3 +57,9 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:22px}
 .crop-actions .button.primary{width:auto}
 .crop-actions .button:disabled{opacity:.5}
 .crop-actions .button{white-space:nowrap;font-size:15px}
+.crop-zoom{-webkit-appearance:none;appearance:none;height:32px;background:transparent;margin:0}
+.crop-zoom:focus{outline:0}
+.crop-zoom::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:rgba(255,255,255,.22)}
+.crop-zoom::-moz-range-track{height:4px;border-radius:2px;background:rgba(255,255,255,.22)}
+.crop-zoom::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-10px;border-radius:50%;background:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.crop-zoom::-moz-range-thumb{width:24px;height:24px;border:0;border-radius:50%;background:var(--ink)}

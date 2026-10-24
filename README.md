@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="site/icon.png" width="96" alt="">
+<img src="docs/brand/banner.svg" width="100%" alt="Shore: a calm home screen for Google TV">
 
 # Shore
 
@@ -105,6 +105,9 @@ Google TV always sends Home to its own launcher and ignores the "default home ap
 
 The service only sees remote keys and which app is in front. It never reads screen content. Turn the switch off to undo.
 
+> [!IMPORTANT]
+> **TCL TVs: allow auto start.** After a restart, TCL's boot manager refuses to start accessibility services of apps without its *auto start* permission. The switch then still shows *Enable* on, but the service shows *Off* and no button works. Shore's *Remote buttons* page says so when this happens. Allow Shore to auto start in TCL's **TV Guard** (permission manager), then switch *Shore Home button* off and on once.
+
 ### Reassign remote buttons
 
 *Settings → Google TV → Remote buttons* (needs the accessibility service). Choose **Assign a button…**, press a button on the remote, then pick what it does:
@@ -139,11 +142,13 @@ Shore uses the TV's system language: German, French, Spanish, Dutch and Polish a
 
 - **Weather** shows the temperature and sky, such as *12 °C Cloudy*, next to the date. It comes from [Open-Meteo](https://open-meteo.com), which needs no key or account. The place is the city of the TV's time zone (*Europe/Berlin* → Berlin), or the place you type in the [phone companion](#phone-companion). Choose **°C or °F** under *Temperature*. Shore refreshes the weather every 30 minutes, and it is off until you turn it on.
 - **Now playing** shows a small moving level meter and *Title · Artist — App* while something plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings → Apps → Special app access → Notification access*; the Clock page has a shortcut. Shore reads only the active media session and ignores notifications themselves. The level meter is decoration: Shore never hears the audio.
-- **Album art** (*Background*): while music with a cover plays, the cover becomes the background, softly blurred and dimmed, and the glass shows it through. It needs a Photo background and goes back to your wallpaper when the music stops. The blur is made once per track on the TV's CPU, not live in the page.
+- **Album art** (*Background*): while music with a cover plays, the cover becomes the background, softly blurred and dimmed, and the glass shows it through. It needs a Photo background and goes back to your wallpaper when the music stops. The blur is made once per track on the TV's CPU, not live in the page. Turn it off in *Settings → Background → Online and album art*.
+- **Sharper pictures** (same page, on by default): media apps often share only a small cover, which looks soft at TV size. Shore then looks up a wide artist picture on [TheAudioDB](https://www.theaudiodb.com) and, if none fits, a 1000-pixel cover from the [iTunes Search API](https://performance-partners.apple.com/search-api). Only the artist name (and title for iTunes) is sent, once per track; results are cached on the TV for 30 days. Turn it off to keep everything on the TV.
+- **Weather icons** next to the temperature follow the sky and switch to night versions after sunset.
 
 ### Screensaver
 
-*Settings → Night and idle → When idle.* Shore has its own screensaver instead of the TV's: after 5, 10 (default) or 15 minutes without a button press it fades to a slow slideshow of your wallpapers (the current rotation source, including My photos) with a large clock, the date and weather. While music plays it shows the album art, the cover, title and artist. The clock moves to another corner every few minutes so nothing sits on the same pixels for hours. Any button wakes Shore without doing anything else. *Start the screensaver now* is on the same page, and the **Screensaver** button on Home and the *Screensaver* remote-button action start it too.
+*Settings → Night and idle → When idle.* Shore has its own screensaver instead of the TV's: after 5, 10 (default) or 15 minutes without a button press it fades to a slow slideshow of your wallpapers (the current rotation source, including My photos). Photos drift slowly, and every few slides it shows a mosaic of two or three photos at once. A large clock, the date and the weather sit on top. While music plays it adds a small card with the cover, title and artist; the album art never replaces the photos. The clock moves to another corner every few minutes so nothing sits on the same pixels for hours. Any button wakes Shore without doing anything else. *Start the screensaver now* is on the same page, and the **Screensaver** button on Home and the *Screensaver* remote-button action start it too.
 
 While Shore's screensaver is on and Shore is in front, Shore keeps the TV's own screensaver away. After four hours of screensaver it lets go, so the TV's usual sleep timer still turns the TV off. Choose *Off* to leave everything to the TV.
 
@@ -297,6 +302,10 @@ Built since the last list: weather with °C/°F, Now playing with album art, Sho
 - Use the phone companion as a remote and keyboard
 - Calendar events under the clock (ICS link)
 - Italian and Turkish translations
+
+## Brand
+
+The half sun over three lines in ivory `#e3e6dc`, on a deep blue-grey gradient (`#20303a` → `#0f161a`) with a warm accent `#f2c58b`, set in Manrope. The same mark is the TV icon, the launcher banner, the website and the phone companion. [`docs/brand/`](docs/brand/) holds the animated banner (SVG, GIF, MP4), the logo and mark, and ready-made ads (1200×628 and 1080×1080, as PNG and MP4). `python3 scripts/brand/make_brand.py` rebuilds them from the screenshots in `site/shots/` (needs Node with Playwright, ffmpeg and Pillow).
 
 ## Credits and licences
 

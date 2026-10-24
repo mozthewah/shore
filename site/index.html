@@ -8,7 +8,10 @@
 <meta name="theme-color" content="#121a1f">
 <meta property="og:title" content="Shore · A calm home screen for Google TV">
 <meta property="og:description" content="Your apps, your HDMI devices, a beautiful picture and the time. Nothing else.">
-<meta property="og:image" content="banner.png">
+<meta property="og:image" content="https://taynotfound.github.io/shore/social.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="icon.png">
 <style>
@@ -62,6 +65,19 @@ h2{margin:0 0 16px;font-size:clamp(32px,4.6vw,48px);line-height:1.1;font-weight:
 .ticks b{color:var(--ink);font-weight:600}
 .phone{width:300px;max-width:80%;margin:0 auto;padding:12px;border-radius:44px;background:#05080a;box-shadow:0 40px 90px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.08)}
 .phone img{border-radius:34px}
+.phones{position:relative;display:flex;justify-content:center;gap:0}
+.phones .phone{width:270px;margin:0}
+.phones .phone+.phone{margin-left:-60px;margin-top:70px;transform:rotate(4deg)}
+.phones .phone:first-child{transform:rotate(-3deg)}
+.pill{display:inline-flex;align-items:center;gap:8px;margin:0 auto 22px;padding:7px 16px 7px 8px;border-radius:999px;border:1px solid var(--line);background:var(--glass);font-size:14px;color:var(--muted);text-decoration:none}
+.pill b{padding:3px 10px;border-radius:999px;background:var(--warm);color:#1b1408;font-size:12px;letter-spacing:.4px;text-transform:uppercase}
+.stack{display:grid;gap:14px}
+.stack .shot:nth-child(2){margin-left:12%;margin-top:-14%;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.wave{display:inline-flex;align-items:flex-end;gap:3px;height:16px;margin-right:8px;vertical-align:-1px}
+.wave i{width:3px;height:16px;border-radius:2px;background:var(--warm);transform-origin:50% 100%;animation:wave .9s ease-in-out infinite alternate}
+.wave i:nth-child(2){animation-duration:.7s;animation-delay:-.3s}.wave i:nth-child(3){animation-duration:1.1s;animation-delay:-.6s}.wave i:nth-child(4){animation-duration:.8s;animation-delay:-.15s}
+@keyframes wave{0%{transform:scaleY(.25)}50%{transform:scaleY(1)}100%{transform:scaleY(.45)}}
+@media (prefers-reduced-motion:reduce){.wave i{animation:none}}
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
 .gallery figure{margin:0}
 .gallery img{border-radius:14px;border:1px solid var(--line);aspect-ratio:16/9;object-fit:cover;width:100%}
@@ -83,6 +99,7 @@ footer a{color:var(--muted)}
   .steps{grid-template-columns:1fr 1fr}
   .split,.split.flip{grid-template-columns:1fr;gap:40px}
   .split.flip .text{order:-1}
+  .phones .phone{width:220px}
   section{padding:80px 0}
 }
 @media (max-width:560px){
@@ -97,12 +114,13 @@ footer a{color:var(--muted)}
 <body>
 <nav><div class="wrap">
   <a class="brand" href="#"><img src="icon.png" alt="">Shore</a>
-  <ul><li><a href="#features">Features</a></li><li><a href="#companion">Phone companion</a></li><li><a href="#install">Install</a></li><li><a href="https://github.com/taynotfound/shore">GitHub</a></li></ul>
+  <ul><li><a href="#features">Features</a></li><li><a href="#music">Music</a></li><li><a href="#screensaver">Screensaver</a></li><li><a href="#companion">Phone companion</a></li><li><a href="#install">Install</a></li><li><a href="https://github.com/taynotfound/shore">GitHub</a></li></ul>
   <a class="btn primary small" href="https://github.com/taynotfound/shore/releases">Download</a>
 </div></nav>
 
 <header class="hero"><div class="wrap">
   <img class="mark" src="icon.png" alt="">
+  <a class="pill" href="#screensaver"><b>New</b> Its own screensaver, album art and weather icons</a>
   <h1>A calm home screen<br>for Google TV.</h1>
   <p class="lede">Shore swaps the busy Google TV home screen for the things you actually use: your apps, your HDMI devices, a beautiful picture and the time. Nothing else.</p>
   <div class="ctas">
@@ -121,12 +139,44 @@ footer a{color:var(--muted)}
     <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M7 21h10"/></svg></div><h3>Three layouts</h3><p>Dock and List draw every logo in one consistent style. Shelf is an Apple TV–style row of banners with a Top Shelf of what's trending.</p></div>
     <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M4.5 7h15a1.5 1.5 0 0 1 1.5 1.5V12l-3 4.5H6L3 12V8.5A1.5 1.5 0 0 1 4.5 7Z"/><path d="M7.5 11h9"/></svg></div><h3>HDMI devices, by name</h3><p>Switch on a console and "PlayStation 5" appears, named over HDMI-CEC. Switch it off and the tile goes away.</p></div>
     <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="9.8" r="1.5"/><path d="m4.5 17.5 4.5-4.5 3 3 2.5-2.5 5 5"/></svg></div><h3>Beautiful wallpapers</h3><p>Fifteen photographs with pre-rendered glass, NASA, Bing and Unsplash online, animated loops, and your own photos from your phone.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></div><h3>Under the clock</h3><p>The weather in °C or °F, with no key or account needed, and what's playing in Spotify, YouTube or any other app.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/></svg></div><h3>Phone companion</h3><p>Scan a code and send photos, GIFs and clips to the TV from a little web app that looks like the launcher.</p></div>
+    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></div><h3>Under the clock</h3><p>The weather with a little icon, in °C or °F, with no key or account. And what's playing in Spotify, YouTube or any other app, with a small moving level meter.</p></div>
+    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/></svg></div><h3>Phone companion</h3><p>Scan a code, frame a photo for the TV right on your phone, and send it. GIFs and clips work too, from an app that looks like the launcher.</p></div>
     <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="5"/><circle cx="12" cy="8" r="1.6"/><path d="M10 13h4M10 16h4"/></svg></div><h3>Your remote, your rules</h3><p>Home opens Shore. Reassign the app shortcut keys or the TV button to an app, an input or the screensaver.</p></div>
-    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></div><h3>Night mode and idle</h3><p>Dims everything on a schedule. After a minute of quiet, only the picture and the clock stay.</p></div>
+    <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></div><h3>Its own screensaver</h3><p>Your photos drift slowly by, alone or as a mosaic, with a big clock and the weather. Any button brings Home back. Night mode dims it all on a schedule.</p></div>
     <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h13"/></svg></div><h3>Eight open fonts</h3><p>Manrope, Inter, Geist, Sora, Outfit and more, with text weight and size, plus four clock sizes.</p></div>
     <div class="card"><div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5Z"/></svg></div><h3>Speaks your language</h3><p>English, German, French, Spanish, Dutch and Polish, following the TV's system language.</p></div>
+  </div>
+</div></section>
+
+<section id="music" class="alt"><div class="wrap split">
+  <div class="text">
+    <p class="eyebrow">Now playing</p>
+    <h2>The music sets the scene.</h2>
+    <p class="intro" style="margin-bottom:0">Play something in Spotify or any music app and Shore notices. <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>The title shows under the clock, and the album art becomes the background until the music stops.</p>
+    <ul class="ticks">
+      <li><b>Wide artist photos.</b> When TheAudioDB has one, Shore shows a full-screen picture of the artist instead of the cover.</li>
+      <li><b>Sharp covers.</b> Small covers are swapped for 1000-pixel artwork from iTunes. Only the artist, title and album are sent, and you can switch it off.</li>
+      <li><b>Your choice.</b> <i>Settings › Background › Online and album art</i> turns the cover background off, and your wallpaper stays.</li>
+    </ul>
+  </div>
+  <div class="shot"><img src="shots/nowplaying.jpg" alt="Shore with a song's album art as the background and the title under the clock" loading="lazy"></div>
+</div></section>
+
+<section id="screensaver"><div class="wrap split flip">
+  <div class="stack">
+    <div class="shot"><img src="shots/screensaver-mosaic.jpg" alt="Shore's screensaver: three photos as a mosaic with a large clock and what's playing" loading="lazy"></div>
+    <div class="shot"><img src="shots/screensaver.jpg" alt="Shore's screensaver: one coastal photo with a large clock and the weather" loading="lazy"></div>
+  </div>
+  <div class="text">
+    <p class="eyebrow">Screensaver</p>
+    <h2>When nobody's watching.</h2>
+    <p class="intro" style="margin-bottom:0">After a few quiet minutes, Shore fades to its own screensaver instead of Google's.</p>
+    <ul class="ticks">
+      <li><b>Always moving.</b> Every photo slowly pans and zooms, sometimes alone, sometimes as a mosaic of two or three.</li>
+      <li><b>Your photos.</b> It uses your wallpapers, online sources and the photos you sent from your phone.</li>
+      <li><b>The clock, the weather and the song.</b> They move to another corner every few minutes, so nothing burns in.</li>
+      <li><b>Gets out of the way.</b> Any button brings Home back. After four hours the TV's own sleep timer takes over.</li>
+    </ul>
   </div>
 </div></section>
 
@@ -145,15 +195,19 @@ footer a{color:var(--muted)}
 </div></section>
 
 <section id="companion"><div class="wrap split flip">
-  <div class="phone"><img src="companion.jpg" alt="The Shore companion on a phone: send photos, my photos grid and weather place" loading="lazy"></div>
+  <div class="phones">
+    <div class="phone"><img src="shots/companion.jpg" alt="Shore Companion on a phone: send photos, my photos grid and weather place" loading="lazy"></div>
+    <div class="phone"><img src="shots/crop.jpg" alt="Framing a photo for the TV in Shore Companion" loading="lazy"></div>
+  </div>
   <div class="text">
     <p class="eyebrow">Phone companion</p>
     <h2>Your photos on the big screen.</h2>
     <p class="intro" style="margin-bottom:0">Turn on <i>Settings › Phone</i> and scan the code. A small web app opens on your phone, served by the TV itself.</p>
     <ul class="ticks">
       <li><b>Send photos, GIFs and short videos.</b> They become wallpapers, with the same frosted glass as the built-in ones.</li>
+      <li><b>Frame it first.</b> Each photo opens in the TV's 16:9 shape. Drag and pinch, then send the crop at full resolution.</li>
       <li><b>Set the weather place</b> without typing on the remote.</li>
-      <li><b>Add it to your home screen</b> and it opens full screen, like an app.</li>
+      <li><b>Install it as an app.</b> Tap Install app after scanning, and Shore Companion lives on your home screen.</li>
       <li><b>Private by design.</b> It runs only on your Wi-Fi, needs the paired code, and nothing goes through the internet.</li>
     </ul>
   </div>
