@@ -12,6 +12,8 @@ While music plays, it opens the song full screen with synced lyrics that light u
 
 ## For Faster response times, join my [Discord](https://discord.gg/z6C4Mj9VPK)
 
+[![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-ff5e5b?logo=kofi&logoColor=white)](https://ko-fi.com/taygotkofi) [![GitHub Sponsors](https://img.shields.io/badge/GitHub-Sponsor-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/taynotfound) [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/z6C4Mj9VPK)
+
 ![Shore on a TCL 55C6KS](docs/images/tcl/home.jpg)
 
 </div>

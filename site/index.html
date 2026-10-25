@@ -89,6 +89,9 @@ ol.steps b{color:var(--ink);font-weight:600}
 .button{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 24px 0 18px;border-radius:24px;background:var(--solid);color:var(--solid-ink);text-decoration:none;font-weight:600}
 .button .ico{width:20px;height:20px}
 .button:hover{background:#fff}
+.button.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--faint)}.button.ghost:hover{background:var(--lift)}
+.support-buttons{display:flex;flex-wrap:wrap;gap:12px}
+.utils .support-link{opacity:1}.utils .support-link .ico{color:#ff7a8a}
 details{border-radius:12px;transition:background-color 140ms linear}
 details+details{margin-top:3px}
 summary{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:52px;padding:12px 18px;border-radius:12px;font-size:17px;cursor:pointer;list-style:none}
@@ -137,6 +140,7 @@ footer p{margin:0}
       <a href="#clock"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Under the clock</a>
       <a href="#music"><svg class="ico" viewBox="0 0 24 24"><path d="M9 17.5V6l10-2v11.5"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/></svg>Music</a>
       <a href="#faq"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4M12 16.6v.1"/></svg>Questions</a>
+      <a class="support-link" href="#support"><svg class="ico" viewBox="0 0 24 24"><path d="M12 19.5s-7-4.3-7-9.6A3.9 3.9 0 0 1 12 7.6a3.9 3.9 0 0 1 7 2.3c0 5.3-7 9.6-7 9.6Z"/></svg>Support Shore</a>
     </nav>
   </div>
   <nav class="dock" aria-label="Get Shore">
@@ -269,6 +273,18 @@ footer p{margin:0}
     </ol>
     <p>From then on, Settings › Google TV › Shore updates fetches new releases from GitHub, and Android asks you before installing each one. The <a href="https://github.com/taynotfound/shore#install">README</a> covers Android 14 wireless debugging and an optional, reversible list of TCL extras to switch off.</p>
     <p><a class="button" href="https://github.com/taynotfound/shore/releases/latest"><svg class="ico" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/></svg>Download the APK</a></p>
+  </div>
+</section>
+
+<section id="support">
+  <h2><span class="head">Shore</span>Support it</h2>
+  <div class="body">
+    <p>Shore is free, with no ads and no tracking, and it's made in spare time. If it made your TV nicer, a coffee or a monthly sponsorship keeps new features and fixes coming.</p>
+    <p class="support-buttons">
+      <a class="button" href="https://ko-fi.com/taygotkofi"><svg class="ico" viewBox="0 0 24 24"><path d="M12 19.5s-7-4.3-7-9.6A3.9 3.9 0 0 1 12 7.6a3.9 3.9 0 0 1 7 2.3c0 5.3-7 9.6-7 9.6Z"/></svg>Buy me a coffee on Ko-fi</a>
+      <a class="button ghost" href="https://github.com/sponsors/taynotfound"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 0 0-2.7 16.6c.4 0 .6-.2.6-.5v-1.7c-2.4.5-2.9-1.1-2.9-1.1-.4-1-1-1.3-1-1.3-.8-.5 0-.5 0-.5.9.1 1.3.9 1.3.9.8 1.3 2 1 2.5.7.1-.6.3-1 .6-1.2-1.9-.2-3.9-1-3.9-4.2 0-.9.3-1.7.9-2.3-.1-.2-.4-1.1.1-2.3 0 0 .7-.2 2.3.9a8 8 0 0 1 4.2 0c1.6-1.1 2.3-.9 2.3-.9.5 1.2.2 2.1.1 2.3.5.6.9 1.4.9 2.3 0 3.3-2 4-3.9 4.2.3.3.6.8.6 1.6v2.4c0 .3.2.6.6.5A8.5 8.5 0 0 0 12 3.5Z"/></svg>Sponsor on GitHub</a>
+    </p>
+    <p>Questions, ideas or a TV to report? The <a href="https://discord.gg/z6C4Mj9VPK">Discord</a> is the fastest way to reach me.</p>
   </div>
 </section>
 
