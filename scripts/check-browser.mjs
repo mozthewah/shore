@@ -370,7 +370,7 @@ try {
   await run('Settings overview and visible choices', async () => {
     await page(); await scene('settings');
     const expected = ['settings.group.background', 'settings.group.layout', 'settings.editor', 'settings.group.focus', 'settings.group.typography', 'settings.group.display', 'settings.group.screensaver',
-      'settings.group.clock', 'settings.group.weather', 'settings.group.samsung'];
+      'settings.group.clock', 'settings.group.weather', 'settings.group.inputs', 'settings.group.samsung'];
     check('Overview has every settings group', same((await call('actions')).filter(a => a.startsWith('settings.')).sort(), expected.slice().sort()), await call('actions'));
     check('Overview starts on Wallpaper', (await state()).focusAction === 'settings.group.background');
     await nav('down', 'down', 'down', 'down', 'down');
@@ -378,7 +378,7 @@ try {
     await nav('right');
     check('Right crosses to the nearest row of the other column', (await state()).focusAction === 'settings.group.samsung', await state());
     await nav('left');
-    check('Left returns to the nearest row of the Look column', (await state()).focusAction === 'settings.group.focus', await state());
+    check('Left returns to the nearest row of the Look column', (await state()).focusAction === 'settings.group.typography', await state());
     await nav('back'); await scene('settings');
     const specs = {
       background: { bg: ['dark', 'light', 'photo'] },
@@ -914,7 +914,7 @@ try {
   await run('Personal touches: accent, glass, icons, clock position and seconds', async () => {
     await page(); await group('focus');
     await act('choice.tint.warm'); await ready(); await act('choice.dglass.solid'); await ready();
-    await nav('back'); await act('settings.group.typography'); await act('choice.isize.large'); await ready();
+    await nav('back'); await act('settings.group.layout'); await act('open.icons'); await act('choice.isize.large'); await ready();
     const look = (await stored()).look;
     check('Style and icon size choices persist', look.tint === 'warm' && look.dglass === 'solid' && look.isize === 'large', look);
     check('Stage carries the chosen accent, glass and icon size', await current.evaluate(() => /tint-warm/.test(document.getElementById('stage').className) && /dg-solid/.test(document.getElementById('stage').className) && /is-large/.test(document.getElementById('stage').className)));

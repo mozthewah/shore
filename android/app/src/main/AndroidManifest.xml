@@ -9,7 +9,7 @@
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
-    <!-- Android 11+ package visibility: only launchable apps, no QUERY_ALL_PACKAGES. -->
+    <!-- Android 11+ package visibility: only launchable apps and icon packs, no QUERY_ALL_PACKAGES. -->
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -23,6 +23,13 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.HOME" />
         </intent>
+        <!-- Icon packs (ADW/Nova/Projectivy format): Shore reads their appfilter.xml and drawables. -->
+        <intent><action android:name="org.adw.launcher.THEMES" /></intent>
+        <intent><action android:name="com.novalauncher.THEME" /></intent>
+        <intent><action android:name="com.teslacoilsw.launcher.THEME" /></intent>
+        <intent><action android:name="com.anddoes.launcher.THEME" /></intent>
+        <intent><action android:name="com.gau.go.launcherex.theme" /></intent>
+        <intent><action android:name="com.spocky.projengmenu.icons.ACTION_PICK_ICON" /></intent>
     </queries>
 
     <application

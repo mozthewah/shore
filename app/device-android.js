@@ -171,6 +171,11 @@
     },
     refresh: function (feed, force) { try { bridge.newsRefresh(String(feed || ''), !!force); } catch (e) { } }
   } : null;
+  /* Installed icon packs (IconPacks.java) and the apps each one draws. */
+  var icons = bridge.iconPacks ? {
+    list: function () { try { return JSON.parse(bridge.iconPacks()).filter(function (p) { return p && typeof p.id === 'string' && typeof p.name === 'string'; }); } catch (e) { return []; } },
+    apps: function (pack) { try { return JSON.parse(bridge.iconPackApps(String(pack))).filter(function (p) { return typeof p === 'string'; }); } catch (e) { return []; } }
+  } : null;
   var nowPlaying = {
     /* lookup: allow a sharper cover and a wide artist picture from the internet (artist, title and album are sent). */
     info: function (lookup) {
@@ -209,7 +214,7 @@
     openSettings: function (done) { reply(ask('screensaverSettings'), done, 'Screensaver settings could not open.'); }
   };
   window.FrameDevice = {
-    platform: 'android', phone: phone, news: news, nowPlaying: nowPlaying, saver: saver, update: update,
+    platform: 'android', phone: phone, news: news, icons: icons, nowPlaying: nowPlaying, saver: saver, update: update,
     launch: launch, launchApp: launchApp, apps: apps, appInfo: appInfo,
     inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */

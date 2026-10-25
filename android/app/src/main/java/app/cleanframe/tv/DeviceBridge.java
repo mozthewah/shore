@@ -157,6 +157,14 @@ final class DeviceBridge {
         return start(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, android.net.Uri.parse("package:" + pkg)));
     }
 
+    /** Installed icon packs: JSON array of {id, name}. */
+    @JavascriptInterface
+    public String iconPacks() { return IconPacks.list(context); }
+
+    /** JSON array of the packages an icon pack draws. */
+    @JavascriptInterface
+    public String iconPackApps(String pack) { return IconPacks.apps(context, pack); }
+
     /** JSON array of {appId, name} for every app the TV can launch. */
     @JavascriptInterface
     public String apps() {
