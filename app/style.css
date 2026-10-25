@@ -896,3 +896,5 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .is-intro .dock .tile:nth-child(5) .tile-content{animation-delay:320ms}.is-intro .dock .tile:nth-child(6) .tile-content{animation-delay:360ms}
 .is-intro .dock .tile:nth-child(7) .tile-content{animation-delay:400ms}.is-intro .dock .tile:nth-child(8) .tile-content{animation-delay:440ms}
 .is-intro .dock .tile:nth-child(n+9) .tile-content{animation-delay:480ms}
+.setting-glyph{position:relative;flex:0 0 56px;width:56px;height:40px;margin-right:4px;color:currentColor}
+.setting-glyph .mark{position:absolute;left:0;top:0}

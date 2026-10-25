@@ -990,6 +990,19 @@ try {
     await nav('back'); await library();
     check('Browser All Apps has no installed fixtures', /TV/.test(await current.locator('#stage').innerText()) && !(await current.locator('[data-action^="apps.open."]').count()));
   });
+  await run('Per-app icon choice', async () => {
+    await closePage(); await page();
+    const id = (await state()).selected, other = (await state()).home.filter(h => h !== id)[0];
+    await current.keyboard.down('Enter'); await current.waitForTimeout(800); await current.keyboard.up('Enter');
+    await act('message.quick.icon:' + id); await nav('ok');
+    check('Quick actions open the icon page', (await state()).view === 'appearance' && (await state()).focusAction === 'iconset.auto');
+    await act('iconset.mark:hdmi'); await nav('ok');
+    check('A Shore mark is stored for that app only', JSON.stringify((await state()).iconFor) === JSON.stringify({ [id]: 'mark:hdmi' }), (await state()).iconFor);
+    await nav('back');
+    check('Home draws the chosen mark', await current.locator('#track .tile [data-mark="hdmi"]').count() === 1 && await current.locator('#track .tile [data-mark="' + other + '"]').count() <= 1);
+    await current.reload(); await ready();
+    check('The choice survives a restart', (await stored()).iconFor[id] === 'mark:hdmi');
+  });
   section = 'Run integrity';
   report.sourceAfter = hashes();
   check('No unexpected browser/resource failures', report.pageErrors.length === 0, report.pageErrors);

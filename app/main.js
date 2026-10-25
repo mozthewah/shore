@@ -249,14 +249,24 @@
   }
   function iconPacks() { if (!packList) packList = ICON_PACKS ? ICON_PACKS.list() : []; return packList; }
   function packName(id) { var p = iconPacks().filter(function (x) { return x.id === id; })[0]; return p ? p.name : 'None'; }
-  function iconKey() { return S.c.istyle + '|' + S.c.ipack + '|' + (packApps[S.c.ipack] ? 1 : 0); }
+  function iconKey() { return S.c.istyle + '|' + S.c.ipack + '|' + (packApps[S.c.ipack] ? 1 : 0) + '|' + JSON.stringify(S.c.iconFor || {}); }
+  /* Shore's own logos, for the per-app icon choice. */
+  function shoreMarks() { return Object.keys(window.FrameIconMetrics || {}).filter(function (id) { return /^[a-z0-9-]{1,40}$/.test(id); }).sort(); }
+  function markName(id) {
+    var named = APPS.filter(function (a) { return (a.brand || a.id) === id && a.mark; })[0];
+    var fixed = { hdmi: 'HDMI', ard: 'ARD', zdf: 'ZDF', arte: 'ARTE', sbs: 'SBS', hbomax: 'HBO Max', waipu: 'waipu.tv', primevideo: 'Prime Video', art: 'Art Mode', apps: 'Apps', home: 'Home', settings: 'Settings' };
+    return fixed[id] || (named ? named.name : id.charAt(0).toUpperCase() + id.slice(1).replace(/-/g, ' '));
+  }
   /* A square glyph the size of Shore's own marks, centred in the w x h box. */
   function maskIcon(src, w, h, size) {
     var side = Math.min(w, h, Math.round(size * 1.1));
     return '<span class="mark mono-icon" style="width:' + w + 'px;height:' + h + 'px"><span class="mk" style="left:' + Math.round((w - side) / 2) + 'px;top:' + Math.round((h - side) / 2) + 'px;width:' + side + 'px;height:' + side + 'px;-webkit-mask-image:url(' + src + ');mask-image:url(' + src + ')"></span></span>';
   }
   function appMark(a, w, h, size) {
-    var pkg = a.appId && PKG_RE.test(a.appId) && !a.input ? a.appId : '', mono = S.c.istyle === 'mono' && maskSupport;
+    var pkg = a.appId && PKG_RE.test(a.appId) && !a.input ? a.appId : '', mono = S.c.istyle === 'mono' && maskSupport, own = S.c.iconFor && S.c.iconFor[a.id];
+    if (own && own.indexOf('mark:') === 0 && shoreMarks().indexOf(own.slice(5)) >= 0 && (maskSupport || S.c.bg !== 'light')) return markHtml(own.slice(5), w, h, size);
+    if (own === 'own' && pkg && ANDROID) return nativeMark(a, a.icon || '/appicon/' + pkg + '.png', w, h, size, true);
+    if (own === 'mono' && pkg && ANDROID && maskSupport) return maskIcon('/appicon/mono/_/' + pkg + '.png', w, h, size);
     if (pkg && ANDROID) {
       if (packCovers(a)) return mono ? maskIcon('/appicon/mono/' + S.c.ipack + '/' + pkg + '.png', w, h, size) : nativeMark(a, '/appicon/pack/' + S.c.ipack + '/' + pkg + '.png', w, h, size, true);
       if (S.c.istyle === 'original') return nativeMark(a, a.icon || '/appicon/' + pkg + '.png', w, h, size, true);
@@ -460,6 +470,13 @@
   }
   /* Favourite and hidden wallpapers: ids only, unique, capped. */
   var PKG_RE = /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$/;
+  /* Per-app icon choices: app id -> 'own', 'mono' or 'mark:<Shore mark>'; apps not listed follow the icon style. */
+  var ICON_CHOICE = /^(own|mono|mark:[a-z0-9-]{1,40})$/;
+  function iconMap(v) {
+    var out = {}, n = 0;
+    if (v && typeof v === 'object') Object.keys(v).forEach(function (id) { if (n < 300 && safeId(id) && ICON_CHOICE.test(String(v[id]))) { out[id] = String(v[id]); n++; } });
+    return out;
+  }
   function idList(v) { var out = []; (Array.isArray(v) ? v : []).forEach(function (id) { if (safeId(id) && out.indexOf(id) < 0 && out.length < 300) out.push(id); }); return out; }
   function clean(saved) {
     var s = saved && typeof saved === 'object' ? saved : {}, modern = s.look && typeof s.look === 'object' ? s.look : s;
@@ -490,7 +507,7 @@
       home: h, recent: recent, lastApp: h.indexOf(s.lastApp) >= 0 ? s.lastApp : h[0],
       mode: pick(s.mode, MODES.map(function (m) { return m.id; }), 'fixed'),
       source: sourceCsv(ONLINE ? ONLINE_INFO.source : 'builtin'),
-      fav: idList(s.fav), hide: idList(s.hide), hidein: idList(s.hidein),
+      fav: idList(s.fav), hide: idList(s.hide), hidein: idList(s.hidein), iconFor: iconMap(s.iconFor),
       ipack: PKG_RE.test(String(modern.ipack || '')) ? String(modern.ipack) : ''
     };
     Object.keys(MORE_LOOK).forEach(function (k) { out[k] = pick(modern[k], LOOK_VALUES[k], MORE_LOOK[k]); });
@@ -556,7 +573,7 @@
   }
   function clearSession() { S.undo = []; S.removedAt = {}; S.note = null; S.err = null; }
   function begin() { S.note = null; }
-  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; c.source = S.c.source; c.fav = S.c.fav.slice(); c.hide = S.c.hide.slice(); c.hidein = S.c.hidein.slice(); return c; }
+  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; c.source = S.c.source; c.fav = S.c.fav.slice(); c.hide = S.c.hide.slice(); c.hidein = S.c.hidein.slice(); c.iconFor = iconMap(S.c.iconFor); return c; }
   function snap() { return { home: S.c.home.slice(), recent: S.c.recent.slice() }; }
   function pushRecent(list, id) { return [id].concat(without(list, id)).slice(0, 5); }
   function write(c, label) {
@@ -854,7 +871,7 @@
     if (!a || top().id !== 'home') return;
     if (a.input) { push({ id: 'message', content: { title: a.name, line: 'Quick actions', note: '', actions: [['quick.open:' + id, 'Switch'], ['quick.hidein:' + id, 'Hide from Home']] }, f: { b: 0 } }); render(); return; }
     push({ id: 'message', content: { title: a.name, line: 'Quick actions', note: '',
-      actions: [['quick.open:' + id, 'Open'], ['quick.move:' + id, 'Move'], ['quick.remove:' + id, 'Remove']].concat(FrameDevice.appInfo ? [['quick.info:' + id, 'App info']] : []) }, f: { b: 0 } });
+      actions: [['quick.open:' + id, 'Open'], ['quick.move:' + id, 'Move'], ['quick.icon:' + id, 'Icon'], ['quick.remove:' + id, 'Remove']].concat(FrameDevice.appInfo ? [['quick.info:' + id, 'App info']] : []) }, f: { b: 0 } });
     render();
   }
   function quickAction(a) {
@@ -863,6 +880,7 @@
     if (kind === 'open') { launch(id); return; }
     if (kind === 'hidein') { toggleInput(id); return; }
     if (kind === 'info') { perform('App info', function (done) { FrameDevice.appInfo(app(id).appId, done); }); return; }
+    if (kind === 'icon') { openAppIcon(id, true); return; }
     // Move and Remove use Apps on Home, which already has undo, so nothing here is final.
     S.sel = id; openEditor('home'); t = top(); t.f.zone = 'home'; t.f.i = Math.max(0, S.c.home.indexOf(id));
     if (kind === 'move') { t.f.part = 'name'; t.lifted = { id: id, from: t.f.i, order: S.c.home.slice(), snap: snap() }; }
@@ -873,6 +891,29 @@
     var axis = { background: 'bg', layout: 'layout', typography: 'tweight', fonts: 'font', focus: 'focus', clock: 'cformat', display: 'night', screensaver: 'saver', weather: 'wunit', news: 'nsrc', saverlook: 'svlay', musicview: 'plyric', music: 'npdim', icons: 'istyle', inputs: 'inputs' }[group];
     var action = S.detailFocus[group] || (axis ? 'choice.' + axis + '.' + S.c[axis] : group === 'rotation' ? 'rotation.' + S.c.mode : PARENT[group] === 'online' || group === 'online' ? 'online.' + sourceList()[0] : group === 'updates' ? updateSections()[0].items[0].action : group === 'health' ? (healthItems()[0] || {}).action : 'samsung.home');
     push({ id: 'appearance', group: group, f: { action: action } });
+  }
+  /* Per-app icon: from Quick actions on Home, or Settings › App icons › Per app. */
+  function openAppIcon(id, fromHome) {
+    var cur = S.c.iconFor[id];
+    openAppearance('appicon');
+    top().app = id; top().fromHome = !!fromHome; top().f.action = 'iconset.' + (cur || 'auto');
+    render();
+  }
+  function setAppIcon(id, value) {
+    var c = next(S.c.home.slice(), S.c.recent.slice());
+    if (value === 'auto') delete c.iconFor[id]; else if (ICON_CHOICE.test(value)) c.iconFor[id] = value; else return;
+    if (write(c, 'App icon')) render();
+  }
+  function iconChoiceName(id) {
+    var cur = S.c.iconFor[id];
+    return !cur ? 'Automatic' : cur === 'own' ? 'App’s own icon' : cur === 'mono' ? 'One colour' : markName(cur.slice(5));
+  }
+  /* The mark the icon style would draw, for the Automatic row. */
+  function autoMark(a, w, h, size) {
+    var saved = S.c.iconFor[a.id], html;
+    delete S.c.iconFor[a.id]; html = appMark(a, w, h, size);
+    if (saved) S.c.iconFor[a.id] = saved;
+    return html;
   }
   function openMessage(key) { push({ id: 'message', msg: key, f: { b: 0 } }); }
   function openApps() {
@@ -1226,9 +1267,9 @@
   function closeEditor() { clearSession(); pop(); }
 
   /* ---------- Settings, Layout and messages ---------- */
-  var PARENT = { musicview: 'music', health: 'samsung', updates: 'samsung', saverlook: 'screensaver', rotation: 'background', online: 'background', unsplash: 'online', animated: 'online', fonts: 'typography', icons: 'layout', iconpack: 'icons', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
-  function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : DETAIL_NAMES[group]; }
-  function parentName(t) { return PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
+  var PARENT = { musicview: 'music', health: 'samsung', updates: 'samsung', saverlook: 'screensaver', rotation: 'background', online: 'background', unsplash: 'online', animated: 'online', fonts: 'typography', icons: 'layout', iconpack: 'icons', iconapps: 'icons', appicon: 'iconapps', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
+  function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : group === 'appicon' && t && app(t.app) ? app(t.app).name : DETAIL_NAMES[group]; }
+  function parentName(t) { return t.group === 'appicon' && t.fromHome ? 'Home' : PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
   /* ---------- Wallpaper sources: any mix of Shore's own, My photos and online sources ----------
      S.c.source is a comma list in SOURCES order. Only photos from these sources rotate. */
   function sourceCsv(value) {
@@ -1306,7 +1347,7 @@
     else if (id === 'phone') openPhone();
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { musicview: 'Music view', health: 'Setup and health', updates: 'Shore updates', fonts: 'Font', clock: 'Clock', display: 'Night', online: 'Wallpaper sources', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Wallpaper', layout: 'Home screen', typography: 'Text', icons: 'App icons', iconpack: 'Icon pack', inputs: 'Inputs', focus: 'Style', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', weather: 'Weather', music: 'Music', news: 'News', screensaver: 'Screensaver', saverlook: 'Arrangement and clock' };
+  var DETAIL_NAMES = { musicview: 'Music view', health: 'Setup and health', updates: 'Shore updates', fonts: 'Font', clock: 'Clock', display: 'Night', online: 'Wallpaper sources', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Wallpaper', layout: 'Home screen', typography: 'Text', icons: 'App icons', iconpack: 'Icon pack', iconapps: 'Per-app icons', appicon: 'Icon', inputs: 'Inputs', focus: 'Style', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', weather: 'Weather', music: 'Music', news: 'News', screensaver: 'Screensaver', saverlook: 'Arrangement and clock' };
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
@@ -1814,7 +1855,21 @@
       { id: 'istyle', title: 'Icon style', horizontal: true, items: options('istyle', ['shore', 'original', 'mono'], S.c.apps === 'text'),
         reason: S.c.apps === 'text' ? 'Choose Icons or Both in App display to show icons.' : S.c.istyle === 'shore' ? 'Shore’s own single-colour logos where it has one, the app’s icon otherwise.' : S.c.istyle === 'mono' ? 'Every icon in one colour.' : '' },
       { id: 'isize', title: 'Icon size', horizontal: true, items: options('isize', ['small', 'default', 'large'], S.c.layout !== 'dock' || S.c.apps === 'text') }]
-      .concat(ICON_PACKS ? [{ id: 'ipack', title: 'Icon pack', items: [{ action: 'open.iconpack', label: packName(S.c.ipack), description: iconPacks().length ? '' : 'None installed', pair: true }] }] : []);
+      .concat(ICON_PACKS ? [{ id: 'ipack', title: 'Icon pack', items: [{ action: 'open.iconpack', label: packName(S.c.ipack), description: iconPacks().length ? '' : 'None installed', pair: true }] }] : [])
+      .concat([{ id: 'iconapps', title: '', items: [{ action: 'open.iconapps', label: 'Per app', description: Object.keys(S.c.iconFor).length ? Object.keys(S.c.iconFor).length + (Object.keys(S.c.iconFor).length === 1 ? ' app chosen' : ' apps chosen') : 'Automatic', pair: true }] }]);
+    if (t.group === 'iconapps') return [{ id: 'iconapps', title: '', items: S.c.home.filter(function (id) { return app(id) && !app(id).input; }).map(function (id) {
+      return { action: 'iconapp.' + id, label: app(id).name, description: iconChoiceName(id), glyph: appMark(app(id), 56, 40, 34), pair: true };
+    }), reason: 'Long OK on an app on Home opens this too.' }];
+    if (t.group === 'appicon') {
+      var ia = app(t.app), ipkg = ia && ia.appId && PKG_RE.test(ia.appId) && ANDROID ? ia.appId : '', icur = ia ? S.c.iconFor[ia.id] || 'auto' : 'auto';
+      if (!ia) return [];
+      return [{ id: 'iconbase', title: '', items: [{ action: 'iconset.auto', label: 'Automatic', description: 'Follows the icon style', tick: true, applied: icur === 'auto', glyph: autoMark(ia, 56, 40, 34) }]
+        .concat(ipkg ? [{ action: 'iconset.own', label: 'App’s own icon', tick: true, applied: icur === 'own', glyph: nativeMark(ia, ia.icon || '/appicon/' + ipkg + '.png', 56, 40, 34, true) }] : [])
+        .concat(ipkg && maskSupport ? [{ action: 'iconset.mono', label: 'One colour', tick: true, applied: icur === 'mono', glyph: maskIcon('/appicon/mono/_/' + ipkg + '.png', 56, 40, 34) }] : []) },
+        { id: 'iconmarks', title: 'Shore icons', items: shoreMarks().map(function (m) {
+          return { action: 'iconset.mark:' + m, label: markName(m), tick: true, applied: icur === 'mark:' + m, glyph: markHtml(m, 56, 40, 34) };
+        }) }];
+    }
     if (t.group === 'iconpack') return [{ id: 'packs', title: '', items: [{ action: 'pack.', label: 'None', tick: true, applied: !S.c.ipack }]
       .concat(iconPacks().map(function (p) { return { action: 'pack.' + p.id, label: p.name, tick: true, applied: S.c.ipack === p.id }; })),
       reason: iconPacks().length ? 'Apps the pack doesn’t draw keep the icon style you chose.' : 'Install an icon pack, for example one made for Projectivy Launcher, and it appears here.' }];
@@ -2024,6 +2079,9 @@
     else if (item.action === 'background.online') openAppearance('online');
     else if (item.action === 'typography.fonts') openAppearance('fonts');
     else if (item.action === 'open.icons') openAppearance('icons');
+    else if (item.action === 'open.iconapps') openAppearance('iconapps');
+    else if (item.action.indexOf('iconapp.') === 0) openAppIcon(item.action.slice(8), false);
+    else if (item.action.indexOf('iconset.') === 0) setAppIcon(t.app, item.action.slice(8));
     else if (item.action === 'open.iconpack') { packList = null; openAppearance('iconpack'); }
     else if (item.action.indexOf('pack.') === 0) applyPack(item.action.slice(5));
     else if (item.action.indexOf('input.toggle.') === 0) toggleInput(item.action.slice(13));
@@ -2838,6 +2896,7 @@
           if (swatch || item.thumbnail) body += item.value === 'light' || item.value === 'dark'
             ? '<span class="setting-swatch swatch-' + item.value + '" aria-hidden="true"></span>'
             : '<img class="setting-swatch" src="' + WP + S.c.wall + '-thumb.jpg" alt="">';
+          if (item.glyph) body += '<span class="setting-glyph" aria-hidden="true">' + item.glyph + '</span>';
           body += '<span class="setting-copy"><span class="setting-name">' + esc(item.label) + '</span>'
             + (item.description ? '<span class="setting-description">' + esc(item.description) + '</span>' : '') + '</span>';
           if (!item.axis && !item.tick) body += icon('right', 'setting-forward');
@@ -2851,7 +2910,7 @@
         + command({ action: 'settings.retry', label: 'Try again' }, '<span>Try again</span>', 'setting-retry');
     }
     setHTML(appearanceStatus, status);
-    hint = selected.disabled ? '' : remoteHint(selected) || (selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis === 'source' ? (selected.applied ? 'Remove from rotation' : 'Add to rotation') : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.action === 'phone.toggle' ? (S.phone.enabled ? 'Turn off' : 'Turn on') : selected.action === 'phone.forget' ? 'Phones scan a new code' : selected.action === 'phone.clear' ? 'Remove all my photos' : selected.action === 'nowplaying.access' ? 'Open Notification access' : /^open\./.test(selected.action) ? 'Open selected group' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : selected.action === 'saver.start' ? 'Start the screensaver now' : selected.action === 'health.remote' ? 'Open Accessibility settings' : selected.action === 'health.phone' ? 'Open Phone settings' : selected.action === 'update.install' ? 'Download and install' : selected.action === 'update.check' ? 'Check now' : selected.action === 'update.auto' ? (S.update.auto ? 'Turn off' : 'Turn on') : selected.action === 'update.wait' ? 'Please wait' : 'Open on the TV');
+    hint = selected.disabled ? '' : remoteHint(selected) || (selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis === 'source' ? (selected.applied ? 'Remove from rotation' : 'Add to rotation') : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.action === 'phone.toggle' ? (S.phone.enabled ? 'Turn off' : 'Turn on') : selected.action === 'phone.forget' ? 'Phones scan a new code' : selected.action === 'phone.clear' ? 'Remove all my photos' : selected.action === 'nowplaying.access' ? 'Open Notification access' : /^open\./.test(selected.action) ? 'Open selected group' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : selected.action === 'saver.start' ? 'Start the screensaver now' : selected.action === 'health.remote' ? 'Open Accessibility settings' : selected.action === 'health.phone' ? 'Open Phone settings' : selected.action === 'update.install' ? 'Download and install' : selected.action === 'update.check' ? 'Check now' : selected.action === 'update.auto' ? (S.update.auto ? 'Turn off' : 'Turn on') : selected.action === 'update.wait' ? 'Please wait' : selected.action.indexOf('iconapp.') === 0 ? 'Choose an icon' : selected.action.indexOf('iconset.') === 0 ? 'Use this icon' : 'Open on the TV');
     setHTML(appearanceDesc, hint ? '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>' : '');
     fitRows();
   }

@@ -1,5 +1,6 @@
 /* Shore interface text in one language, loaded by i18n.js only when the TV uses it. */
 CleanFrameI18n.load("nl", {
+      "Icon": "Pictogram", "Automatic": "Automatisch", "Follows the icon style": "Volgt de pictogramstijl", "App’s own icon": "Eigen pictogram van de app", "One colour": "Eén kleur", "Shore icons": "Shore-pictogrammen", "Per app": "Per app", "Per-app icons": "Pictogrammen per app", "Long OK on an app on Home opens this too.": "Lang OK op een app op Home opent dit ook.", "Choose an icon": "Kies een pictogram", "Use this icon": "Dit pictogram gebruiken",
       "The pulse follows the TV’s sound, never the microphone. Android still calls this permission recording audio.": "De puls volgt het geluid van de tv, nooit de microfoon. Android noemt deze toestemming toch audio opnemen.", "Lyrics come from LRCLIB. Only the artist, title, album and length are sent.": "Songteksten komen van LRCLIB. Alleen artiest, titel, album en lengte worden verstuurd.",
       "Word by word": "Woord voor woord", "Beat pulse": "Beatpuls", "Music view": "Muziekweergave",
       "Lyrics": "Songtekst", "Hide lyrics": "Songtekst verbergen", "Show lyrics": "Songtekst tonen", "Looking for lyrics…": "Songtekst zoeken…", "Instrumental": "Instrumentaal", "No lyrics for this song": "Geen songtekst voor dit nummer", "Lyrics from LRCLIB": "Songtekst van LRCLIB", "Left and right jump 10 seconds": "Links en rechts springen 10 seconden", "Nothing is playing": "Er speelt niets",
@@ -96,6 +97,7 @@ CleanFrameI18n.load("nl", {
       "While music plays": "Terwijl er muziek speelt", "Album art as background": "Albumhoes als achtergrond", "Find artist pictures online": "Artiestfoto’s online zoeken", "Uses only the cover the music app provides.": "Gebruikt alleen de hoes van de muziekapp.", "Artist pictures": "Artiestfoto’s"
     },
 [
+      [/^(\d+) apps? chosen$/, '$1 gekozen'], 
       [/^Playing on (.+)$/, 'Speelt in $1'], [/^Paused · (.+)$/, 'Gepauzeerd · $1'],
       [/^(\d+) hr (\d+) min left$/, 'Nog $1 u $2 min'], [/^(\d+) min left$/, 'Nog $1 min'],
       [/^(.+) is on$/, '$1 staat aan'], [/^(.+) is a favourite\.$/, '$1 is een favoriet.'], [/^(.+) is hidden\.$/, '$1 is verborgen.'], [/^(\d+) things to check$/, '$1 punten om te controleren'], [/^On · (.+)$/, 'Aan · $1'], [/^Shore (.+) is out$/, 'Shore $1 is uit'], [/^Downloading Shore (.+)$/, 'Shore $1 downloaden'], [/^Install Shore (.+)$/, 'Shore $1 installeren'], [/^Update available: (.+)$/, 'Update beschikbaar: $1'], [/^Downloading (\d+)%$/, 'Downloaden: $1%'], [/^Version (.+)$/, 'Versie $1'], [/^Shore (.+) is the latest version$/, 'Shore $1 is de nieuwste versie'], [/^You have Shore (.+)$/, 'Je hebt Shore $1'],

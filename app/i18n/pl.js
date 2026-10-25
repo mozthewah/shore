@@ -1,5 +1,6 @@
 /* Shore interface text in one language, loaded by i18n.js only when the TV uses it. */
 CleanFrameI18n.load("pl", {
+      "Icon": "Ikona", "Automatic": "Automatycznie", "Follows the icon style": "Zgodnie ze stylem ikon", "App’s own icon": "Własna ikona aplikacji", "One colour": "Jeden kolor", "Shore icons": "Ikony Shore", "Per app": "Dla każdej aplikacji", "Per-app icons": "Ikony aplikacji", "Long OK on an app on Home opens this too.": "Długie OK na aplikacji na ekranie głównym też to otwiera.", "Choose an icon": "Wybierz ikonę", "Use this icon": "Użyj tej ikony",
       "The pulse follows the TV’s sound, never the microphone. Android still calls this permission recording audio.": "Puls podąża za dźwiękiem telewizora, nigdy za mikrofonem. Android i tak nazywa to uprawnienie nagrywaniem dźwięku.", "Lyrics come from LRCLIB. Only the artist, title, album and length are sent.": "Teksty pochodzą z LRCLIB. Wysyłane są tylko wykonawca, tytuł, album i długość.",
       "Word by word": "Słowo po słowie", "Beat pulse": "Puls rytmu", "Music view": "Widok muzyki",
       "Lyrics": "Tekst", "Hide lyrics": "Ukryj tekst", "Show lyrics": "Pokaż tekst", "Looking for lyrics…": "Szukam tekstu…", "Instrumental": "Instrumentalny", "No lyrics for this song": "Brak tekstu dla tego utworu", "Lyrics from LRCLIB": "Tekst z LRCLIB", "Left and right jump 10 seconds": "W lewo i w prawo przewija o 10 sekund", "Nothing is playing": "Nic nie gra",
@@ -97,6 +98,7 @@ CleanFrameI18n.load("pl", {
       "While music plays": "Gdy gra muzyka", "Album art as background": "Okładka jako tło", "Find artist pictures online": "Szukaj zdjęć wykonawców online", "Uses only the cover the music app provides.": "Używa tylko okładki z aplikacji muzycznej.", "Artist pictures": "Zdjęcia wykonawców"
     },
 [
+      [/^(\d+) apps? chosen$/, 'Wybrano: $1'], 
       [/^Playing on (.+)$/, 'Odtwarzane w $1'], [/^Paused · (.+)$/, 'Wstrzymane · $1'],
       [/^(\d+) hr (\d+) min left$/, 'Zostało $1 godz. $2 min'], [/^(\d+) min left$/, 'Zostało $1 min'],
       [/^(.+) is on$/, '$1 jest włączony'], [/^(.+) is a favourite\.$/, '$1 jest w ulubionych.'], [/^(.+) is hidden\.$/, '$1 jest ukryte.'], [/^(\d+) things to check$/, '$1 rzeczy do sprawdzenia'], [/^On · (.+)$/, 'Włączony · $1'], [/^Shore (.+) is out$/, 'Shore $1 jest dostępny'], [/^Downloading Shore (.+)$/, 'Pobieranie Shore $1'], [/^Install Shore (.+)$/, 'Zainstaluj Shore $1'], [/^Update available: (.+)$/, 'Dostępna aktualizacja: $1'], [/^Downloading (\d+)%$/, 'Pobieranie: $1%'], [/^Version (.+)$/, 'Wersja $1'], [/^Shore (.+) is the latest version$/, 'Shore $1 to najnowsza wersja'], [/^You have Shore (.+)$/, 'Masz Shore $1'],

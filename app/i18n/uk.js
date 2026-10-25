@@ -1,5 +1,6 @@
 /* Shore interface text in one language, loaded by i18n.js only when the TV uses it. */
 CleanFrameI18n.load("uk", {
+      "Icon": "Значок", "Automatic": "Автоматично", "Follows the icon style": "За стилем значків", "App’s own icon": "Власний значок застосунку", "One colour": "Один колір", "Shore icons": "Значки Shore", "Per app": "Для кожного застосунку", "Per-app icons": "Значки застосунків", "Long OK on an app on Home opens this too.": "Довге натискання OK на застосунку на головному екрані теж відкриває це.", "Choose an icon": "Вибрати значок", "Use this icon": "Використати цей значок",
       'The pulse follows the TV’s sound, never the microphone. Android still calls this permission recording audio.': 'Пульс стежить за звуком телевізора, ніколи не за мікрофоном. Android однаково називає цей дозвіл записом аудіо.', 'Lyrics come from LRCLIB. Only the artist, title, album and length are sent.': 'Тексти пісень беруться з LRCLIB. Надсилаються лише виконавець, назва, альбом і тривалість.',
       'Word by word': 'Слово за словом', 'Beat pulse': 'Пульс ритму', 'Music view': 'Музичний екран',
       'Lyrics': 'Текст пісні', 'Hide lyrics': 'Сховати текст', 'Show lyrics': 'Показати текст', 'Looking for lyrics…': 'Шукаю текст…', 'Instrumental': 'Інструментал', 'No lyrics for this song': 'Немає тексту для цієї пісні', 'Lyrics from LRCLIB': 'Текст із LRCLIB', 'Left and right jump 10 seconds': 'Ліворуч і праворуч — перехід на 10 секунд', 'Nothing is playing': 'Нічого не грає',
@@ -391,6 +392,7 @@ CleanFrameI18n.load("uk", {
       'Artist pictures': 'Фото виконавців'
     },
 [
+      [/^(\d+) apps? chosen$/, 'Вибрано: $1'], 
       [/^Playing on (.+)$/, 'Грає в $1'], [/^Paused · (.+)$/, 'Пауза · $1'],
       [/^(\d+) hr (\d+) min left$/, 'Залишилось $1 год $2 хв'], [/^(\d+) min left$/, 'Залишилось $1 хв'],
       [/^(.+) is on$/, '$1 увімкнено'], [/^(.+) is a favourite\.$/, '$1 — в улюблених.'], [/^(.+) is hidden\.$/, '$1 — приховано.'], [/^((?:\d*[02-9])?1) things to check$/, '$1 пункт для перевірки'], [/^((?:\d*[02-9])?[234]) things to check$/, '$1 пункти для перевірки'], [/^(\d+) things to check$/, '$1 пунктів для перевірки'], [/^On · (.+)$/, 'Увімк. · $1'], [/^Shore (.+) is out$/, 'Вийшов Shore $1'], [/^Downloading Shore (.+)$/, 'Завантаження Shore $1'], [/^Install Shore (.+)$/, 'Установити Shore $1'], [/^Update available: (.+)$/, 'Доступне оновлення: $1'], [/^Downloading (\d+)%$/, 'Завантаження: $1%'], [/^Version (.+)$/, 'Версія $1'], [/^Shore (.+) is the latest version$/, 'Shore $1 — найновіша версія'], [/^You have Shore (.+)$/, 'Установлено Shore $1'],

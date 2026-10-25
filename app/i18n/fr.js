@@ -1,5 +1,6 @@
 /* Shore interface text in one language, loaded by i18n.js only when the TV uses it. */
 CleanFrameI18n.load("fr", {
+      "Icon": "Icône", "Automatic": "Automatique", "Follows the icon style": "Suit le style d’icône", "App’s own icon": "Icône de l’app", "One colour": "Une couleur", "Shore icons": "Icônes Shore", "Per app": "Par app", "Per-app icons": "Icônes par app", "Long OK on an app on Home opens this too.": "Un appui long sur OK sur une app de l’accueil ouvre aussi ceci.", "Choose an icon": "Choisir une icône", "Use this icon": "Utiliser cette icône",
       "The pulse follows the TV’s sound, never the microphone. Android still calls this permission recording audio.": "La pulsation suit le son du téléviseur, jamais le micro. Android appelle quand même cette autorisation enregistrement audio.", "Lyrics come from LRCLIB. Only the artist, title, album and length are sent.": "Les paroles viennent de LRCLIB. Seuls l’artiste, le titre, l’album et la durée sont envoyés.",
       "Word by word": "Mot à mot", "Beat pulse": "Pulsation", "Music view": "Vue musique",
       "Lyrics": "Paroles", "Hide lyrics": "Masquer les paroles", "Show lyrics": "Afficher les paroles", "Looking for lyrics…": "Recherche des paroles…", "Instrumental": "Instrumental", "No lyrics for this song": "Pas de paroles pour ce titre", "Lyrics from LRCLIB": "Paroles via LRCLIB", "Left and right jump 10 seconds": "Gauche et droite sautent de 10 secondes", "Nothing is playing": "Rien en lecture",
@@ -100,6 +101,7 @@ CleanFrameI18n.load("fr", {
       "While music plays": "Pendant la musique", "Album art as background": "Pochette en fond", "Find artist pictures online": "Chercher des photos d’artistes en ligne", "Uses only the cover the music app provides.": "Utilise seulement la pochette fournie par l’app musicale.", "Artist pictures": "Photos d’artistes"
     },
 [
+      [/^1 app chosen$/, '1 choisie'], [/^(\d+) apps chosen$/, '$1 choisies'], 
       [/^Playing on (.+)$/, 'Lecture sur $1'], [/^Paused · (.+)$/, 'En pause · $1'],
       [/^(\d+) hr (\d+) min left$/, '$1 h $2 min restantes'], [/^(\d+) min left$/, '$1 min restantes'],
       [/^(.+) is on$/, '$1 est allumé'], [/^(.+) is a favourite\.$/, '$1 est un favori.'], [/^(.+) is hidden\.$/, '$1 est masquée.'], [/^(\d+) things to check$/, '$1 points à vérifier'], [/^On · (.+)$/, 'Activé · $1'], [/^Shore (.+) is out$/, 'Shore $1 est disponible'], [/^Downloading Shore (.+)$/, 'Téléchargement de Shore $1'], [/^Install Shore (.+)$/, 'Installer Shore $1'], [/^Update available: (.+)$/, 'Mise à jour disponible : $1'], [/^Downloading (\d+)%$/, 'Téléchargement : $1 %'], [/^Version (.+)$/, 'Version $1'], [/^Shore (.+) is the latest version$/, 'Shore $1 est à jour'], [/^You have Shore (.+)$/, 'Installée : Shore $1'],
