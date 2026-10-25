@@ -79,6 +79,14 @@ Launcher wallpaper is separate from native Art Mode. Runtime photos, materials a
 
 The native Home operation and startup configuration from 19 October remain separate from this app update. Home from Netflix was confirmed for that configuration; power-on after Netflix remains provisional. Streaming apps retain their own Back navigation. Netflix did not exit on repeated Back in the observed test, so there was no app-exit destination to verify. No global Back interception or key-filter hook was installed. See [TV status](tv-status.md) for device evidence; this behaviour specification is not an installation or visual-verification record for 0.6.0.
 
+## Add-ons and Home Assistant
+
+Settings › Add-ons appears only when this TV can run an add-on; today that means Home Assistant in the Android shell. Each add-on has one switch, off by default. While it is off it adds nothing to Home and does no work. It starts only after Home has painted.
+
+With Home Assistant on and connected, Home gains a Smart home control after Settings, and the line under the clock gains the indoor temperature and humidity (from the first chosen room with a reading, in the weather's unit). The server address and long-lived access token are entered in the phone companion's Home Assistant card; the TV never shows or stores the token in its preferences. Settings › Add-ons › Home Assistant shows the connection, the rooms to show (Home Assistant's areas; every room shown by default, and devices hidden in Home Assistant stay hidden) and Disconnect, which asks first.
+
+The Smart home control opens a panel. Rooms are headed rows of chips: the device name and its state. Lights, switches and fans switch on OK, locks lock or unlock, and the chip changes at once while Home Assistant confirms within a second. Other devices only show their state, and OK says so. Cameras sit in a column on the right: Right from the end of a row reaches them, Left returns to the nearest row, and Up from the first row or the first camera reaches Settings. Focusing a camera whose still is over a minute old takes one short snapshot. OK opens the full-screen live view, which keeps its single focus on a Smart home button; OK or Back closes it and ends the stream. Back closes the panel onto its control. Pressing Home, or leaving Shore, ends any camera stream.
+
 ## Clock and rendering
 
 Both layouts show the TV's local time in 12-hour format, without AM/PM or seconds. It updates at the minute boundary and on return to the launcher. No date or clock panel is shown.
