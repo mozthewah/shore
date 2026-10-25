@@ -10,6 +10,8 @@ While music plays, it opens the song full screen with synced lyrics that light u
 
 [Website](https://taynotfound.github.io/shore/) · [Install](#install) · [Features](#features) · [Music view](#music-view) · [Phone companion](#phone-companion) · [Wallpapers](#online-and-animated-wallpapers) · [Top Shelf](#top-shelf) · [Build](#build-from-source)
 
+## For Faster response times, join my [Discord](https://discord.gg/z6C4Mj9VPK)
+
 ![Shore on a TCL 55C6KS](docs/images/tcl/home.jpg)
 
 </div>
