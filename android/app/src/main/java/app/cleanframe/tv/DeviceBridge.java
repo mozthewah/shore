@@ -121,6 +121,9 @@ final class DeviceBridge {
     @JavascriptInterface
     public String phoneInfo() { return phone == null ? "{}" : phone.info(); }
 
+    @JavascriptInterface
+    public String phoneQr() { return phone == null ? "" : phone.qrCode(); }
+
     /** Switches the companion server on or off (remembered across restarts). */
     @JavascriptInterface
     public void phoneEnable(boolean on) { if (phone != null) phone.setEnabled(on); }
@@ -188,6 +191,14 @@ final class DeviceBridge {
     }
 
     /** Installed icon packs: JSON array of {id, name}. */
+    /** Saves the Home wallpaper the native start screen shows next time (a JPEG data URL from the page). */
+    @JavascriptInterface
+    public void backdrop(String dataUrl) { if (activity != null) { if (dataUrl == null || dataUrl.isEmpty()) Backdrop.clear(context); else Backdrop.save(context, dataUrl); } }
+
+    /** The page has painted Home: the native start screen can go. */
+    @JavascriptInterface
+    public void pageReady() { if (activity instanceof MainActivity) activity.runOnUiThread(((MainActivity) activity)::hideCurtain); }
+
     /** Continue watching: {allowed, items}. */
     @JavascriptInterface
     public String watchNext() { return WatchNext.get(context).list(); }

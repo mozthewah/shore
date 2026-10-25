@@ -156,13 +156,15 @@
   var phoneListeners = [];
   window.CleanFramePhoneChanged = function (count) { phoneListeners.forEach(function (fn) { try { fn(count); } catch (e) { } }); };
   var phone = {
-    /* {enabled, url, qr, count, place, feed}: url and qr are empty while off or offline. */
+    /* {enabled, url, count, place, feed}: url is empty while off or offline. */
     info: function () {
       var r;
       try { r = JSON.parse(bridge.phoneInfo()); } catch (e) { r = {}; }
-      return { enabled: !!r.enabled, url: typeof r.url === 'string' ? r.url : '', qr: /^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(r.qr || '') ? r.qr : '',
+      return { enabled: !!r.enabled, url: typeof r.url === 'string' ? r.url : '',
         count: +r.count || 0, place: typeof r.place === 'string' ? r.place : '', feed: typeof r.feed === 'string' ? r.feed : '' };
     },
+    /* Pairing QR code as a PNG data URL, '' while off or offline. Made on demand: it is slow to encode. */
+    qr: function () { var q = ''; try { q = String(bridge.phoneQr() || ''); } catch (e) { } return /^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(q) ? q : ''; },
     enable: function (on) { try { bridge.phoneEnable(!!on); } catch (e) { } },
     /* Settings model for the companion's settings screens; the companion sends choices back through CleanFrameCompanionSet. */
     publish: function (json) { try { bridge.companionState(String(json)); } catch (e) { } },
@@ -250,8 +252,13 @@
     requested: function () { try { return !!bridge.saverRequested(); } catch (e) { return false; } },
     openSettings: function (done) { reply(ask('screensaverSettings'), done, 'Screensaver settings could not open.'); }
   };
+  /* Native start screen: the page saves the wallpaper it shows and says when Home has painted. */
+  var startup = {
+    backdrop: function (dataUrl) { try { bridge.backdrop(String(dataUrl || '')); } catch (e) { } },
+    ready: function () { try { bridge.pageReady(); } catch (e) { } }
+  };
   window.FrameDevice = {
-    platform: 'android', phone: phone, news: news, icons: icons, nowPlaying: nowPlaying, saver: saver, update: update,
+    platform: 'android', startup: startup, phone: phone, news: news, icons: icons, nowPlaying: nowPlaying, saver: saver, update: update,
     launch: launch, launchApp: launchApp, apps: apps, appInfo: appInfo,
     inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf, watchNext: watchNext,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */

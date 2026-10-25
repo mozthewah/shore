@@ -38,7 +38,11 @@ public class HomeButtonService extends AccessibilityService {
 
 
     @Override
-    protected void onServiceConnected() { connected = true; RemoteKeys.notifyChanged(); }
+    protected void onServiceConnected() {
+        connected = true; RemoteKeys.notifyChanged();
+        // Just after boot: open Shore now instead of waiting for Google TV Home to draw and then replacing it.
+        if (SystemClock.uptimeMillis() < 180000) openCleanFrame(false);
+    }
 
     @Override
     public boolean onUnbind(Intent intent) { connected = false; RemoteKeys.notifyChanged(); return super.onUnbind(intent); }

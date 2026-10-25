@@ -883,3 +883,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .has-lyrics .pl-toggle{width:88px;height:88px}
 .has-lyrics .pl-toggle .ico{width:40px;height:40px}
 .is-night .view-player .pl-back,.is-night .view-player .pl-art img{filter:brightness(var(--night))}
+
+/* Start: Home waits under the native backdrop (is-pre), then rises in while it fades (is-intro). */
+.is-pre .caption,.is-pre .utils,.is-pre .dock,.is-pre .input-row,.is-pre #home .ph-list{opacity:0}
+@keyframes intro-rise{from{opacity:0;transform:translate3d(0,18px,0) scale(.97)}to{opacity:1;transform:none}}
+@keyframes intro-fade{from{opacity:0}to{opacity:1}}
+.is-intro .caption{animation:intro-rise 620ms cubic-bezier(.2,.8,.2,1) both}
+.is-intro .utils{animation:intro-fade 520ms 120ms ease-out both}
+.is-intro .dock{animation:intro-fade 420ms 60ms ease-out both}
+.is-intro .dock .tile-content{animation:intro-rise 560ms cubic-bezier(.2,.8,.2,1) both;animation-delay:200ms}
+.is-intro .dock .tile:nth-child(3) .tile-content{animation-delay:240ms}.is-intro .dock .tile:nth-child(4) .tile-content{animation-delay:280ms}
+.is-intro .dock .tile:nth-child(5) .tile-content{animation-delay:320ms}.is-intro .dock .tile:nth-child(6) .tile-content{animation-delay:360ms}
+.is-intro .dock .tile:nth-child(7) .tile-content{animation-delay:400ms}.is-intro .dock .tile:nth-child(8) .tile-content{animation-delay:440ms}
+.is-intro .dock .tile:nth-child(n+9) .tile-content{animation-delay:480ms}

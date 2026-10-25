@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
     static final String EXTRA_SAVER = "app.cleanframe.tv.SAVER", EXTRA_HOME_KEY = "app.cleanframe.tv.HOME_KEY";
     private static volatile boolean saverRequest;
     private boolean loaded, resumed, homeRequest;
+    private android.widget.ImageView curtain;
 
     static boolean takeSaverRequest() { boolean r = saverRequest; saverRequest = false; return r; }
     private WebView web;
@@ -54,7 +55,20 @@ public class MainActivity extends Activity {
         web.setBackgroundColor(Color.BLACK);
         web.setFocusable(true);
         web.setFocusableInTouchMode(true);
-        setContentView(web);
+        // The last wallpaper over the WebView until the page paints (see Backdrop).
+        android.widget.FrameLayout root = new android.widget.FrameLayout(this);
+        root.setBackgroundColor(Color.BLACK);
+        root.addView(web);
+        android.graphics.Bitmap still = Backdrop.load(this);
+        if (still != null) {
+            curtain = new android.widget.ImageView(this);
+            curtain.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+            curtain.setImageBitmap(still);
+            curtain.setFocusable(false);
+            root.addView(curtain);
+            new Handler(Looper.getMainLooper()).postDelayed(this::hideCurtain, 30000); // never longer than this
+        }
+        setContentView(root);
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -172,6 +186,17 @@ public class MainActivity extends Activity {
             homeRequest = true;
             if (resumed) goHome();
         }
+    }
+
+    /** Fades the start screen out once the page shows Home. */
+    void hideCurtain() {
+        final android.widget.ImageView c = curtain;
+        if (c == null) return;
+        curtain = null;
+        c.animate().alpha(0f).setDuration(220).withEndAction(() -> {
+            if (c.getParent() instanceof android.view.ViewGroup) ((android.view.ViewGroup) c.getParent()).removeView(c);
+            c.setImageDrawable(null);
+        }).start();
     }
 
     private void goHome() {

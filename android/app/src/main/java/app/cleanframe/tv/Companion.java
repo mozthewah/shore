@@ -124,16 +124,23 @@ final class Companion {
     /** Thumbnail of the wallpaper on the TV, used as the companion's background. */
     void setWallpaper(String path) { if (path != null && path.matches("[A-Za-z0-9_-]+")) wallpaper = path; }
 
-    /** {enabled, url, qr, count, place}; url and qr are empty while off or without a network. */
+    /** {enabled, url, count, place, feed}; url is empty while off or without a network. */
     String info() {
         try {
             ServerSocket s = server;
             String address = s == null || s.isClosed() ? null : address();
             url = address == null ? "" : "http://" + address + ":" + s.getLocalPort(); // follows a new IP address
-            String link = url.isEmpty() ? "" : PAIR_URL + "#tv=" + java.net.URLEncoder.encode(url, "UTF-8") + "&k=" + key();
-            return new JSONObject().put("enabled", enabled()).put("url", url).put("qr", link.isEmpty() ? "" : qr(link))
+            return new JSONObject().put("enabled", enabled()).put("url", url)
                     .put("count", count()).put("place", place()).put("feed", feed()).toString();
         } catch (Exception e) { return "{}"; }
+    }
+
+    /** The pairing QR code as a PNG data URL, '' while off or offline. Only the Phone settings page asks. */
+    String qrCode() {
+        try {
+            info(); // refreshes url
+            return url.isEmpty() ? "" : qr(PAIR_URL + "#tv=" + java.net.URLEncoder.encode(url, "UTF-8") + "&k=" + key());
+        } catch (Exception e) { return ""; }
     }
 
     /** Removes every uploaded file. */
@@ -182,7 +189,17 @@ final class Companion {
         return null;
     }
 
-    private static String qr(String text) throws Exception {
+    private static String qrText = "", qrImage = "";
+
+    /** The QR code as a PNG data URL. Encoding and compressing take about half a second on the TV at start,
+     *  and info() is asked often (the weather reads the place from it), so the last one is kept. */
+    private static synchronized String qr(String text) throws Exception {
+        if (text.equals(qrText)) return qrImage;
+        qrImage = encodeQr(text); qrText = text;
+        return qrImage;
+    }
+
+    private static String encodeQr(String text) throws Exception {
         Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
         hints.put(EncodeHintType.MARGIN, 2);
         BitMatrix m = new QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, 0, 0, hints);

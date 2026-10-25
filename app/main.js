@@ -326,6 +326,14 @@
       }
     });
   }
+  /* Measuring a face forces a dozen layouts, about 100ms on the TV at start. The result only changes with the
+     face file or the WebView, so it is kept per face and browser; bump FACE_REV when a bundled face changes. */
+  var FACE_REV = 1;
+  function faceKey(id) { return 'shore.face.' + FACE_REV + '.' + id + '|' + navigator.userAgent; }
+  function savedFace(id) {
+    try { var m = JSON.parse(localStorage.getItem(faceKey(id))); return m && m.roles && m.digits && m.digits.length === 10 ? m : null; } catch (e) { return null; }
+  }
+  function saveFace(id, m) { try { localStorage.setItem(faceKey(id), JSON.stringify(m)); } catch (e) { } return m; }
   function loadFont(id, done) {
     var f = FONTS[id], weights = [f.display], timer, ended = false;
     if (fontMetrics[id]) { done(true); return; }
@@ -336,7 +344,7 @@
       if (ended) return;
       ended = true; clearTimeout(timer);
       if (ok) {
-        fontMetrics[id] = measureFace(id, faces); delete unavailableFonts[id];
+        fontMetrics[id] = savedFace(id) || saveFace(id, measureFace(id, faces)); delete unavailableFonts[id];
         if (id === 'manrope') fontsReady = true;
       } else if (reason !== 'timeout') unavailableFonts[id] = true;
       fontChoices(); done(ok, reason);
@@ -1651,7 +1659,7 @@
     var p = S.phone, n = p.count;
     var sections = [{ id: 'companion', title: '', items: [{ action: 'phone.toggle', label: 'Phone companion', description: 'Send photos and change settings from your phone', tick: true, applied: p.enabled }],
       reason: p.enabled ? '' : 'The companion runs on your home Wi-Fi only and needs this code to pair.' }];
-    if (p.enabled) sections.push({ id: 'phonecode', title: '', items: [], qr: p.qr || ' ', url: p.url,
+    if (p.enabled) sections.push({ id: 'phonecode', title: '', items: [], qr: (PHONE && PHONE.qr ? PHONE.qr() : p.qr) || ' ', url: p.url,
       qrNote: p.url ? 'Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:' : 'Connect the TV to your Wi-Fi to use the companion.' });
     sections.push({ id: 'phoneuse', title: 'Wallpaper', items: [choice('source', 'phone', flat || !n)]
       .concat(n ? [{ action: 'phone.clear', label: 'Remove all my photos', description: n === 1 ? '1 photo' : n + ' photos' }] : [])
@@ -2253,7 +2261,7 @@
     loadPack();
     var t = top(), sheet = !!V[t.id].sheet, shown = wall(S.shown ? S.shown.wall : S.c.wall), np = npArt(), palette = np ? null : ADAPTIVE_INK[shown.id];
     var adaptive = applyAdaptiveInk(palette), tr = np ? 'light' : adaptive && palette.tr ? palette.tr.pol : shown.ut.tr, br = np ? 'light' : adaptive && palette.br ? palette.br.pol : shown.ut.br;
-    stage.className = 'stage bg-' + S.c.bg + ' l-' + S.c.layout + ' v-' + S.variant + ' m-' + (materialApplies() ? S.c.material : 'none') + ' f-' + S.c.focus + ' a-' + S.c.apps + ' u-' + S.c.controls + ' g-' + S.geom + ' tone-' + (np ? 'dark' : shown.tone) + ' tr-' + tr + ' br-' + br + wallClasses(shown) + inkRungClasses(palette, adaptive) + ' at-' + t.id + ' font-' + homeFont() + (homeFont() !== 'manrope' ? ' font-custom' : '') + (S.fontSwitch ? ' is-font-switch' : '') + (adaptive ? ' has-adaptive-ink adaptive-tl-' + palette.tl.pol : '') + (!adaptive && !np && shown.clockInk ? ' has-clock-ink' : '') + (!adaptive && !np && shown.dockClockInk ? ' has-dock-clock-ink' : '') + (np ? ' has-np-art' : '') + (S.saver ? ' is-saver' : '') + (registeredMaterial(shown.id) ? ' registered-material' : '') + (sheet ? ' is-sheet' : '') + (S.reflow ? ' is-reflow' : '') + ' mo-' + (S.c.bg === 'photo' && !animated(shown) ? S.c.motion : 'still') + (syncPause() ? ' anim-paused' : '') + (nightActive() ? ' is-night nd-' + S.c.ndim : '') + (S.idleHidden && top().id === 'home' ? ' is-idle' : '') + weatherFx()
+    stage.className = 'stage bg-' + S.c.bg + ' l-' + S.c.layout + ' v-' + S.variant + ' m-' + (materialApplies() ? S.c.material : 'none') + ' f-' + S.c.focus + ' a-' + S.c.apps + ' u-' + S.c.controls + ' g-' + S.geom + ' tone-' + (np ? 'dark' : shown.tone) + ' tr-' + tr + ' br-' + br + wallClasses(shown) + inkRungClasses(palette, adaptive) + ' at-' + t.id + ' font-' + homeFont() + (homeFont() !== 'manrope' ? ' font-custom' : '') + (S.fontSwitch ? ' is-font-switch' : '') + (adaptive ? ' has-adaptive-ink adaptive-tl-' + palette.tl.pol : '') + (!adaptive && !np && shown.clockInk ? ' has-clock-ink' : '') + (!adaptive && !np && shown.dockClockInk ? ' has-dock-clock-ink' : '') + (np ? ' has-np-art' : '') + (S.saver ? ' is-saver' : '') + (S.intro ? ' is-' + S.intro : '') + (registeredMaterial(shown.id) ? ' registered-material' : '') + (sheet ? ' is-sheet' : '') + (S.reflow ? ' is-reflow' : '') + ' mo-' + (S.c.bg === 'photo' && !animated(shown) ? S.c.motion : 'still') + (syncPause() ? ' anim-paused' : '') + (nightActive() ? ' is-night nd-' + S.c.ndim : '') + (S.idleHidden && top().id === 'home' ? ' is-idle' : '') + weatherFx()
       + ' ls-' + (isShelf() ? 'shelf' : 'glass') + ' cs-' + S.c.csize + ' cw-' + S.c.cweight + ' tw-' + S.c.tweight + ' ts-' + S.c.tsize
       + ' cp-' + S.c.cpos + ' tint-' + S.c.tint + ' dg-' + S.c.dglass + ' is-' + S.c.isize + ' npd-' + S.c.npdim;
     syncStorm();
@@ -2307,14 +2315,34 @@
     return (S.c.cformat === '24' && h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + (S.c.csec === 'on' ? ':' + (sec < 10 ? '0' : '') + sec : '');
   }
   function dateText() {
-    try { return new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) { return new Date().toDateString(); }
+    var d = new Date();
+    return localeText('date.' + d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(), function () {
+      try { return d.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) { return d.toDateString(); }
+    });
+  }
+  /* Locale formatting loads ICU data on first use (about 200ms on the TV), so its results are kept: per
+     language for AM/PM, per day for the date line. */
+  var localeCache = null;
+  function localeText(key, make) {
+    var lang = navigator.language || '', value;
+    if (!localeCache) { try { localeCache = JSON.parse(localStorage.getItem('shore.locale')) || {}; } catch (e) { localeCache = {}; } }
+    if (localeCache.lang !== lang) localeCache = { lang: lang };
+    if (typeof localeCache[key] === 'string') return localeCache[key];
+    value = make();
+    if (/^date\./.test(key)) Object.keys(localeCache).forEach(function (k) { if (/^date\./.test(k)) delete localeCache[k]; });
+    localeCache[key] = value;
+    try { localStorage.setItem('shore.locale', JSON.stringify(localeCache)); } catch (e) { }
+    return value;
   }
   /* AM or PM in the TV's language for the 12-hour clock ("PM", "م", "nachm."), '' for 24 hours. */
   function meridiem() {
     if (S.c.cformat === '24') return '';
-    var d = new Date(), word = '';
-    try { word = d.toLocaleTimeString(undefined, { hour: 'numeric', hour12: true }).replace(/[\d\s\u200e\u200f\u202f\u00a0:]+/g, ' ').trim(); } catch (e) { }
-    return word && word.length <= 8 ? word : d.getHours() < 12 ? 'AM' : 'PM';
+    var pm = new Date().getHours() >= 12;
+    return localeText(pm ? 'pm' : 'am', function () {
+      var d = new Date(2026, 0, 1, pm ? 15 : 3), word = '';
+      try { word = d.toLocaleTimeString(undefined, { hour: 'numeric', hour12: true }).replace(/[\d\s\u200e\u200f\u202f\u00a0:]+/g, ' ').trim(); } catch (e) { }
+      return word && word.length <= 8 ? word : pm ? 'PM' : 'AM';
+    });
   }
   function clockHtml(plain) {
     var text = clockText(), metrics = !plain && fontMetrics[homeFont()], ampm = meridiem();
@@ -3253,6 +3281,60 @@
       if (rotationActive()) setLook({ wall: pool[(at + 1) % pool.length].id }, { row: 'bg' });
     }, Math.max(10, mode().min * QA.minuteMs - activeMs));
   }
+  /* ---------- Native start screen (Android) ---------- */
+  /* Home has painted once the look is installed and the photo decoded: the native backdrop can fade. The
+     wallpaper is saved for the next start as a small JPEG, only when it changes. */
+  var STARTUP = ANDROID && FrameDevice.startup && !DREAM ? FrameDevice.startup : null, BACKDROP_KEY = 'shore.backdrop';
+  /* Start: Home stays hidden ('pre') under the native backdrop, then the clock, buttons and tiles rise in
+     while the backdrop fades ('intro'). Off in the screensaver and when the TV asks for less motion. */
+  function reducedMotion() { try { return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { return false; } }
+  function startupReady() {
+    var since = Date.now();
+    (function wait() {
+      var photo = S.c.bg !== 'photo' || !!(IMG.photo.complete && IMG.photo.naturalWidth);
+      if (!(QA.ready() && photo) && Date.now() - since < 8000) { setTimeout(wait, 60); return; }
+      requestAnimationFrame(function () { requestAnimationFrame(function () {
+        if (STARTUP) STARTUP.ready();
+        S.intro = reducedMotion() || DREAM ? '' : 'intro'; render();
+        setTimeout(function () { S.intro = ''; render(); }, 1300);
+        if (STARTUP) setTimeout(saveBackdrop, 3000);
+      }); });
+    })();
+  }
+  /* Where Home's pieces sit on the 1920x1080 stage, for the skeleton drawn into the backdrop. */
+  function stageRects(selector) {
+    var base = stage.getBoundingClientRect(), k = base.width / 1920 || 1;
+    return Array.prototype.map.call(document.querySelectorAll(selector), function (el) {
+      var r = el.getBoundingClientRect();
+      return { x: (r.left - base.left) / k, y: (r.top - base.top) / k, w: r.width / k, h: r.height / k };
+    }).filter(function (r) { return r.w > 4 && r.h > 4 && r.x < 1920 && r.y < 1080 && r.x + r.w > 0 && r.y + r.h > 0; });
+  }
+  function skeleton(ctx, rects, radius, fill) {
+    ctx.fillStyle = fill;
+    rects.forEach(function (r) {
+      var x = r.x / 2, y = r.y / 2, w = r.w / 2, h = r.h / 2, q = Math.min(radius / 2, w / 2, h / 2);
+      ctx.beginPath(); ctx.moveTo(x + q, y); ctx.arcTo(x + w, y, x + w, y + h, q); ctx.arcTo(x + w, y + h, x, y + h, q); ctx.arcTo(x, y + h, x, y, q); ctx.arcTo(x, y, x + w, y, q); ctx.closePath(); ctx.fill();
+    });
+  }
+  function saveBackdrop() {
+    if (!STARTUP || S.saver || document.hidden || top().id !== 'home' || S.pending || !S.shown || S.intro) return;
+    var key = [S.shown.bg, S.shown.wall, S.c.layout, S.c.lstyle, S.c.apps, S.c.controls, S.c.home.length, S.c.cpos, S.c.csize].join('|'), saved = '', canvas, ctx, im = IMG.photo, w, h, k;
+    try { saved = localStorage.getItem(BACKDROP_KEY) || ''; } catch (e) { }
+    if (key === saved) return;
+    try {
+      canvas = document.createElement('canvas'); canvas.width = 960; canvas.height = 540; ctx = canvas.getContext('2d');
+      ctx.fillStyle = getComputedStyle(stage).backgroundColor || '#000'; ctx.fillRect(0, 0, 960, 540);
+      if (S.shown.bg === 'photo' && im.complete && im.naturalWidth) {
+        k = Math.max(960 / im.naturalWidth, 540 / im.naturalHeight); w = 960 / k; h = 540 / k;
+        ctx.drawImage(im, (im.naturalWidth - w) / 2, (im.naturalHeight - h) / 2, w, h, 0, 0, 960, 540);
+      }
+      // Skeleton: soft shapes where the dock, its tiles, the clock and the buttons appear.
+      skeleton(ctx, stageRects('#dock:not(.is-empty)'), 28, 'rgba(18,18,20,.34)');
+      skeleton(ctx, stageRects('#track .tile .mark, #track .tile .label-ink, #home .ph-row, #caption .clock, #utils .u'), 14, 'rgba(255,255,255,.26)');
+      STARTUP.backdrop(canvas.toDataURL('image/jpeg', 0.82));
+      localStorage.setItem(BACKDROP_KEY, key);
+    } catch (e) { }
+  }
   function updateClock() {
     clearTimeout(clockTimer);
     if (document.hidden) return;
@@ -3265,6 +3347,7 @@
     if (WEATHER && S.c.cweather === 'on') WEATHER.refresh(false);
     if (top().id === 'home' || isSettingsDetail(top())) renderCaption(top(), homeState(top()));
     if (S.saver) renderSaver(); else if (!saverTimer) saverReset();
+    if (STARTUP) saveBackdrop();
     syncAwake();
     clockTimer = setTimeout(updateClock, S.c.csec === 'on' ? 1000 - (Date.now() % 1000) + 20 : 60000 - (Date.now() % 60000) + 30);
   }
@@ -3407,6 +3490,7 @@
     refreshRemote();
   }
   if (ONLINE) { ONLINE.onChange(onlineChanged); ONLINE.select(S.c.source, false); }
+  S.intro = STARTUP && !reducedMotion() ? 'pre' : '';
   setLook({}, { transient: true, startup: true });
   norm(); render(); fit(); focusStage(); updateClock(); syncRotation();
   if (S.firstRun) { openMessage('welcome'); render(); }
@@ -3415,4 +3499,5 @@
   /* The remote's Home button: back to Home from Settings, All apps or the music view, unsaved previews dropped. */
   window.CleanFrameHomePressed = function () { if (!S.saver && top().id !== 'home') goScene('home'); };
   if (DREAM || SAVER_API && SAVER_API.requested()) startSaver();
+  startupReady();
 })();
