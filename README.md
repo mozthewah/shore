@@ -6,7 +6,9 @@
 
 A home screen for Google TV that shows your apps, your HDMI devices and a photo you chose, with the time, the weather and a headline in the corner.
 
-[Website](https://taynotfound.github.io/shore/) · [Install](#install) · [Features](#features) · [Phone companion](#phone-companion) · [Wallpapers](#online-and-animated-wallpapers) · [Top Shelf](#top-shelf) · [Build](#build-from-source)
+While music plays, it opens the song full screen with synced lyrics that light up word by word, and an optional pulse on the beat.
+
+[Website](https://taynotfound.github.io/shore/) · [Install](#install) · [Features](#features) · [Music view](#music-view) · [Phone companion](#phone-companion) · [Wallpapers](#online-and-animated-wallpapers) · [Top Shelf](#top-shelf) · [Build](#build-from-source)
 
 ![Shore on a TCL 55C6KS](docs/images/tcl/home.jpg)
 
