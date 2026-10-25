@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="docs/brand/banner.svg" width="100%" alt="Shore: a calm home screen for Google TV">
+<img src="docs/brand/banner.svg" width="100%" alt="Shore, a home screen for Google TV">
 
 # Shore
 
-**A calm home screen for Google TV: your apps, your HDMI devices, a beautiful picture and the time. Nothing else.**
+A home screen for Google TV that shows your apps, your HDMI devices and a photo you chose, with the time, the weather and a headline in the corner.
 
 [Website](https://taynotfound.github.io/shore/) · [Install](#install) · [Features](#features) · [Phone companion](#phone-companion) · [Wallpapers](#online-and-animated-wallpapers) · [Top Shelf](#top-shelf) · [Build](#build-from-source)
 
@@ -21,34 +21,34 @@ Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://githu
 
 ![Shelf layout with app banners](docs/images/tcl/shelf.jpg)
 
-**Home, your way**
-- **Three layouts.** *Dock* and *List* draw every app logo in one consistent style. *Shelf* is an Apple TV–style row of each app's colourful banner, with a [Top Shelf](#top-shelf) above it.
-- **Your apps, found automatically.** Pick and order up to nine for Home.
-- **Music controls:** while something plays, a ♪ *Music* button joins the top-right row on Home. OK shows the song with *Previous*, *Pause/Play* and *Next*; after a pause it stays for 10 minutes so you can resume. Needs Notification access, like Now playing.
-- **Quick actions:** hold OK on an app on Home for *Open*, *Move*, *Remove* or *App info*. A normal press still opens the app; Move and Remove go through *Apps on Home*, so they can be undone.
-- **HDMI devices appear by themselves**, named by HDMI-CEC ("PlayStation 5" instead of "HDMI 1"). Switch on a console or set-top box and its tile shows up; switch it off and it disappears. Show inputs first on Home or in their own row, and Shore offers to switch when one turns on.
-- **Speaks your language.** The launcher follows the TV's system language (*Settings → System → Language*). German, French, Spanish, Dutch, Polish and Ukrainian are included; anything else falls back to English.
+### Home
+- Three layouts. *Dock* and *List* draw every app logo the same way: Shore's own logos in colour or in one colour, or the icons from an installed icon pack (for example one made for Projectivy Launcher). *Shelf* shows each app's own banner, with a [Top Shelf](#top-shelf) above it.
+- Shore finds your installed apps. Pick up to nine for Home and put them in order.
+- While something plays, a ♪ *Music* button joins the top-right row on Home. OK shows the song with *Previous*, *Pause/Play* and *Next*; after a pause it stays for 10 minutes so you can resume. Needs Notification access, like Now playing.
+- Hold OK on an app on Home for *Open*, *Move*, *Remove* or *App info*. A normal press still opens the app; Move and Remove go through *Apps on Home*, so they can be undone.
+- HDMI devices appear when they are switched on, named over HDMI-CEC ("PlayStation 5" instead of "HDMI 1"). Switch on a console or set-top box and its tile shows up; switch it off and it disappears. Show inputs first on Home or in their own row, and Shore offers to switch when one turns on. Inputs you never use can be hidden.
+- The launcher follows the TV's system language (*Settings › System › Language*). German, French, Spanish, Dutch, Polish and Ukrainian are included; anything else falls back to English.
 
-**The picture**
-- **15 photographs** with pre-rendered glass, plus **online wallpapers** from NASA, Bing, Wikimedia, Picsum and Unsplash.
-- **Animated wallpapers**: bundled seamless loops, Pexels video loops and Klipy GIFs.
-- **[Phone companion](#phone-companion)**: scan a QR code and send photos, GIFs and short videos to the TV, from a web app styled like the launcher.
-- **Drift**: a slow Ken Burns zoom where the photo and its glass move together.
-- **Rotation**: a new picture each time Home opens, or every 5, 15 or 60 minutes.
-- **Night mode** dims everything on a timer (21–07, 22–06, 23–07) or all the time, in three strengths. With *Calmer photos at night*, rotation sticks to dark photos while it is on, and a bright wallpaper gives way to a dark one when night begins.
+### The picture
+- 15 bundled photographs with pre-rendered glass, plus online wallpapers from NASA, Bing, Wikimedia, Picsum and Unsplash.
+- Animated wallpapers: bundled seamless loops, Pexels video loops and Klipy GIFs.
+- [Phone companion](#phone-companion): scan a QR code and send photos, GIFs and short videos to the TV, from a web app styled like the launcher.
+- Drift: a slow Ken Burns zoom where the photo and its glass move together.
+- Rotation: a new picture each time Home opens, or every 5, 15 or 60 minutes.
+- Night mode dims everything on a timer (21–07, 22–06, 23–07) or all the time, in three strengths. With *Calmer photos at night*, rotation sticks to dark photos while it is on, and a bright wallpaper gives way to a dark one when night begins.
 
-**Make it yours**
-- **Eight open-licence fonts**, with text weight and app-name size.
-- **Clock**: 12- or 24-hour, optional date, four sizes and weights.
-- **[Under the clock](#under-the-clock-weather-music-and-news)**: the current weather in °C or °F (Open-Meteo, no key), what's playing in Spotify, YouTube or any other app, and news headlines from Google News, an outlet you pick or your own feed.
-- **Hide controls when idle**: after 1 or 5 minutes only the picture and clock stay.
+### Text, clock and info
+- Eight open-licence fonts, with text weight and app-name size.
+- Clock: 12- or 24-hour, optional date, four sizes and weights.
+- [Under the clock](#under-the-clock-weather-music-and-news): the current weather in °C or °F (Open-Meteo, no key), what's playing in Spotify, YouTube or any other app, and news headlines from Google News, an outlet you pick or your own feed.
+- Hide controls when idle: after 1 or 5 minutes only the picture and clock stay.
 - Focus style and glass materials.
 
-**Fits the TV**
-- **The Home button opens Shore.** Hold Home for the original Google TV Home.
-- **Reassign remote buttons** such as the app shortcut keys or the TV button.
+### On the TV
+- The Home button opens Shore. Hold Home for the original Google TV Home.
+- Reassign remote buttons such as the app shortcut keys or the TV button.
 - Animations pause outside Home, so menus stay snappy.
-- An optional, reversible **debloat** list for TCL's preinstalled extras.
+- An optional, reversible debloat list for TCL's preinstalled extras.
 
 | | |
 | --- | --- |
@@ -72,24 +72,24 @@ Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://githu
 
 You need a computer on the same Wi-Fi with [Android platform tools](https://developer.android.com/tools/releases/platform-tools) (`adb`).
 
-1. **Enable developer options.** On the TV, open *Settings → System → About*. Press OK on **Android TV OS build** seven times, until "You are now a developer" appears. Use the main profile; kids profiles hide this.
-2. **Turn on debugging.** *Settings → System → Developer options → USB debugging*.
-3. **Connect**, replacing `<tv-ip>` with the address from *Settings → Network*:
+1. Enable developer options. On the TV, open *Settings › System › About*. Press OK on **Android TV OS build** seven times, until "You are now a developer" appears. Use the main profile; kids profiles hide this.
+2. Turn on debugging in *Settings › System › Developer options › USB debugging*.
+3. Connect, replacing `<tv-ip>` with the address from *Settings › Network*:
 
    ```sh
    adb connect <tv-ip>:5555
    ```
 
    The TV asks "Allow debugging?". Tick **Always allow from this computer** and press OK.
-4. **Install** the APK from the [latest release](https://github.com/taynotfound/shore/releases/latest) or [build it](#build-from-source):
+4. Install the APK from the [latest release](https://github.com/taynotfound/shore/releases/latest) or [build it](#build-from-source):
 
    ```sh
    adb install -r Shore.apk
    ```
 
-Shore now appears in your apps. Open it once; it remembers everything on the TV. The first time, it offers a short setup: *Settings → Google TV → Setup and health* lists each step (Home button, what's playing, wallpaper sources, phone companion, updates) with a tick when it works, and OK opens the place that fixes it. Come back to it whenever something seems off, for example when the TV blocked the Home button service after a restart.
+Shore now appears in your apps. Open it once; it remembers everything on the TV. The first time, it offers a short setup: *Settings › Google TV › Setup and health* lists each step (Home button, what's playing, wallpaper sources, phone companion, updates) with a tick when it works, and OK opens the place that fixes it. Come back to it whenever something seems off, for example when the TV blocked the Home button service after a restart.
 
-**Updating:** after the first install you don't need a computer again. *Settings → Google TV → Shore updates* checks the public releases (automatically every few hours, or on demand), downloads the new APK, checks that it is Shore, newer and signed with the same key, and opens Android's installer. Android asks you to confirm, and the first time it asks you to allow Shore to install apps. Settings and photos stay. Only release APKs update themselves: a copy you built yourself just tells you when a new version is out, so you can pull the latest source and rebuild it with your keys.
+**Updating.** After the first install you don't need a computer again. *Settings › Google TV › Shore updates* checks the public releases (automatically every few hours, or on demand), downloads the new APK, checks that it is Shore, newer and signed with the same key, and opens Android's installer. Android asks you to confirm, and the first time it asks you to allow Shore to install apps. Settings and photos stay. Only release APKs update themselves: a copy you built yourself just tells you when a new version is out, so you can pull the latest source and rebuild it with your keys.
 
 > [!NOTE]
 > **Release APKs carry no API keys.** Each release is built from `main` (version `0.8.<commit count>`). Weather, NASA, Bing, Wikimedia and Picsum wallpapers, album art lookups and everything else work as they are. Unsplash, Pexels and Klipy wallpapers and Top Shelf recommendations need your own keys: [build from source](#build-from-source) with them in `android/local.properties`.
@@ -97,7 +97,7 @@ Shore now appears in your apps. Open it once; it remembers everything on the TV.
 <details>
 <summary>Android 14 builds with "Wireless debugging"</summary>
 
-Open *Wireless debugging → Pair device with pairing code*, then run `adb pair <ip>:<pair-port> <code>` and `adb connect <ip>:<port>`. The pairing port is different from the connect port.
+Open *Wireless debugging › Pair device with pairing code*, then run `adb pair <ip>:<pair-port> <code>` and `adb connect <ip>:<port>`. The pairing port is different from the connect port.
 
 </details>
 
@@ -105,10 +105,10 @@ Open *Wireless debugging → Pair device with pairing code*, then run `adb pair 
 
 Google TV always sends Home to its own launcher and ignores the "default home app" setting. Shore includes a small accessibility service that catches the Home key instead, the same approach launchers like Projectivy use. Turn it on yourself:
 
-**Settings → System → Accessibility → Shore Home button → On**
+**Settings › System › Accessibility › Shore Home button › On**
 
-- **Press Home** to open Shore.
-- **Hold Home** for about a second to open the original Google TV Home. *Settings → Google TV → Google TV Home* in Shore does the same.
+- Press Home to open Shore.
+- Hold Home for about a second to open the original Google TV Home. *Settings › Google TV › Google TV Home* in Shore does the same.
 - If Google TV Home appears by itself, for example after leaving an app, Shore takes over. It won't do that if you opened Google TV Home on purpose.
 
 The service only sees remote keys and which app is in front. It never reads screen content. Turn the switch off to undo.
@@ -118,11 +118,11 @@ The service only sees remote keys and which app is in front. It never reads scre
 
 ### Reassign remote buttons
 
-*Settings → Google TV → Remote buttons* (needs the accessibility service). Choose **Assign a button…**, press a button on the remote, then pick what it does:
+*Settings › Google TV › Remote buttons* (needs the accessibility service). Choose **Assign a button…**, press a button on the remote, then pick what it does:
 
-- **Default**: what the TV normally does. This removes the assignment.
-- **Shore Home**, **Do nothing** or **Screensaver** (Shore's own, see below).
-- A **connected HDMI input**, or **an app** from your Home screen.
+- *Default*: what the TV normally does. This removes the assignment.
+- *Shore Home*, *Do nothing* or *Screensaver* (Shore's own, see below).
+- A connected HDMI input, or an app from your Home screen.
 
 Assignments work everywhere, including inside other apps.
 
@@ -138,11 +138,11 @@ Assignments work everywhere, including inside other apps.
 
 ### HDMI inputs
 
-Inputs come from Android's TV Input Framework. A device that is **plugged in and switched on** gets a tile; standby or unplugged devices are hidden. OK switches the TV to that input, and inputs you rename in the TV settings keep their name. Otherwise a tile uses the name the device announces over HDMI-CEC, such as *PlayStation 5* or *Apple TV*. CEC must be on in the TV settings (TCL calls it *T-Link*); without it the port name, such as *HDMI 1*, is shown. Choose *Settings → Home screen → Inputs → First in Home* or *Own row*. When a device switches on while Home is showing (or the screensaver runs), Shore asks *PlayStation 5 is on · Switch / Stay*; OK switches to it, and the question goes away after 20 seconds. Turn this off with *Ask* in the same row.
+Inputs come from Android's TV Input Framework. A device that is **plugged in and switched on** gets a tile; standby or unplugged devices are hidden. OK switches the TV to that input, and inputs you rename in the TV settings keep their name. Otherwise a tile uses the name the device announces over HDMI-CEC, such as *PlayStation 5* or *Apple TV*. CEC must be on in the TV settings (TCL calls it *T-Link*); without it the port name, such as *HDMI 1*, is shown. Choose *Settings › Home screen › Inputs › First in Home* or *Own row*. When a device switches on while Home is showing (or the screensaver runs), Shore asks *PlayStation 5 is on · Switch / Stay*; OK switches to it, and the question goes away after 20 seconds. Turn this off with *Ask* in the same row.
 
 ### Language
 
-Shore uses the TV's system language: German, French, Spanish, Dutch, Polish and Ukrainian are built in, and anything else shows English. Change it in *Settings → System → Language* on the TV, then reopen Shore. Translations live in [`app/i18n.js`](app/i18n.js): one dictionary per language, keyed by the English text, so adding a language means adding one block. In the browser preview, `?lang=de` picks a language.
+Shore uses the TV's system language: German, French, Spanish, Dutch, Polish and Ukrainian are built in, and anything else shows English. Change it in *Settings › System › Language* on the TV, then reopen Shore. Translations live in [`app/i18n.js`](app/i18n.js): one dictionary per language, keyed by the English text, so adding a language means adding one block. In the browser preview, `?lang=de` picks a language.
 
 ### Settings
 
@@ -150,19 +150,19 @@ Shore's settings are two columns of short pages. **Look**: Wallpaper (background
 
 ### Under the clock: weather, music and news
 
-*Settings → Weather, Music and News.*
+*Settings › Weather, Music and News.*
 
-- **Weather** shows the temperature and sky, such as *12 °C Cloudy*, next to the date. It comes from [Open-Meteo](https://open-meteo.com), which needs no key or account. The place is the city of the TV's time zone (*Europe/Berlin* → Berlin), or the place you type in the [phone companion](#phone-companion). Choose **°C or °F** under *Temperature*. Shore refreshes the weather every 30 minutes, and it is off until you turn it on.
-- **Weather effects** (*Weather › Details*) draw the current weather over the photo: rain, a light drizzle, snow, drifting fog, or a storm with the odd flash of lightning. Clear and cloudy skies leave the photo alone. They need Weather on and a Photo background, follow night dimming, and pause whenever Home is not on screen. The layers are pre-drawn and only slide, so the TV never redraws or blurs the photo for them.
-- **Headlines** (*Settings → News*) show one news headline under the clock and on the screensaver, with its source, changing every 20 seconds. Choose the **source**: Google News top stories for the TV's language and country, a news outlet for the TV's language (for example tagesschau, DER SPIEGEL, ZEIT ONLINE and DW in German, BBC News, The Guardian, NPR and Al Jazeera in English; BBC News is offered in every language), or **Your own feed**, any RSS or Atom feed you save under *News feed* in the [phone companion](#phone-companion). Saving a feed there switches to it. The TV fetches the feed at most every 30 minutes and keeps only titles, sources and times; nothing else is sent. Off until you turn it on.
-- **Now playing** shows a small moving level meter and *Title · Artist — App* while something plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings → Apps → Special app access → Notification access*; the Music page has a shortcut. Shore reads only the active media session and ignores notifications themselves. The level meter is decoration: Shore never hears the audio.
-- **Album art** (*Music*): while music with a cover plays, the cover becomes the background, softly blurred and dimmed, and the glass shows it through. It needs a Photo background and goes back to your wallpaper when the music stops. The blur is made once per track on the TV's CPU, not live in the page. Turn it off in *Settings → Music*.
-- **Sharper pictures** (same page, on by default): media apps often share only a small cover, which looks soft at TV size. Shore then looks up a wide artist picture on [TheAudioDB](https://www.theaudiodb.com) and, if none fits, a 1000-pixel cover from the [iTunes Search API](https://performance-partners.apple.com/search-api). Only the artist name (and title for iTunes) is sent, once per track; results are cached on the TV for 30 days. Turn it off to keep everything on the TV.
-- **Weather icons** next to the temperature follow the sky and switch to night versions after sunset. *Weather → Details* hides the icon; *Music* hides the level meter.
+- Weather shows the temperature and sky, such as *12 °C Cloudy*, next to the date. It comes from [Open-Meteo](https://open-meteo.com), which needs no key or account. The place is the city of the TV's time zone (*Europe/Berlin* gives Berlin), or the place you type in the [phone companion](#phone-companion). Choose **°C or °F** under *Temperature*. Shore refreshes the weather every 30 minutes, and it is off until you turn it on.
+- Weather effects (*Weather › Details*) draw the current weather over the photo: rain, a light drizzle, snow, drifting fog, or a storm with the odd flash of lightning. Clear and cloudy skies leave the photo alone. They need Weather on and a Photo background, follow night dimming, and pause whenever Home is not on screen. The layers are pre-drawn and only slide, so the TV never redraws or blurs the photo for them.
+- Headlines (*Settings › News*) show one news headline under the clock and on the screensaver, with its source, changing every 20 seconds. Choose the **source**: Google News top stories for the TV's language and country, a news outlet for the TV's language (for example tagesschau, DER SPIEGEL, ZEIT ONLINE and DW in German, BBC News, The Guardian, NPR and Al Jazeera in English; BBC News is offered in every language), or **Your own feed**, any RSS or Atom feed you save under *News feed* in the [phone companion](#phone-companion). Saving a feed there switches to it. The TV fetches the feed at most every 30 minutes and keeps only titles, sources and times; nothing else is sent. Off until you turn it on.
+- Now playing shows a small moving level meter and *Title · Artist — App* while something plays in another app, for example Spotify in the background. Android only shares media sessions with apps that have notification access. So allow **Shore Now playing** under *Settings › Apps › Special app access › Notification access*; the Music page has a shortcut. Shore reads only the active media session and ignores notifications themselves. The level meter is decoration: Shore never hears the audio.
+- Album art (*Music*): while music with a cover plays, the cover becomes the background, softly blurred and dimmed, and the glass shows it through. It needs a Photo background and goes back to your wallpaper when the music stops. The blur is made once per track on the TV's CPU, not live in the page. Turn it off in *Settings › Music*.
+- Sharper pictures (same page, on by default): media apps often share only a small cover, which looks soft at TV size. Shore then looks up a wide artist picture on [TheAudioDB](https://www.theaudiodb.com) and, if none fits, a 1000-pixel cover from the [iTunes Search API](https://performance-partners.apple.com/search-api). Only the artist name (and title for iTunes) is sent, once per track; results are cached on the TV for 30 days. Turn it off to keep everything on the TV.
+- Weather icons next to the temperature follow the sky and switch to night versions after sunset. *Weather › Details* hides the icon; *Music* hides the level meter.
 
 ### Screensaver
 
-*Settings → Screensaver.* Shore has its own screensaver instead of the TV's: after 5, 10 (default) or 15 minutes without a button press it fades to a slow slideshow of your wallpapers (the sources in rotation, including My photos). Photos drift slowly, and every few slides it shows a mosaic of two or three photos at once. A large clock, the date and the weather sit on top. Turn on *Photo title* (*Screensaver → Arrangement and clock*) to see each photo's name and credit underneath. While music plays it adds a small card with the cover, title and artist; the album art never replaces the photos. The clock moves to another corner every few minutes so nothing sits on the same pixels for hours. Any button wakes Shore without doing anything else. *Start the screensaver now* is on the same page, and the **Screensaver** button on Home and the *Screensaver* remote-button action start it too.
+*Settings › Screensaver.* Shore has its own screensaver instead of the TV's: after 5, 10 (default) or 15 minutes without a button press it fades to a slow slideshow of your wallpapers (the sources in rotation, including My photos). Photos drift slowly, and every few slides it shows a mosaic of two or three photos at once. A large clock, the date and the weather sit on top. Turn on *Photo title* (*Screensaver › Arrangement and clock*) to see each photo's name and credit underneath. While music plays it adds a small card with the cover, title and artist; the album art never replaces the photos. The clock moves to another corner every few minutes so nothing sits on the same pixels for hours. Any button wakes Shore without doing anything else. *Start the screensaver now* is on the same page, and the **Screensaver** button on Home and the *Screensaver* remote-button action start it too.
 
 The same page chooses when it starts, the photos (*Like Home*, which adds Shore's wallpapers when your rotation has only a few; *Everything*; or *Built-in*) and 15, 30 or 60 seconds per slide. *Arrangement and clock* chooses mixed, one photo or mosaics, switches the slow pan off, fixes or hides the clock, and hides the date and weather or the music card.
 
@@ -197,16 +197,16 @@ To undo, run the same command with `disallow_listener`.
 
 ## Phone companion
 
-*Settings → Phone → Phone companion.* Turn it on and the TV shows a QR code. Scan it with your phone's camera and tap **Install app**: Shore Companion lands on your home screen. Opening it takes you to a small web app served by the TV itself, styled like the launcher, with your current wallpaper behind glass cards.
+*Settings › Phone › Phone companion.* Turn it on and the TV shows a QR code. Scan it with your phone's camera and tap **Install app**: Shore Companion lands on your home screen. Opening it takes you to a small web app served by the TV itself, styled like the launcher, with your current wallpaper behind glass cards.
 
-- **Send to your TV**: pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. Each photo first opens in a 16:9 frame, the TV's shape: drag to move it, pinch or use the slider to zoom, then **Send**. *Whole photo* sends it uncropped, *Skip* leaves it out. The crop is made on the phone at the photo's own resolution (up to 3840 px wide). They appear under **My photos**, a wallpaper source like the others. Glass is rendered once, rotation cycles through them, and GIFs and clips play animated. Choose *Settings → Phone → My photos* to use them.
-- **My photos**: see what's stored and delete single photos or all of them. Shore keeps the newest 30, in its private storage on the TV.
-- **Weather place**: the city for the weather under the clock.
-- **News feed**: an RSS or Atom address for the headlines. Saving one makes it the news source (*Your own feed* in *Settings → News*); clearing it goes back to Google News.
-- **TV settings**: every setting from the TV's own Settings, grouped the same way (background and wallpaper, layout, text, clock, focus and colour, night and idle, screensaver), as buttons and switches. Changes apply on the TV at once, as if chosen with the remote, and *Start the screensaver now* is one tap. Shore must be open on the TV (in front or behind another app).
-- **Apps**: reorder Home with the arrows, remove an app, or add one of the other installed apps.
-- **Backup**: *Save backup* stores every TV setting (look, clock, Home apps and their order, wallpaper sources, screensaver) as a `.json` file on the phone. *Restore…* sends one back, after you confirm, to the same TV or another one running Shore. The TV checks the file like its own saved preferences, so a damaged or edited one can't break anything. Photos stay on the TV and are not part of the backup.
-- **Install it**: the QR code opens [taynotfound.github.io/shore/app](https://taynotfound.github.io/shore/app/), a tiny installable page (HTTPS, manifest, offline cache). It remembers your TV and opens it whenever you start the app. If your browser shows no install button, use its menu: *Install app* or *Add to Home screen*. On iPhone: *Share → Add to Home Screen*.
+- *Send to your TV*: pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. Each photo first opens in a 16:9 frame, the TV's shape: drag to move it, pinch or use the slider to zoom, then **Send**. *Whole photo* sends it uncropped, *Skip* leaves it out. The crop is made on the phone at the photo's own resolution (up to 3840 px wide). They appear under **My photos**, a wallpaper source like the others. Glass is rendered once, rotation cycles through them, and GIFs and clips play animated. Choose *Settings › Phone › My photos* to use them.
+- *My photos*: see what's stored and delete single photos or all of them. Shore keeps the newest 30, in its private storage on the TV.
+- *Weather place*: the city for the weather under the clock.
+- *News feed*: an RSS or Atom address for the headlines. Saving one makes it the news source (*Your own feed* in *Settings › News*); clearing it goes back to Google News.
+- *TV settings*: every setting from the TV's own Settings, grouped the same way (background and wallpaper, layout, text, clock, focus and colour, night and idle, screensaver), as buttons and switches. Changes apply on the TV at once, as if chosen with the remote, and *Start the screensaver now* is one tap. Shore must be open on the TV (in front or behind another app).
+- *Apps*: reorder Home with the arrows, remove an app, or add one of the other installed apps.
+- *Backup*: *Save backup* stores every TV setting (look, clock, Home apps and their order, wallpaper sources, screensaver) as a `.json` file on the phone. *Restore…* sends one back, after you confirm, to the same TV or another one running Shore. The TV checks the file like its own saved preferences, so a damaged or edited one can't break anything. Photos stay on the TV and are not part of the backup.
+- Installing: the QR code opens [taynotfound.github.io/shore/app](https://taynotfound.github.io/shore/app/), a tiny installable page (HTTPS, manifest, offline cache). It remembers your TV and opens it whenever you start the app. If your browser shows no install button, use its menu: *Install app* or *Add to Home screen*. On iPhone: *Share › Add to Home Screen*.
 
 **Privacy and limits**
 
@@ -218,9 +218,9 @@ To undo, run the same command with `disallow_listener`.
 
 ## Online and animated wallpapers
 
-*Settings → Wallpaper → Sources.* Tick as many sources as you like: Shore wallpapers (the bundled gallery), My photos, NASA Astronomy Picture, NASA Image Library, Bing, Wikimedia, Picsum, Unsplash themes and animated loops. Only ticked sources rotate. The page says how many photos are in rotation (or which source couldn't be reached), OK on a row says *Add to rotation* or *Remove from rotation*, and the wallpaper gallery marks every photo that isn't in rotation.
+*Settings › Wallpaper › Sources.* Tick as many sources as you like: Shore wallpapers (the bundled gallery), My photos, NASA Astronomy Picture, NASA Image Library, Bing, Wikimedia, Picsum, Unsplash themes and animated loops. Only ticked sources rotate. The page says how many photos are in rotation (or which source couldn't be reached), OK on a row says *Add to rotation* or *Remove from rotation*, and the wallpaper gallery marks every photo that isn't in rotation.
 
-**Favourites and hiding:** in the wallpaper gallery, press Right to reach **Favourite** and **Hide** under the preview; Up and Down keep stepping through photos, so you can sort several quickly. Favourites always rotate, whatever their source, and favourite online photos are kept on the TV even after their source moves on. Hidden photos never show up in rotation or the screensaver.
+**Favourites and hiding.** In the wallpaper gallery, press Right to reach **Favourite** and **Hide** under the preview; Up and Down keep stepping through photos, so you can sort several quickly. Favourites always rotate, whatever their source, and favourite online photos are kept on the TV even after their source moves on. Hidden photos never show up in rotation or the screensaver.
 
 The TV downloads up to eight pictures or clips per source. On download it renders them once into the same files the bundled gallery uses: photo, thumbnail and four pre-blurred glass layers. Nothing is blurred live, so Home stays smooth. New wallpapers arrive every few hours, and rotation cycles through them.
 
@@ -241,7 +241,7 @@ Credits for each picture appear in the wallpaper gallery, as the sources' terms 
 
 ## Top Shelf
 
-*Settings → Home screen → Layout → Shelf.* As on Apple TV, the focused app fills the screen with what is trending there. **Down** opens a row of recommendations. **OK** opens an item directly in YouTube, Twitch, ZDF or ARTE, and opens the app itself for the others. **Up** or **Back** returns to the apps.
+*Settings › Home screen › Layout › Shelf.* As on Apple TV, the focused app fills the screen with what is trending there. **Down** opens a row of recommendations. **OK** opens an item directly in YouTube, Twitch, ZDF or ARTE, and opens the app itself for the others. **Up** or **Back** returns to the apps.
 
 Google TV doesn't share its recommendations with other launchers, so Shore reads public catalogues about once an hour, over HTTPS only:
 
@@ -273,7 +273,7 @@ To check the pair before building, ask Twitch for a token yourself. A JSON reply
 curl -X POST "https://id.twitch.tv/oauth2/token" -d "client_id=YOUR_ID" -d "client_secret=YOUR_SECRET" -d "grant_type=client_credentials"
 ```
 
-Authorize links (`https://id.twitch.tv/oauth2/authorize?…`) and token generator websites create *user* tokens, which Shore doesn't use. Never paste a user token anywhere: it can act as your account. If you made one, revoke it under twitch.tv → *Settings → Connections*.
+Authorize links (`https://id.twitch.tv/oauth2/authorize?…`) and token generator websites create *user* tokens, which Shore doesn't use. Never paste a user token anywhere: it can act as your account. If you made one, revoke it under twitch.tv › *Settings › Connections*.
 
 </details>
 
@@ -329,11 +329,11 @@ Built since the last list: weather with °C/°F, Now playing with album art, Sho
 
 ## Brand
 
-The half sun over three lines in ivory `#e3e6dc`, on a deep blue-grey gradient (`#20303a` → `#0f161a`) with a warm accent `#f2c58b`, set in Manrope. The same mark is the TV icon, the launcher banner, the website and the phone companion. [`docs/brand/`](docs/brand/) holds the animated banner (SVG, GIF, MP4), the logo and mark, and ready-made ads (1200×628 and 1080×1080, as PNG and MP4). `python3 scripts/brand/make_brand.py` rebuilds them from the screenshots in `site/shots/` (needs Node with Playwright, ffmpeg and Pillow).
+The half sun over three lines in ivory `#e3e6dc`, on a deep blue-grey gradient (`#20303a` to `#0f161a`) with a warm accent `#f2c58b`, set in Manrope. The same mark is the TV icon, the launcher banner, the website and the phone companion. [`docs/brand/`](docs/brand/) holds the animated banner (SVG, GIF, MP4), the logo and mark, and ready-made ads (1200×628 and 1080×1080, as PNG and MP4). `python3 scripts/brand/make_brand.py` rebuilds them from the screenshots in `site/shots/` (needs Node with Playwright, ffmpeg and Pillow).
 
 ## Credits and licences
 
-- **CleanFrame** by Nathan Clark, MIT. This fork keeps the original [licence](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md).
+- CleanFrame by Nathan Clark, MIT. This fork keeps the original [licence](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md).
 - Android TV port and TCL additions: Shore contributors, MIT.
 - App logos: [Simple Icons](https://simpleicons.org) (CC0) and public-domain wordmarks from Wikimedia Commons; see `app/assets/icons/SOURCES.json`. Trademarks belong to their owners.
 - Fonts: SIL Open Font License; see `app/assets/fonts/`.

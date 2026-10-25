@@ -116,8 +116,8 @@
   var UTIL = { music: ['Music', 'music'], art: [TV.art, 'art'], apps: ['All apps', 'apps'], arrange: ['Arrange', 'arrange'], settings: ['Settings', 'settings'] };
   var MSG = {
     leave: { title: 'Leave Home?', line: 'Open ' + TV.home + '?', note: '', actions: [['stay', 'Stay'], ['samsung', TV.home]] },
-    welcome: { title: 'Welcome to Shore', line: 'A few quick steps make Shore feel at home: the Home button, what’s playing, wallpapers and your phone.', note: '', actions: [['setup', 'Set up'], ['stay', 'Later']] },
-    restored: { title: 'Settings restored', line: 'Shore now looks and works the way your backup was saved. Photos on the TV stay as they were.', note: '', actions: [['stay', 'OK']] },
+    welcome: { title: 'Welcome to Shore', line: 'Set up the Home button, what’s playing, wallpapers and your phone.', note: '', actions: [['setup', 'Set up'], ['stay', 'Later']] },
+    restored: { title: 'Settings restored', line: 'Photos on the TV haven’t changed; they aren’t part of a backup.', note: '', actions: [['stay', 'OK']] },
     clearphotos: { title: 'Remove all my photos?', line: 'They are deleted from the TV. Your phone keeps its own copies.', note: '', actions: [['stay', 'Keep them'], ['clearphotos', 'Remove']] }
   };
   var SVG = {
@@ -1514,7 +1514,7 @@
   /* Settings › Phone: the Shore Companion web app, paired by QR code, and the photos it sent. */
   function phoneSections(flat) {
     var p = S.phone, n = p.count;
-    var sections = [{ id: 'companion', title: '', items: [{ action: 'phone.toggle', label: 'Phone companion', description: 'Photos and weather from your phone', tick: true, applied: p.enabled }],
+    var sections = [{ id: 'companion', title: '', items: [{ action: 'phone.toggle', label: 'Phone companion', description: 'Send photos and change settings from your phone', tick: true, applied: p.enabled }],
       reason: p.enabled ? '' : 'The companion runs on your home Wi-Fi only and needs this code to pair.' }];
     if (p.enabled) sections.push({ id: 'phonecode', title: '', items: [], qr: p.qr || ' ', url: p.url,
       qrNote: p.url ? 'Point your phone’s camera at the code, then tap Install app to keep Shore Companion on your phone. Without internet, open this address instead:' : 'Connect the TV to your Wi-Fi to use the companion.' });
