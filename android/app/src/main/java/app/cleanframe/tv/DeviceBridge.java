@@ -82,6 +82,17 @@ final class DeviceBridge {
     public boolean nowPlayingControl(String pkg, String action) { return action != null && action.matches("toggle|next|prev") && NowPlayingService.control(context, pkg, action); }
 
     /** Opens the screen where the user allows CleanFrame to read what is playing. */
+    /** The music view's session, playing or paused: adds album, pos, dur, speed and seek. */
+    @JavascriptInterface
+    public String nowPlayingDetail(String pkg, boolean lookup) { return NowPlayingService.detail(context, pkg, lookup); }
+
+    @JavascriptInterface
+    public boolean nowPlayingSeek(String pkg, double ms) { return NowPlayingService.seek(context, pkg, (long) ms); }
+
+    /** {state: pending|ok|none|instrumental, synced:[[ms, line]], plain} from LRCLIB. */
+    @JavascriptInterface
+    public String lyrics(String artist, String title, String album, int seconds) { return Lyrics.get(artist, title, album, seconds); }
+
     @JavascriptInterface
     public boolean nowPlayingSettings() {
         return start(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")) || settings();

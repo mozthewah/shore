@@ -197,6 +197,22 @@
     },
     openSettings: function (done) { reply(ask('nowPlayingSettings'), done, 'Notification access could not open.'); },
     /* toggle, next or prev; pkg finds the session again once it is paused. */
+    /* The music view: playing or paused, with album, pos/dur (ms), speed and whether it can seek. */
+    detail: bridge.nowPlayingDetail ? function (pkg, lookup) {
+      var r, img = /^\/nowplaying\/[0-9a-f]+(-b)?\.jpg$/;
+      try { r = JSON.parse(bridge.nowPlayingDetail(String(pkg || ''), !!lookup)) || {}; } catch (e) { r = {}; }
+      if (!r.found || typeof r.title !== 'string') return { access: r.access !== false, found: false };
+      return { access: true, found: true, playing: !!r.playing, title: r.title, artist: String(r.artist || ''), album: String(r.album || ''), app: String(r.app || ''),
+        pkg: /^[A-Za-z][A-Za-z0-9_.]{0,160}$/.test(r.pkg || '') ? r.pkg : '', pos: Math.max(0, +r.pos || 0), dur: Math.max(0, +r.dur || 0), speed: +r.speed || 0, seek: !!r.seek,
+        art: img.test(r.art || '') ? r.art : '', back: img.test(r.back || '') ? r.back : '' };
+    } : null,
+    seek: function (pkg, ms) { try { return !!bridge.nowPlayingSeek(String(pkg || ''), Math.max(0, ms | 0)); } catch (e) { return false; } },
+    lyrics: function (artist, title, album, seconds) {
+      var r;
+      try { r = JSON.parse(bridge.lyrics(String(artist || ''), String(title || ''), String(album || ''), seconds | 0)) || {}; } catch (e) { r = {}; }
+      return { state: /^(pending|ok|none|instrumental)$/.test(r.state) ? r.state : 'none', plain: String(r.plain || ''),
+        synced: (r.synced && r.synced.filter ? r.synced : []).filter(function (l) { return l && typeof l[0] === 'number' && typeof l[1] === 'string'; }) };
+    },
     control: bridge.nowPlayingControl ? function (pkg, action) { try { return !!bridge.nowPlayingControl(String(pkg || ''), String(action)); } catch (e) { return false; } } : null
   };
   /* In-app updates: the native side checks the public releases, verifies the APK and opens Android's installer. */

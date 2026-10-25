@@ -16,6 +16,7 @@ import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.service.notification.NotificationListenerService;
 import android.webkit.WebResourceResponse;
 
@@ -61,17 +62,65 @@ public class NowPlayingService extends NotificationListenerService {
      *  sending only the artist, title and album; results arrive on a later call. */
     static String info(Context context) { return info(context, false); }
 
+    /** The playing session, or pkg's session once it is paused. */
+    private static MediaController session(Context context, String pkg) {
+        MediaSessionManager msm = (MediaSessionManager) context.getSystemService(Context.MEDIA_SESSION_SERVICE);
+        if (msm == null) return null;
+        MediaController target = null;
+        for (MediaController c : msm.getActiveSessions(new ComponentName(context, NowPlayingService.class))) {
+            PlaybackState s = c.getPlaybackState();
+            if (s != null && s.getState() == PlaybackState.STATE_PLAYING) return c;
+            if (target == null && pkg != null && pkg.equals(c.getPackageName())) target = c;
+        }
+        return target;
+    }
+
+    /** Jumps to a position in the session's track, when the app allows seeking. */
+    static boolean seek(Context context, String pkg, long ms) {
+        try {
+            MediaController c = session(context, pkg);
+            PlaybackState s = c == null ? null : c.getPlaybackState();
+            if (s == null || (s.getActions() & PlaybackState.ACTION_SEEK_TO) == 0) return false;
+            c.getTransportControls().seekTo(Math.max(0, ms));
+            return true;
+        } catch (Exception e) { return false; }
+    }
+
+    /** The music view: everything info() gives, playing or paused, plus album, position (ms, as of now), duration and seekability. */
+    static String detail(Context context, String pkg, boolean lookup) {
+        JSONObject out = new JSONObject();
+        try {
+            out.put("access", true).put("found", false);
+            MediaController c = session(context, pkg);
+            if (c == null) return out.toString();
+            PlaybackState state = c.getPlaybackState();
+            MediaMetadata meta = c.getMetadata();
+            if (state == null || meta == null) return out.toString();
+            String title = text(meta, MediaMetadata.METADATA_KEY_TITLE, MediaMetadata.METADATA_KEY_DISPLAY_TITLE);
+            if (title.isEmpty()) return out.toString();
+            String artist = text(meta, MediaMetadata.METADATA_KEY_ARTIST, MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE);
+            if (artist.isEmpty()) artist = text(meta, MediaMetadata.METADATA_KEY_ALBUM_ARTIST, MediaMetadata.METADATA_KEY_ALBUM);
+            String album = text(meta, MediaMetadata.METADATA_KEY_ALBUM, MediaMetadata.METADATA_KEY_ALBUM), owner = c.getPackageName();
+            boolean playing = state.getState() == PlaybackState.STATE_PLAYING;
+            long pos = state.getPosition();
+            if (playing && pos >= 0 && state.getLastPositionUpdateTime() > 0)
+                pos += (long) ((SystemClock.elapsedRealtime() - state.getLastPositionUpdateTime()) * state.getPlaybackSpeed());
+            String id = art(context, meta, owner + "|" + title + "|" + artist + "|" + album, artist, title, album, lookup);
+            out.put("found", true).put("playing", playing).put("title", clip(title)).put("artist", clip(artist)).put("album", clip(album))
+                    .put("app", appName(context, owner)).put("pkg", owner)
+                    .put("pos", Math.max(0, pos)).put("dur", Math.max(0, meta.getLong(MediaMetadata.METADATA_KEY_DURATION)))
+                    .put("speed", playing ? state.getPlaybackSpeed() : 0).put("seek", (state.getActions() & PlaybackState.ACTION_SEEK_TO) != 0);
+            if (!id.isEmpty()) out.put("art", "/nowplaying/" + id + ".jpg").put("back", "/nowplaying/" + id + "-b.jpg");
+        } catch (SecurityException e) {
+            try { out.put("access", false); } catch (Exception ignored) { }
+        } catch (Exception ignored) { }
+        return out.toString();
+    }
+
     /** Play/pause, next or previous for the playing session, or for pkg's session once it is paused. */
     static boolean control(Context context, String pkg, String action) {
         try {
-            MediaSessionManager msm = (MediaSessionManager) context.getSystemService(Context.MEDIA_SESSION_SERVICE);
-            if (msm == null) return false;
-            MediaController target = null;
-            for (MediaController c : msm.getActiveSessions(new ComponentName(context, NowPlayingService.class))) {
-                PlaybackState s = c.getPlaybackState();
-                if (s != null && s.getState() == PlaybackState.STATE_PLAYING) { target = c; break; }
-                if (target == null && pkg != null && pkg.equals(c.getPackageName())) target = c;
-            }
+            MediaController target = session(context, pkg);
             if (target == null) return false;
             MediaController.TransportControls t = target.getTransportControls();
             PlaybackState s = target.getPlaybackState();

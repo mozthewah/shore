@@ -97,10 +97,10 @@
     cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], clook: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'],
     svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], ncalm: ['off', 'on'], wfx: ['off', 'on'], cnews: ['off', 'on'], svphoto: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
-    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'], cwatch: ['off', 'on'],
+    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'], cwatch: ['off', 'on'], plyric: ['off', 'on'],
     nsrc: ['google', 'phone'].concat(NEWS_OUTLETS.map(function (o) { return o.id; })) };
   /* Newer axes with their defaults: stored, migrated and validated like the others. */
-  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore', cwatch: 'on' };
+  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore', cwatch: 'on', plyric: 'on' };
   /* On/off settings that OK flips. */
   var TOGGLES = ['svphoto', 'ncalm', 'wfx', 'cnews', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec', 'cwatch'];
   var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', clook: 'Artist pictures', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
@@ -140,6 +140,12 @@
     'w-storm': '<path d="M7 14.5h10.5a3.6 3.6 0 0 0 .3-7.2 5.2 5.2 0 0 0-10-.5A3.9 3.9 0 0 0 7 14.5Z"/><path d="m12.8 15.5-2.3 3.5h3l-2.2 3.5"/>',
     undo: '<path d="M9 6 5 10l4 4"/><path d="M5 10h9.5a4.5 4.5 0 0 1 0 9H11"/>',
     check: '<path d="m5.5 12.5 4 4 9-9"/>',
+    play: '<path d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.6-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2Z"/>',
+    pause: '<rect x="6.5" y="5" width="3.8" height="14" rx="1"/><rect x="13.7" y="5" width="3.8" height="14" rx="1"/>',
+    prev: '<path d="M18.5 6.2v11.6a.7.7 0 0 1-1.1.6L9.5 12.6a.7.7 0 0 1 0-1.2l7.9-5.8a.7.7 0 0 1 1.1.6Z"/><rect x="5.5" y="5.5" width="2.6" height="13" rx=".9"/>',
+    next: '<path d="M5.5 6.2v11.6a.7.7 0 0 0 1.1.6l7.9-5.8a.7.7 0 0 0 0-1.2L6.6 5.6a.7.7 0 0 0-1.1.6Z"/><rect x="15.9" y="5.5" width="2.6" height="13" rx=".9"/>',
+    lyrics: '<path d="M4.5 6h11M4.5 10.5h11M4.5 15h6"/><path d="M15.5 19v-6.5l4-1"/><circle cx="14" cy="19" r="1.6"/>',
+    open: '<path d="M14 4.5h5.5V10"/><path d="m19.5 4.5-8 8"/><path d="M17 13.5v4.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 5 18V9a1.5 1.5 0 0 1 1.5-1.5H11"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
     music: '<path d="M9 17.5V6l10-2v11.5"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/>',
     left: '<path d="m14.5 5-7 7 7 7"/>',
@@ -172,7 +178,7 @@
   function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, clook: c.clook, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material, svsrc: c.svsrc, svlay: c.svlay, svtime: c.svtime,
       svmotion: c.svmotion, iask: c.iask, ncalm: c.ncalm, wfx: c.wfx, cnews: c.cnews, svphoto: c.svphoto, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
-      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack, cwatch: c.cwatch }; }
+      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack, cwatch: c.cwatch, plyric: c.plyric }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
 
   /* ---------- Helpers ---------- */
@@ -679,6 +685,7 @@
   function openMusic(b) {
     var p = S.playing.playing ? S.playing : musicPaused || {}, paused = !S.playing.playing;
     if (!S.playing.playing && !musicPaused) return;
+    if (NOWPLAYING.detail) { openPlayer(p.pkg); return; }
     push({ id: 'message', content: { title: p.title || 'Music', line: (p.artist || '') + (p.artist && p.app ? ' — ' : '') + (p.app || ''), note: '',
       actions: [['np.prev', 'Previous'], ['np.toggle', paused ? 'Play' : 'Pause'], ['np.next', 'Next']] }, f: { b: b === undefined ? 1 : b } });
     render();
@@ -691,6 +698,76 @@
     openMusic(b);
     setTimeout(pollPlaying, 900); // the session reports the new state (or the next title) shortly after
   }
+  /* ---------- Music view: cover, progress, controls and synced lyrics ----------
+     Detail comes from the media session (NowPlayingService.detail) once a second; between polls the position
+     runs on locally. Lyrics come from LRCLIB through Lyrics.java and follow the position line by line. */
+  var PB = ['prev', 'toggle', 'next', 'lyrics', 'app'], SEEK_STEP = 10000;
+  var P = { d: null, at: 0, pkg: '', ly: null, lyKey: '', poll: 0, tick: 0, seekTo: -1, seekUntil: 0 };
+  function openPlayer(pkg) {
+    P.pkg = pkg || ''; P.d = null; P.ly = null; P.lyKey = ''; P.seekTo = -1;
+    push({ id: 'player', f: { zone: 'buttons', b: 1 } });
+    playerPoll(); render();
+  }
+  function playerOpen() { return top().id === 'player'; }
+  function playerPoll() {
+    var d, key;
+    clearTimeout(P.poll); P.poll = 0;
+    if (!playerOpen() || !NOWPLAYING || !NOWPLAYING.detail) return;
+    if (!document.hidden) {
+      d = NOWPLAYING.detail(P.pkg, S.c.clook === 'on');
+      if (d.found) {
+        if (P.seekTo >= 0 && Date.now() < P.seekUntil && Math.abs(d.pos - P.seekTo) > 3000) d.pos = playerPos(); // the app hasn't reported the jump yet
+        else P.seekTo = -1;
+        P.d = d; P.at = Date.now(); P.pkg = d.pkg || P.pkg;
+        key = d.artist + '\n' + d.title;
+        if (key !== P.lyKey) { P.lyKey = key; P.ly = null; }
+        if (S.c.plyric === 'on' && (!P.ly || P.ly.state === 'pending')) P.ly = NOWPLAYING.lyrics(d.artist, d.title, d.album, Math.round(d.dur / 1000));
+      } else if (!P.d) P.d = { found: false };
+      render();
+    }
+    P.poll = setTimeout(playerPoll, 1000);
+  }
+  /* Position now, from the last poll and the playback speed. */
+  function playerPos() {
+    var d = P.d;
+    if (!d || !d.found) return 0;
+    if (P.seekTo >= 0 && Date.now() < P.seekUntil) return P.seekTo;
+    return Math.min(d.dur || Infinity, d.pos + (Date.now() - P.at) * d.speed);
+  }
+  function playerTime(ms) { var s = Math.max(0, Math.floor(ms / 1000)), m = Math.floor(s / 60), h = Math.floor(m / 60); s %= 60; return (h ? h + ':' + (m % 60 < 10 ? '0' : '') + (m % 60) : m) + ':' + (s < 10 ? '0' : '') + s; }
+  function playerSeek(delta) {
+    var d = P.d, to;
+    if (!d || !d.found || !d.seek) return;
+    to = Math.max(0, Math.min(d.dur ? d.dur - 1000 : Infinity, playerPos() + delta));
+    if (!NOWPLAYING.seek(d.pkg, to)) { S.note = 'Couldn’t control the music.'; return; }
+    P.seekTo = to; P.seekUntil = Date.now() + 2500; P.d.pos = to; P.at = Date.now();
+  }
+  function playerButton(id) {
+    var d = P.d || {};
+    if (id === 'lyrics') {
+      var c = next(S.c.home.slice(), S.c.recent.slice()); c.plyric = S.c.plyric === 'on' ? 'off' : 'on';
+      write(c, 'Lyrics'); if (c.plyric === 'on') { P.lyKey = ''; playerPoll(); }
+      return;
+    }
+    if (id === 'app') { if (d.pkg && FrameDevice.launchApp) perform(d.app || 'Music', function (done) { FrameDevice.launchApp(d.pkg, done); }); return; }
+    if (!NOWPLAYING.control(d.pkg || P.pkg, id)) { S.note = 'Couldn’t control the music.'; return; }
+    if (id === 'toggle' && d.found) { d.pos = playerPos(); P.at = Date.now(); d.speed = d.playing ? 0 : 1; d.playing = !d.playing; }
+    clearTimeout(P.poll); P.poll = setTimeout(playerPoll, 600);
+  }
+  /* The lyric line playing now: the last synced line that has started. */
+  function lyricIndex(lines, pos) {
+    var lo = 0, hi = lines.length - 1, at = -1, mid;
+    while (lo <= hi) { mid = (lo + hi) >> 1; if (lines[mid][0] <= pos + 250) { at = mid; lo = mid + 1; } else hi = mid - 1; }
+    return at;
+  }
+  /* A light timer while the view is open: the bar, the clock digits and the lyric line, nothing else. */
+  function playerTick() {
+    clearTimeout(P.tick); P.tick = 0;
+    if (!playerOpen()) return;
+    if (!document.hidden) FILLS.player(top(), slotEls, true);
+    P.tick = setTimeout(playerTick, 250);
+  }
+
   /* prev/next run along the apps; out goes to the controls, inn comes back (or to a per-app action). */
   function axes() {
     var v = S.c.layout === 'list';
@@ -1933,6 +2010,30 @@
     }
   };
   function messageContent(t) { return t.content || MSG[t.msg]; }
+  V.player = {
+    sheet: true,
+    key: function (t, k) {
+      var f = t.f, d = P.d || {}, seekable = !!(d.found && d.seek);
+      if (k === 'back') { pop(); return; }
+      if (f.zone === 'bar') {
+        if (!seekable || k === 'down') f.zone = 'buttons';
+        else if (k === 'left') playerSeek(-SEEK_STEP);
+        else if (k === 'right') playerSeek(SEEK_STEP);
+        else if (k === 'ok') playerButton('toggle');
+        return;
+      }
+      f.b = clamp(f.b, 0, PB.length - 1);
+      if (k === 'left' && f.b > 0) f.b--;
+      else if (k === 'right' && f.b < PB.length - 1) f.b++;
+      else if (k === 'up' && seekable) f.zone = 'bar';
+      else if (k === 'ok') playerButton(PB[f.b]);
+    },
+    point: function (t, z, i) {
+      if (z === 'pbtn') { t.f.zone = 'buttons'; t.f.b = i; this.key(t, 'ok'); }
+      else if (z === 'pbar') t.f.zone = 'bar';
+    }
+  };
+
   V.message = {
     sheet: true,
     key: function (t, k) {
@@ -2601,7 +2702,7 @@
     if (!sheet) { sheetView.innerHTML = ''; sheetKey = ''; return; }
     key = t.id + '|' + (t.mode || '') + '|' + (t.msg || '') + '|' + S.variant + '|' + S.c.bg;
     if (key !== sheetKey) {
-      sheetView.innerHTML = FRAMES[t.id](t);
+      sheetView.innerHTML = FRAMES[t.id](t); sheetView.className = 'view view-' + t.id;
       sheetKey = key; slotEls = {};
       Array.prototype.forEach.call(sheetView.querySelectorAll('[data-slot]'), function (el) { slotEls[el.getAttribute('data-slot')] = el; });
     }
@@ -2743,6 +2844,16 @@
     }).join('');
   }
   var FRAMES = {
+    player: function () {
+      return '<div class="pl-bg" aria-hidden="true"><img class="pl-back" data-slot="back" alt=""></div><div class="pl-shade" aria-hidden="true"></div>'
+        + '<div class="pl-art" data-slot="art"></div>'
+        + '<div class="pl-info"><p class="pl-app" data-slot="app"></p><h2 class="pl-title" data-slot="title"></h2><p class="pl-artist" data-slot="artist"></p>'
+        + '<div class="pl-bar" data-slot="bar" data-z="pbar" data-i="0"><div class="pl-track"><div class="pl-fill" data-slot="fill"></div><div class="pl-knob" data-slot="knob"></div></div>'
+        + '<div class="pl-times"><span data-slot="pos"></span><span data-slot="dur"></span></div></div>'
+        + '<div class="pl-buttons" data-slot="buttons"></div></div>'
+        + '<div class="pl-words" data-slot="lyrics"><div class="pl-lines" data-slot="lines"></div></div>'
+        + '<p class="pl-credit" data-slot="credit"></p><p class="pl-hint" data-slot="hint"></p>';
+    },
     apps: function () {
       return '<h2 class="s-title" data-slot="title"></h2><p class="s-sub" data-slot="sub"></p><div class="s-head" data-slot="head"></div>'
         + '<div class="grid-view" data-slot="view"><div class="grid-in" data-slot="grid"></div></div>'
@@ -2765,6 +2876,43 @@
     return '<span class="panel-content">' + appMark(a, 120, 72, 58) + '<span class="label">' + esc(a.name) + '</span></span><span class="state">' + state + '</span>';
   }
   var FILLS = {
+    player: function (t, el, tick) {
+      var d = P.d || {}, f = t.f, pos = playerPos(), dur = d.dur || 0, ly = S.c.plyric === 'on' ? P.ly : null, synced = ly && ly.state === 'ok' && ly.synced.length ? ly.synced : null;
+      var showLyrics = !!(ly && ly.state === 'ok'), frac = dur ? Math.max(0, Math.min(1, pos / dur)) : 0, at, html;
+      el.fill.style.transform = 'scaleX(' + frac.toFixed(4) + ')';
+      el.knob.style.transform = 'translate3d(' + Math.round(frac * 640) + 'px,0,0)';
+      setHTML(el.pos, d.found && dur ? playerTime(pos) : '');
+      setHTML(el.dur, d.found && dur ? '−' + playerTime(Math.max(0, dur - pos)) : '');
+      if (synced) {
+        at = lyricIndex(synced, pos);
+        Array.prototype.forEach.call(el.lines.childNodes, function (n, i) { var c = 'pl-line' + (i === at ? ' is-now' : i < at ? ' is-past' : ''); if (n.className !== c) n.className = c; });
+        el.lines.style.transform = 'translate3d(0,' + (at > 0 && el.lines.childNodes[at] ? -el.lines.childNodes[at].offsetTop : 0) + 'px,0)';
+      } else if (showLyrics && dur) el.lines.style.transform = 'translate3d(0,' + (-Math.round(frac * Math.max(0, el.lines.scrollHeight - 600))) + 'px,0)';
+      if (tick) return;
+      if (!P.tick) playerTick();
+      if (el.back.getAttribute('src') !== (d.back || '')) { if (d.back) el.back.src = d.back; else el.back.removeAttribute('src'); }
+      el.back.parentNode.className = 'pl-bg' + (d.back ? ' is-on' : '');
+      setHTML(el.art, d.art ? '<img alt="" src="' + escRaw(d.art) + '">' : '<span class="pl-art-empty">' + icon('music') + '</span>');
+      setHTML(el.app, d.found ? esc(d.playing ? 'Playing on ' + d.app : 'Paused · ' + d.app) : '');
+      setHTML(el.title, d.found ? escRaw(d.title) : esc(d.access === false ? 'Allow Shore in Notification access' : P.d ? 'Nothing is playing' : ''));
+      setHTML(el.artist, d.found ? escRaw([d.artist, d.album].filter(Boolean).join(' · ')) : '');
+      el.bar.className = 'pl-bar' + (f.zone === 'bar' ? ' is-focus' : '') + (d.found && d.seek ? ' can-seek' : '') + (dur ? '' : ' is-live');
+      setHTML(el.buttons, PB.map(function (id, i) {
+        var name = id === 'toggle' ? (d.playing ? 'pause' : 'play') : id === 'app' ? 'open' : id, label = id === 'toggle' ? (d.playing ? 'Pause' : 'Play') : id === 'prev' ? 'Previous' : id === 'next' ? 'Next' : id === 'lyrics' ? 'Lyrics' : 'Open ' + (d.app || 'app');
+        return '<button type="button" tabindex="-1" class="pl-btn pl-' + id + (f.zone === 'buttons' && f.b === i ? ' is-focus' : '') + (id === 'lyrics' && S.c.plyric === 'on' ? ' is-on' : '') + '" data-z="pbtn" data-i="' + i + '" aria-label="' + esc(label) + '">'
+          + icon(name, id === 'lyrics' || id === 'app' ? '' : 'ico-fill') + '</button>';
+      }).join(''));
+      var b = PB[clamp(f.b, 0, PB.length - 1)];
+      setHTML(el.hint, f.zone === 'bar' ? esc('Left and right jump 10 seconds') : esc(b === 'toggle' ? (d.playing ? 'Pause' : 'Play') : b === 'prev' ? 'Previous' : b === 'next' ? 'Next' : b === 'lyrics' ? (S.c.plyric === 'on' ? 'Hide lyrics' : 'Show lyrics') : 'Open ' + (d.app || 'app')));
+      html = !ly ? '' : ly.state === 'ok' ? (synced ? synced.map(function (l) { return '<p class="pl-line">' + (l[1] ? escRaw(l[1]) : '<span class="pl-gap">♪</span>') + '</p>'; }).join('')
+        : '<div class="pl-plain">' + escRaw(ly.plain).replace(/\n/g, '<br>') + '</div>')
+        : '<p class="pl-state">' + esc(ly.state === 'pending' ? 'Looking for lyrics…' : ly.state === 'instrumental' ? 'Instrumental' : 'No lyrics for this song') + '</p>';
+      if (el.lines._key !== P.lyKey + '|' + (ly && ly.state)) { el.lines._key = P.lyKey + '|' + (ly && ly.state); el.lines.innerHTML = html; el.lines.style.transition = 'none'; FILLS.player(t, el, true); void el.lines.offsetHeight; el.lines.style.transition = ''; } // a new song jumps, it doesn't scroll
+      var wide = !!(ly && (ly.state === 'ok' || ly.state === 'pending'));
+      el.lyrics.className = 'pl-words' + (wide ? ' is-on' : '') + (synced ? ' is-synced' : '');
+      setHTML(el.credit, showLyrics ? esc('Lyrics from LRCLIB') : ly && ly.state === 'instrumental' ? esc('Instrumental') : ly && ly.state === 'none' ? esc('No lyrics for this song') : '');
+      sheetView.className = 'view view-player' + (wide ? ' has-lyrics' : '');
+    },
     apps: function (t, el) {
       var f = t.f, items = appsItems(), n = items.length, rows = Math.ceil(n / COLS), vis = 3, row = Math.floor(f.i / COLS);
       setHTML(el.title, esc('All apps'));
