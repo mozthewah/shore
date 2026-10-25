@@ -70,7 +70,6 @@
     playfair: { name: 'Playfair Display', family: 'Study Playfair', display: 400, ui: 400, clock: 400 }
   };
   var PRIVATE_FONTS = window.CleanFramePrivateFontIDs || [], fontMetrics = {}, unavailableFonts = {}, widthCache = {}, fontsReady = false;
-  var LOOK_KEYS = ['bg', 'layout', 'apps', 'font', 'controls', 'focus', 'material'];
   /* News sources for the headline under the clock. Outlets are offered by the TV's language, with a couple for everyone;
      "phone" is the RSS or Atom feed typed in the phone companion. Every feed was checked to answer plain RSS requests. */
   var NEWS_OUTLETS = [
@@ -175,7 +174,6 @@
       svmotion: c.svmotion, iask: c.iask, ncalm: c.ncalm, wfx: c.wfx, cnews: c.cnews, svphoto: c.svphoto, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
       cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
-  function derivedTheme() { return S.c.layout === 'list' ? 'list' : 'shore'; }
 
   /* ---------- Helpers ---------- */
   function app(id) { for (var i = 0; i < APPS.length; i++) if (APPS[i].id === id) return APPS[i]; return null; }
@@ -197,7 +195,6 @@
   function inputRow() { return S.c.inputs === 'row' && S.c.layout === 'dock' && LIVE.length > 0; }
   function visibleHome() { return !LIVE.length || inputRow() ? S.c.home : LIVE.concat(S.c.home); }
   function top() { return S.stack[S.stack.length - 1]; }
-  function inStack(id) { for (var i = S.stack.length - 1; i >= 0; i--) if (S.stack[i].id === id) return S.stack[i]; return null; }
   function push(e) { S.stack.push(e); return e; }
   function pop() { if (S.stack.length > 1) S.stack.pop(); }
   function px(n) { return n.toFixed(2) + 'px'; }
@@ -1051,7 +1048,6 @@
 
   /* ---------- Settings, Layout and messages ---------- */
   var PARENT = { health: 'samsung', updates: 'samsung', saverlook: 'screensaver', rotation: 'background', online: 'background', unsplash: 'online', animated: 'online', fonts: 'typography', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
-  function subPage(t) { return !!PARENT[t.group]; }
   function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : DETAIL_NAMES[group]; }
   function parentName(t) { return PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
   /* ---------- Wallpaper sources: any mix of Shore's own, My photos and online sources ----------
@@ -1064,13 +1060,11 @@
   function sourceOn(id) { return sourceList().indexOf(id) >= 0; }
   function sourceName(id) { var o = SOURCES.filter(function (x) { return x.id === id; })[0]; return o ? o.name : id; }
   function sourceShort() { var l = sourceList().map(function (id) { return T(sourceName(id)); }); return l.length > 1 ? l[0] + ' +' + (l.length - 1) : l[0]; }
-  function sourceSummary() { return sourceList().map(function (id) { return T(sourceName(id)); }).join(', '); }
   /* A wallpaper rotates when its source is chosen. Online and phone photos carry their source; older entries count as online. */
   function isFav(w) { return S.c.fav.indexOf(w.id) >= 0; }
   function isHidden(w) { return S.c.hide.indexOf(w.id) >= 0; }
   /* Hidden photos never rotate; favourites always do, whatever their source. */
   function inRotation(w) { return isHidden(w) ? false : isFav(w) || (w.online ? !w.source || sourceOn(w.source) : sourceOn('builtin')); }
-  function source() { for (var i = 0; i < SOURCES.length; i++) if (SOURCES[i].id === S.c.source) return SOURCES[i]; return SOURCES[0]; }
   function mode() { for (var i = 0; i < MODES.length; i++) if (MODES[i].id === S.c.mode) return MODES[i]; return MODES[0]; }
   /* Settings overview: two columns of headed groups. Up and down stay in a column; left and right cross to the nearest row. */
   function settingsColumns() {
@@ -1555,13 +1549,12 @@
   }
   function companionModel() {
     var home = S.c.home.map(function (id) { var a = app(id); return a ? { id: id, name: a.name } : null; }).filter(Boolean);
-    var others = APPS.filter(function (a) { return !a.input && a.appId && S.c.home.indexOf(a.id) < 0 && installedApp(a); }).slice(0, 80).map(function (a) { return { id: a.id, name: a.name }; });
+    var others = APPS.filter(function (a) { return !a.input && a.appId && S.c.home.indexOf(a.id) < 0; }).slice(0, 80).map(function (a) { return { id: a.id, name: a.name }; });
     return { version: 1, lang: (window.CleanFrameI18n && CleanFrameI18n.lang) || 'en', saver: !!S.saver, cap: CAP,
       groups: COMPANION_GROUPS.map(function (g) { return { name: T(g[0]), items: g[1].map(companionAxis).filter(Boolean) }; }).filter(function (g) { return g.items.length; }),
       home: home, others: others, backup: backupOf(),
       labels: { start: T('Start the screensaver now'), apps: T('Apps on Home'), more: T('Other installed apps'), full: T(FULL) } };
   }
-  function installedApp(a) { return !!a; }
   /* Backup for the companion: every saved preference, in the same format Shore stores. No timestamp, so an unchanged
      model is not republished; the phone dates the file. Photos stay on the TV and are not part of it. */
   function backupOf() { return { shore: 'backup', format: 1, settings: serialise(S.c) }; }

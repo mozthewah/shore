@@ -47,10 +47,8 @@ import java.util.concurrent.Executors;
  */
 final class Companion {
     interface Listener { void changed(int count); }
-    /** Applies a setting chosen on the phone; MainActivity hands it to the page. */
-    /** Buttons from the phone remote, answered right away so the phone can say when a button can't reach the TV. */
-
     interface Commands {
+        /** Applies a setting chosen on the phone; MainActivity hands it to the page. */
         void set(String axis, String value);
         /** A settings backup from the phone, already checked to be a Shore backup. */
         void restore(String json);

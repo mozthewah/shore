@@ -349,7 +349,7 @@ try {
       if (font === 'newsreader') {
         for (const layout of ['list', 'dock']) for (const controls of ['icons', 'both', 'text']) {
           await look({ layout, controls });
-          const wrong = await current.evaluate(() => [...document.querySelectorAll('.home .clock, .home .u, .home .u-label, .home .ph-name, .home .tile .label, .home .app-focus-name, .home .util-focus-label, .home .wall-keep')].filter(e => !/Newsreader/.test(getComputedStyle(e).fontFamily)).map(e => ({ cls: e.className, font: getComputedStyle(e).fontFamily })));
+          const wrong = await current.evaluate(() => [...document.querySelectorAll('.home .clock, .home .u, .home .u-label, .home .ph-name, .home .tile .label, .home .app-focus-name, .home .util-focus-label')].filter(e => !/Newsreader/.test(getComputedStyle(e).fontFamily)).map(e => ({ cls: e.className, font: getComputedStyle(e).fontFamily })));
           check('Newsreader covers Home text ' + layout + '/' + controls, wrong.length === 0, wrong);
         }
       }

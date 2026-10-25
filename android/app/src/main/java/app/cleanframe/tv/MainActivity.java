@@ -143,7 +143,6 @@ public class MainActivity extends Activity {
         return super.dispatchKeyEvent(event);
     }
 
-    /** One button from the phone remote. Returns whether it reached something. */
     private void inputsChanged() {
         if (web != null) web.evaluateJavascript("window.CleanFrameInputsChanged&&window.CleanFrameInputsChanged()", null);
     }
