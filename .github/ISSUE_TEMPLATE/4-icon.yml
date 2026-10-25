@@ -1,0 +1,30 @@
+name: New Shore icon
+description: Ask for a Shore logo for an app that doesn't have one yet.
+labels: [icon]
+body:
+  - type: markdown
+    attributes:
+      value: Shore draws its own single-colour logos. Once an app has one, you can also pick it for any app under Settings › App icons › Per app.
+  - type: input
+    id: app
+    attributes:
+      label: App name
+      placeholder: "Plex"
+    validations:
+      required: true
+  - type: input
+    id: package
+    attributes:
+      label: Package name
+      description: Optional. It's in the Play Store link after id=, for example com.plexapp.android.
+      placeholder: "com.plexapp.android"
+  - type: input
+    id: logo
+    attributes:
+      label: Link to the official logo or brand page
+      placeholder: "https://www.plex.tv/media-kit/"
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Which version of the logo you'd like, if there are several.

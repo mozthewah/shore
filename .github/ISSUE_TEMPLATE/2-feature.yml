@@ -1,0 +1,21 @@
+name: Feature idea
+description: Suggest something new for Shore.
+labels: [idea]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: Describe it the way you'd use it with the remote.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why does it matter to you?
+      description: What you do today instead, or what's missing.
+  - type: textarea
+    id: refs
+    attributes:
+      label: Examples
+      description: Other launchers, apps or screenshots that do it well.
