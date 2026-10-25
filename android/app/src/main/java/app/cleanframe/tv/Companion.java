@@ -103,6 +103,7 @@ final class Companion {
     String place() { return prefs.getString("place", ""); }
     /** RSS or Atom feed typed on the phone for the headlines; empty means Google News for the TV's language. */
     String feed() { return prefs.getString("feed", ""); }
+    String calendar() { return prefs.getString("calendar", ""); }
 
     /** Starts the server when switched on; called when Shore opens. */
     synchronized void resume() { if (enabled() && (server == null || server.isClosed())) try { open(); } catch (IOException ignored) { } }
@@ -131,7 +132,7 @@ final class Companion {
             String address = s == null || s.isClosed() ? null : address();
             url = address == null ? "" : "http://" + address + ":" + s.getLocalPort(); // follows a new IP address
             return new JSONObject().put("enabled", enabled()).put("url", url)
-                    .put("count", count()).put("place", place()).put("feed", feed()).toString();
+                    .put("count", count()).put("place", place()).put("feed", feed()).put("calendar", calendar()).toString();
         } catch (Exception e) { return "{}"; }
     }
 
@@ -296,6 +297,14 @@ final class Companion {
                 send(out, 200, "application/json", apiInfo());
                 return;
             }
+            if (method.equals("POST") && api.equals("calendar")) {
+                String cal = param(query, "url").trim();
+                if (!cal.isEmpty() && CalendarFeed.clean(cal).isEmpty()) { send(out, 400, "application/json", "{\"error\":\"calendar\"}"); return; }
+                prefs.edit().putString("calendar", cal).apply();
+                notifyChanged();
+                send(out, 200, "application/json", apiInfo());
+                return;
+            }
             if (method.equals("POST") && api.equals("place")) {
                 String place = param(query, "name").trim();
                 if (place.length() > 80) place = place.substring(0, 80);
@@ -321,7 +330,7 @@ final class Companion {
         JSONArray photos = new JSONArray();
         File[] all = files();
         for (int i = all.length - 1; i >= 0; i--) photos.put(all[i].getName());
-        return new JSONObject().put("name", "Shore").put("install", PAIR_URL).put("count", all.length).put("max", MAX_FILES).put("place", place()).put("feed", feed()).put("photos", photos).toString();
+        return new JSONObject().put("name", "Shore").put("install", PAIR_URL).put("count", all.length).put("max", MAX_FILES).put("place", place()).put("feed", feed()).put("calendar", calendar()).put("photos", photos).toString();
     }
 
     private void asset(OutputStream out, String name) throws IOException {

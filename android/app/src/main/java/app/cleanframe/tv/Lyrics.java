@@ -48,6 +48,57 @@ final class Lyrics {
         return PENDING;
     }
 
+    /** key -> {state, src, lines:[…]}: the lines translated, same count and order. */
+    private static final Map<String, String> TRANSLATED = new LinkedHashMap<String, String>(16, .75f, true) {
+        @Override protected boolean removeEldestEntry(Map.Entry<String, String> e) { return size() > 20; }
+    };
+
+    /**
+     * The lyric lines in the TV's language, only when the owner turned Translate lyrics on. The lines go to
+     * Google Translate's keyless endpoint in one request; nothing else about the song or the TV is sent.
+     * "same" when the song is already in that language.
+     */
+    static String translate(String text, String lang) {
+        if (text == null || text.trim().isEmpty() || lang == null || !lang.matches("[a-z]{2,3}(-[A-Za-z]{2,4})?") || text.length() > 12000) return NONE;
+        final String key = lang + "\n" + text;
+        synchronized (TRANSLATED) {
+            String hit = TRANSLATED.get(key);
+            if (hit != null) return hit;
+            TRANSLATED.put(key, PENDING);
+        }
+        NET.execute(() -> {
+            String result;
+            try { result = fetchTranslation(text, lang); } catch (Exception e) { result = null; }
+            synchronized (TRANSLATED) { if (result == null) TRANSLATED.remove(key); else TRANSLATED.put(key, result); }
+        });
+        return PENDING;
+    }
+
+    private static String fetchTranslation(String text, String lang) throws Exception {
+        HttpURLConnection c = (HttpURLConnection) new URL("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&tl=" + enc(lang)).openConnection();
+        String body;
+        try {
+            c.setConnectTimeout(8000); c.setReadTimeout(15000);
+            c.setDoOutput(true); c.setRequestMethod("POST");
+            c.setRequestProperty("User-Agent", OnlineWallpapers.UA);
+            c.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+            c.getOutputStream().write(("q=" + enc(text)).getBytes(StandardCharsets.UTF_8));
+            if (c.getResponseCode() != 200) throw new IllegalStateException("HTTP " + c.getResponseCode());
+            try (InputStream in = c.getInputStream()) { body = new String(OnlineWallpapers.readAll(in, 2 << 20), StandardCharsets.UTF_8); }
+        } finally { c.disconnect(); }
+        JSONArray r = new JSONArray(body), parts = r.optJSONArray(0);
+        String src = r.optString(2, "");
+        if (src.equalsIgnoreCase(lang) || src.equalsIgnoreCase(lang.split("-")[0])) return "{\"state\":\"same\"}";
+        if (parts == null) return NONE;
+        StringBuilder all = new StringBuilder();
+        for (int i = 0; i < parts.length(); i++) { JSONArray p = parts.optJSONArray(i); if (p != null && !p.isNull(0)) all.append(p.optString(0)); }
+        String[] want = text.split("\n", -1), got = all.toString().split("\n", -1);
+        if (want.length != got.length) return NONE; // lines that no longer line up are worse than none
+        JSONArray lines = new JSONArray();
+        for (String g : got) lines.put(g.trim());
+        return new JSONObject().put("state", "ok").put("src", src).put("lines", lines).toString();
+    }
+
     /** Title without what streaming services add: (feat. …), - Remastered 2011, [Explicit], - Radio Edit and similar. */
     static String cleanTitle(String t) {
         String s = t.replaceAll("(?i)\\s*[(\\[](feat|ft|with)\\.?\\s[^)\\]]*[)\\]]", "")

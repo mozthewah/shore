@@ -111,10 +111,30 @@ public class NowPlayingService extends NotificationListenerService {
                     .put("pos", Math.max(0, pos)).put("dur", Math.max(0, meta.getLong(MediaMetadata.METADATA_KEY_DURATION)))
                     .put("speed", playing ? state.getPlaybackSpeed() : 0).put("seek", (state.getActions() & PlaybackState.ACTION_SEEK_TO) != 0);
             if (!id.isEmpty()) out.put("art", "/nowplaying/" + id + ".jpg").put("back", "/nowplaying/" + id + "-b.jpg");
+            out.put("next", upNext(c, state));
         } catch (SecurityException e) {
             try { out.put("access", false); } catch (Exception ignored) { }
         } catch (Exception ignored) { }
         return out.toString();
+    }
+
+    /** Up to three queue items after the playing one, [{title, artist}], when the app shares its queue (Spotify does). */
+    private static org.json.JSONArray upNext(MediaController c, PlaybackState state) {
+        org.json.JSONArray out = new org.json.JSONArray();
+        try {
+            java.util.List<android.media.session.MediaSession.QueueItem> queue = c.getQueue();
+            if (queue == null || queue.isEmpty()) return out;
+            long active = state.getActiveQueueItemId();
+            int at = -1;
+            for (int i = 0; i < queue.size(); i++) if (queue.get(i).getQueueId() == active) { at = i; break; }
+            if (at < 0) return out;
+            for (int i = at + 1; i < queue.size() && out.length() < 3; i++) {
+                android.media.MediaDescription d = queue.get(i).getDescription();
+                String t = d.getTitle() == null ? "" : d.getTitle().toString().trim(), a = d.getSubtitle() == null ? "" : d.getSubtitle().toString().trim();
+                if (!t.isEmpty()) out.put(new JSONObject().put("title", clip(t)).put("artist", clip(a)));
+            }
+        } catch (Exception ignored) { }
+        return out;
     }
 
     /** Play/pause, next or previous for the playing session, or for pkg's session once it is paused. */

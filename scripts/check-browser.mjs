@@ -1003,6 +1003,22 @@ try {
     await current.reload(); await ready();
     check('The choice survives a restart', (await stored()).iconFor[id] === 'mark:hdmi');
   });
+  await run('Parental lock', async () => {
+    const pinHash = pin => { let h = 0x811c9dc5; for (const ch of 'shore:' + pin) { h ^= ch.charCodeAt(0); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, '0'); };
+    await closePage(); await page();
+    const id = (await state()).selected;
+    await closePage(); await page({ seed: { ...baseline(), lock: { pin: pinHash('1234'), settings: true, apps: [id] } } });
+    check('The lock survives loading', (await state()).lock.apps[0] === id && (await state()).lock.settings === true);
+    await nav('ok');
+    check('A locked app asks for the PIN', (await state()).view === 'pin');
+    for (const k of '1235') await current.keyboard.press(k);
+    check('A wrong PIN keeps it locked', (await state()).view === 'pin' && /Wrong PIN/.test(await current.locator('#sheetView').innerText()));
+    await nav('back');
+    check('Back leaves the PIN screen', (await state()).view === 'home');
+    await nav('ok');
+    await nav('up', 'up', 'ok', 'up', 'up', 'up', 'ok', 'up', 'up', 'up', 'up', 'ok', 'up', 'up', 'up', 'up', 'up', 'ok');
+    check('The arrows enter the right PIN and the app opens', (await state()).view !== 'pin', [(await state()).view, await current.locator('#sheetView').innerText()]);
+  });
   section = 'Run integrity';
   report.sourceAfter = hashes();
   check('No unexpected browser/resource failures', report.pageErrors.length === 0, report.pageErrors);

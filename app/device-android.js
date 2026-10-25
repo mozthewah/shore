@@ -161,7 +161,7 @@
       var r;
       try { r = JSON.parse(bridge.phoneInfo()); } catch (e) { r = {}; }
       return { enabled: !!r.enabled, url: typeof r.url === 'string' ? r.url : '',
-        count: +r.count || 0, place: typeof r.place === 'string' ? r.place : '', feed: typeof r.feed === 'string' ? r.feed : '' };
+        count: +r.count || 0, place: typeof r.place === 'string' ? r.place : '', feed: typeof r.feed === 'string' ? r.feed : '', calendar: typeof r.calendar === 'string' ? r.calendar : '' };
     },
     /* Pairing QR code as a PNG data URL, '' while off or offline. Made on demand: it is slow to encode. */
     qr: function () { var q = ''; try { q = String(bridge.phoneQr() || ''); } catch (e) { } return /^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(q) ? q : ''; },
@@ -206,7 +206,8 @@
       if (!r.found || typeof r.title !== 'string') return { access: r.access !== false, found: false };
       return { access: true, found: true, playing: !!r.playing, title: r.title, artist: String(r.artist || ''), album: String(r.album || ''), app: String(r.app || ''),
         pkg: /^[A-Za-z][A-Za-z0-9_.]{0,160}$/.test(r.pkg || '') ? r.pkg : '', pos: Math.max(0, +r.pos || 0), dur: Math.max(0, +r.dur || 0), speed: +r.speed || 0, seek: !!r.seek,
-        art: img.test(r.art || '') ? r.art : '', back: img.test(r.back || '') ? r.back : '' };
+        art: img.test(r.art || '') ? r.art : '', back: img.test(r.back || '') ? r.back : '',
+        next: (r.next && r.next.filter ? r.next : []).filter(function (x) { return x && typeof x.title === 'string' && x.title; }).slice(0, 3).map(function (x) { return { title: x.title, artist: String(x.artist || '') }; }) };
     } : null,
     /* Beat pulse: start() is false without permission; level() is -1 while off, else 0..1. */
     beat: bridge.beatStart ? {
@@ -226,6 +227,13 @@
           return w && w.length ? [l[0], l[1], w] : [l[0], l[1]];
         }) };
     },
+    /* The lyric lines in lang, same count and order: state pending|ok|same|none. */
+    translate: bridge.lyricsTranslate ? function (lines, lang) {
+      var r;
+      try { r = JSON.parse(bridge.lyricsTranslate(lines.join('\n'), String(lang || ''))) || {}; } catch (e) { r = {}; }
+      if (r.state === 'ok' && r.lines && r.lines.length === lines.length) return { state: 'ok', lines: r.lines.map(function (l) { return String(l || ''); }) };
+      return { state: /^(pending|same)$/.test(r.state) ? r.state : 'none', lines: [] };
+    } : null,
     control: bridge.nowPlayingControl ? function (pkg, action) { try { return !!bridge.nowPlayingControl(String(pkg || ''), String(action)); } catch (e) { return false; } } : null
   };
   /* In-app updates: the native side checks the public releases, verifies the APK and opens Android's installer. */
@@ -252,13 +260,21 @@
     requested: function () { try { return !!bridge.saverRequested(); } catch (e) { return false; } },
     openSettings: function (done) { reply(ask('screensaverSettings'), done, 'Screensaver settings could not open.'); }
   };
+  /* Next calendar event from the iCal address set on the phone: {title, start, allDay} or null. */
+  var calendar = { next: function () { try { var e = JSON.parse(bridge.calendarNext()); return e && e.title ? e : null; } catch (x) { return null; } } };
+  /* Sleep timer, kept by the Home-button service so it runs while other apps are open. */
+  var sleep = {
+    set: function (minutes) { try { return !!bridge.sleepIn(minutes | 0); } catch (e) { return false; } },
+    /* Milliseconds until standby, 0 when off, -1 when the Home-button service is off. */
+    left: function () { try { return +bridge.sleepLeft(); } catch (e) { return -1; } }
+  };
   /* Native start screen: the page saves the wallpaper it shows and says when Home has painted. */
   var startup = {
     backdrop: function (dataUrl) { try { bridge.backdrop(String(dataUrl || '')); } catch (e) { } },
     ready: function () { try { bridge.pageReady(); } catch (e) { } }
   };
   window.FrameDevice = {
-    platform: 'android', startup: startup, phone: phone, news: news, icons: icons, nowPlaying: nowPlaying, saver: saver, update: update,
+    platform: 'android', startup: startup, sleep: sleep, calendar: calendar, phone: phone, news: news, icons: icons, nowPlaying: nowPlaying, saver: saver, update: update,
     launch: launch, launchApp: launchApp, apps: apps, appInfo: appInfo,
     inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf, watchNext: watchNext,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */
