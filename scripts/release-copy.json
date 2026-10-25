@@ -10,5 +10,16 @@
       "Long photo titles no longer run into the preview."
     ],
     "image": "docs/images/tcl/online.jpg"
+  },
+  "2b71be0": {
+    "title": "The big one: your icons, a parental lock, a sleep timer and your calendar",
+    "notes": [
+      "Parental lock (Settings › Google TV › Parental lock): a four-digit PIN before the apps you choose open, and before Settings, Apps on Home and Quick actions if you like. Type it with the number keys or pick each digit with the arrows.",
+      "Sleep timer (Settings › Night): 30, 60, 90 or 120 minutes, then the TV switches off, even while another app is open. The time left shows under the clock.",
+      "Calendar under the clock: paste your calendar's iCal address in the phone companion and the next event appears, like \"Tomorrow 9:30 · Dentist\". Repeating events are understood.",
+      "Music view: Up next shows the next three songs when the music app shares its queue.",
+      "Music view: Translate lyrics (off by default) puts a translation into the TV's language under every synced line, using Google Translate.",
+      "The screensaver no longer starts over the music view while a song is playing."
+    ]
   }
 }

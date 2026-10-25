@@ -134,7 +134,7 @@ footer p{margin:0}
     <div class="caption">
       <h1>A plainer home screen for Google&nbsp;TV</h1>
       <p>Shore puts your apps, the devices plugged into HDMI and a photo you chose on the screen, with the time, the weather and a headline in the corner. Hold Home and you're back in Google TV.</p>
-      <p class="new"><a href="#music">New: a music view with lyrics that keep time, word by word, and a pulse that finds the beat.</a></p>
+      <p class="new"><a href="#home">New: your own icon for every app, recently used apps, a parental lock, a sleep timer and your calendar under the clock.</a></p>
     </div>
     <nav class="utils" aria-label="Sections">
       <a href="#clock"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Under the clock</a>
@@ -170,7 +170,8 @@ footer p{margin:0}
 <section id="home">
   <h2><span class="head">Look</span>Apps and inputs</h2>
   <div class="body">
-    <p>Shore finds your installed apps and puts up to nine on Home, in the order you choose. The Dock and List layouts draw every logo the same way: Shore's own drawings in colour or in one colour, or the icons from a pack you've installed, such as one made for Projectivy Launcher.</p>
+    <p>Shore finds your installed apps and puts up to nine on Home, in the order you choose. The Dock and List layouts draw every logo the same way: Shore's own drawings in colour or in one colour, or the icons from a pack you've installed, such as one made for Projectivy Launcher. Hold OK on any app to give it a different icon.</p>
+    <p>Apps you opened lately but haven't put on Home follow your own ones in the dock, up to three of them.</p>
     <p>Shelf uses each app's own banner instead. The focused app fills the screen with what's on there, and Down opens a row of picks. ARD, ZDF and ARTE work as they are. YouTube, Twitch and the apps covered by TMDB need API keys in a build of your own.</p>
     <div class="pair">
       <figure><div class="shot"><img src="images/home.jpg" width="1280" height="720" loading="lazy" alt="Dock layout over Sydney Harbour with YouTube, waipu.tv, Joyn, Spotify, Twitch and ARD Mediathek"></div><figcaption>Dock</figcaption></figure>
@@ -179,18 +180,23 @@ footer p{margin:0}
     <p>A console or set-top box gets a tile when you switch it on and loses it when you switch it off. The name comes over HDMI-CEC, so you see "PlayStation 5" rather than "HDMI 2". Inputs can go first in the dock or in a row of their own, and you can hide the ones you never use. If a device turns on while Home is showing, Shore asks whether to switch to it.</p>
     <figure><div class="shot"><img src="images/inputs-row.jpg" width="1280" height="720" loading="lazy" alt="Home with an HDMI 2 tile in its own row above the app dock"></div><figcaption>Inputs in their own row.</figcaption></figure>
     <p>Pressing Home opens Shore and holding it opens Google TV's own Home. The app shortcut keys and the TV button on the remote can be given new jobs: an app, an input or the screensaver.</p>
+    <ul class="rows parts">
+      <li class="row"><b>Parental lock</b><span>A four-digit PIN before the apps you choose open, and before Settings if you like. Type it with the number keys or pick each digit with the arrows.</span></li>
+      <li class="row"><b>Sleep timer</b><span>30 minutes to two hours, then the TV switches off, even in the middle of another app.</span></li>
+    </ul>
   </div>
 </section>
 
 <section id="clock">
   <h2><span class="head">Clock and info</span>Under the clock</h2>
   <div class="body">
-    <p>Three optional lines sit under the time. Each has its own settings page.</p>
+    <p>Optional lines sit under the time. Each has its own settings page.</p>
     <figure><div class="shot"><img src="shots/nowplaying.jpg" width="1600" height="900" loading="lazy" alt="Home with a blurred album cover as the background and Tidal Lights, Harbour Room, Spotify under the clock"></div><figcaption>While music plays, the album cover can take over the background.</figcaption></figure>
     <ul class="rows parts">
       <li class="row"><b>Weather</b><span>Temperature and sky from Open-Meteo, which needs no key or account. The place follows the TV's time zone unless you type a city on your phone. Weather effects draw rain, snow, fog or a storm over the photo while it's happening; clear skies leave it alone.</span></li>
       <li class="row"><b>Music</b><span>With notification access, Shore shows what another app is playing, such as Spotify in the background. If an app shares only a small cover, Shore looks for an artist photo on TheAudioDB or a bigger cover on iTunes. You can turn that lookup off.</span></li>
       <li class="row"><b>News</b><span>One headline every 20 seconds from Google News for your language and country, an outlet like BBC News or tagesschau, or an RSS feed you paste on your phone. Shore fetches it at most twice an hour and keeps only the titles.</span></li>
+      <li class="row"><b>Calendar</b><span>Paste your calendar's iCal address on your phone and the next event shows up: "Tomorrow 9:30 · Dentist". Google Calendar, iCloud and Outlook all have one.</span></li>
     </ul>
   </div>
 </section>
@@ -203,6 +209,8 @@ footer p{margin:0}
     <ul class="rows parts">
       <li class="row"><b>Lyrics</b><span>Shore only shows lyrics whose title, artist and length match the version that's playing, so a radio edit or a cover gets none rather than the wrong words. Only the artist, title, album and length leave the TV.</span></li>
       <li class="row"><b>Beat pulse</b><span>Turn it on and the beat pushes the cover and the background out a little. Shore listens for where each song keeps it, whether that's an 808, a kick, claps or hi-hats. It listens to the TV's own sound, not a microphone, though Android still asks to allow recording audio.</span></li>
+      <li class="row"><b>Up next</b><span>The next three songs, when the music app shares its queue. With a song playing, the screensaver stays away.</span></li>
+      <li class="row"><b>Translation</b><span>Optional: a translation into your TV's language under every line. The lyrics go to Google Translate for that, so it's off until you turn it on.</span></li>
       <li class="row"><b>Continue watching</b><span>In Dock, a row under your apps with what you were watching in apps that share it, such as Twitch and Apple TV. Down to pick, OK to carry on.</span></li>
     </ul>
   </div>
@@ -254,7 +262,7 @@ footer p{margin:0}
     <ul class="plain">
       <li>Send photos, GIFs and short videos. Each photo opens in a 16:9 frame first so you can crop it for the TV.</li>
       <li>Change any TV setting, and add, remove or reorder the apps on Home.</li>
-      <li>Type the weather city or paste a news feed address instead of spelling it out with the remote.</li>
+      <li>Type the weather city, paste a news feed or your calendar's address instead of spelling it out with the remote.</li>
       <li>Save every setting to a backup file and restore it later, or on another TV.</li>
     </ul>
   </div>
