@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!-- Continue watching: reads the rows apps publish to the system's Watch Next list. -->
     <uses-permission android:name="android.permission.READ_TV_LISTINGS" />
+    <!-- Beat pulse in the music view: Android's Visualizer reads the TV's mixed output (never the microphone) but requires these. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />

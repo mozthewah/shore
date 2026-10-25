@@ -178,6 +178,7 @@ public class MainActivity extends Activity {
     public void onRequestPermissionsResult(int code, String[] permissions, int[] results) {
         super.onRequestPermissionsResult(code, permissions, results);
         if (code == 7) watchNextChanged();
+        if (code == 8 && web != null) web.evaluateJavascript("window.CleanFrameBeatAllowed&&window.CleanFrameBeatAllowed()", null);
     }
 
     @Override
@@ -192,6 +193,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         RemoteKeys.learn(false); // never capture a button while another app is in front
+        Beat.stop();
         if (web != null) web.onPause(); // stops wallpaper rotation work while an app is open
         super.onPause();
     }

@@ -206,6 +206,13 @@
         pkg: /^[A-Za-z][A-Za-z0-9_.]{0,160}$/.test(r.pkg || '') ? r.pkg : '', pos: Math.max(0, +r.pos || 0), dur: Math.max(0, +r.dur || 0), speed: +r.speed || 0, seek: !!r.seek,
         art: img.test(r.art || '') ? r.art : '', back: img.test(r.back || '') ? r.back : '' };
     } : null,
+    /* Beat pulse: start() is false without permission; level() is -1 while off, else 0..1. */
+    beat: bridge.beatStart ? {
+      start: function () { try { return !!bridge.beatStart(); } catch (e) { return false; } },
+      stop: function () { try { bridge.beatStop(); } catch (e) { } },
+      level: function () { try { return +bridge.beat(); } catch (e) { return -1; } },
+      allow: function () { try { bridge.beatAllow(); } catch (e) { } }
+    } : null,
     seek: function (pkg, ms) { try { return !!bridge.nowPlayingSeek(String(pkg || ''), Math.max(0, ms | 0)); } catch (e) { return false; } },
     lyrics: function (artist, title, album, seconds) {
       var r;

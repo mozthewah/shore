@@ -97,16 +97,16 @@
     cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], clook: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'],
     svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], ncalm: ['off', 'on'], wfx: ['off', 'on'], cnews: ['off', 'on'], svphoto: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
-    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'], cwatch: ['off', 'on'], plyric: ['off', 'on'],
+    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'], cwatch: ['off', 'on'], plyric: ['off', 'on'], pword: ['off', 'on'], pbeat: ['off', 'on'],
     nsrc: ['google', 'phone'].concat(NEWS_OUTLETS.map(function (o) { return o.id; })) };
   /* Newer axes with their defaults: stored, migrated and validated like the others. */
-  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore', cwatch: 'on', plyric: 'on' };
+  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore', cwatch: 'on', plyric: 'on', pword: 'on', pbeat: 'off' };
   /* On/off settings that OK flips. */
-  var TOGGLES = ['svphoto', 'ncalm', 'wfx', 'cnews', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec', 'cwatch'];
+  var TOGGLES = ['svphoto', 'ncalm', 'wfx', 'cnews', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec', 'cwatch', 'plyric', 'pword', 'pbeat'];
   var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', clook: 'Artist pictures', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material',
     svphoto: 'Photo title', ncalm: 'Calmer photos at night', wfx: 'Weather effects', cnews: 'Headlines', iask: 'Ask to switch', svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
-    cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver', nsrc: 'Source', istyle: 'Icon style', cwatch: 'Continue watching' };
+    cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver', nsrc: 'Source', istyle: 'Icon style', cwatch: 'Continue watching', plyric: 'Lyrics', pword: 'Word by word', pbeat: 'Beat pulse' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
     '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min', '10': 'After 10 min', '15': 'After 15 min', c: '°C', f: '°F',
@@ -178,7 +178,7 @@
   function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, clook: c.clook, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material, svsrc: c.svsrc, svlay: c.svlay, svtime: c.svtime,
       svmotion: c.svmotion, iask: c.iask, ncalm: c.ncalm, wfx: c.wfx, cnews: c.cnews, svphoto: c.svphoto, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
-      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack, cwatch: c.cwatch, plyric: c.plyric }; }
+      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack, cwatch: c.cwatch, plyric: c.plyric, pword: c.pword, pbeat: c.pbeat }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
 
   /* ---------- Helpers ---------- */
@@ -795,10 +795,26 @@
     for (var i = 0; i < words.length; i++) { var c = i < lit ? 'w is-lit' : 'w'; if (words[i].className !== c) words[i].className = c; }
     box._lit = lit;
   }
+  /* Beat pulse: the bass level (Beat.java) pushes the backdrop and the cover out a little on every kick.
+     ~30 reads a second while the music view is open; stopped as soon as it closes. */
+  var beatTimer = 0, beatOn = false, beatV = 0;
+  function beatLoop() {
+    var B = NOWPLAYING && NOWPLAYING.beat, want = !!B && playerOpen() && S.c.pbeat === 'on' && !document.hidden, v, el = slotEls;
+    clearTimeout(beatTimer); beatTimer = 0;
+    if (!want) { if (beatOn) { B.stop(); beatOn = false; } beatV = 0; if (el.back) { el.back.style.transform = ''; el.art.style.transform = ''; } return; }
+    if (!beatOn) beatOn = B.start();
+    if (!beatOn) return; // no permission: the Settings switch asks for it
+    v = Math.max(0, B.level());
+    beatV = v > beatV ? v : beatV * .7; // hits at once, falls back quickly
+    if (el.back) { el.back.style.transform = 'scale(' + (1.08 + beatV * .04).toFixed(4) + ')'; el.art.style.transform = 'scale(' + (1 + beatV * .02).toFixed(4) + ')'; }
+    beatTimer = setTimeout(beatLoop, 33);
+  }
+  window.CleanFrameBeatAllowed = function () { render(); };
+
   /* A light timer while the view is open: the bar, the clock digits and the lyric line, nothing else. */
   function playerTick() {
     clearTimeout(P.tick); P.tick = 0;
-    if (!playerOpen()) return;
+    if (!playerOpen()) { beatLoop(); return; }
     if (!document.hidden) FILLS.player(top(), slotEls, true);
     P.tick = setTimeout(playerTick, 250);
   }
@@ -844,7 +860,7 @@
   }
   function openSettings() { push({ id: 'settings', f: { id: S.settingsFocus } }); }
   function openAppearance(group) {
-    var axis = { background: 'bg', layout: 'layout', typography: 'tweight', fonts: 'font', focus: 'focus', clock: 'cformat', display: 'night', screensaver: 'saver', weather: 'wunit', news: 'nsrc', saverlook: 'svlay', music: 'npdim', icons: 'istyle', inputs: 'inputs' }[group];
+    var axis = { background: 'bg', layout: 'layout', typography: 'tweight', fonts: 'font', focus: 'focus', clock: 'cformat', display: 'night', screensaver: 'saver', weather: 'wunit', news: 'nsrc', saverlook: 'svlay', musicview: 'plyric', music: 'npdim', icons: 'istyle', inputs: 'inputs' }[group];
     var action = S.detailFocus[group] || (axis ? 'choice.' + axis + '.' + S.c[axis] : group === 'rotation' ? 'rotation.' + S.c.mode : PARENT[group] === 'online' || group === 'online' ? 'online.' + sourceList()[0] : group === 'updates' ? updateSections()[0].items[0].action : group === 'health' ? (healthItems()[0] || {}).action : 'samsung.home');
     push({ id: 'appearance', group: group, f: { action: action } });
   }
@@ -1200,7 +1216,7 @@
   function closeEditor() { clearSession(); pop(); }
 
   /* ---------- Settings, Layout and messages ---------- */
-  var PARENT = { health: 'samsung', updates: 'samsung', saverlook: 'screensaver', rotation: 'background', online: 'background', unsplash: 'online', animated: 'online', fonts: 'typography', icons: 'layout', iconpack: 'icons', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
+  var PARENT = { musicview: 'music', health: 'samsung', updates: 'samsung', saverlook: 'screensaver', rotation: 'background', online: 'background', unsplash: 'online', animated: 'online', fonts: 'typography', icons: 'layout', iconpack: 'icons', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
   function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : DETAIL_NAMES[group]; }
   function parentName(t) { return PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
   /* ---------- Wallpaper sources: any mix of Shore's own, My photos and online sources ----------
@@ -1280,11 +1296,11 @@
     else if (id === 'phone') openPhone();
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { health: 'Setup and health', updates: 'Shore updates', fonts: 'Font', clock: 'Clock', display: 'Night', online: 'Wallpaper sources', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Wallpaper', layout: 'Home screen', typography: 'Text', icons: 'App icons', iconpack: 'Icon pack', inputs: 'Inputs', focus: 'Style', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', weather: 'Weather', music: 'Music', news: 'News', screensaver: 'Screensaver', saverlook: 'Arrangement and clock' };
+  var DETAIL_NAMES = { musicview: 'Music view', health: 'Setup and health', updates: 'Shore updates', fonts: 'Font', clock: 'Clock', display: 'Night', online: 'Wallpaper sources', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Wallpaper', layout: 'Home screen', typography: 'Text', icons: 'App icons', iconpack: 'Icon pack', inputs: 'Inputs', focus: 'Style', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', weather: 'Weather', music: 'Music', news: 'News', screensaver: 'Screensaver', saverlook: 'Arrangement and clock' };
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'nsrc' ? newsSourceName(value) : axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm|svphoto|wfx|cnews|cwatch)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
+      label: axis === 'nsrc' ? newsSourceName(value) : axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm|svphoto|wfx|cnews|cwatch|plyric|pword|pbeat)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
   /* "Seconds" in the Format row, abbreviated where the word is long. */
   /* "Ask" (to switch inputs), short enough to share the Inputs row in every language. */
@@ -1444,7 +1460,7 @@
     if (S.saver) renderSaver();
     if (top().id === 'home' || isSettingsDetail(top())) render();
   }
-  /* A small looping level meter: decoration only, Shore never hears the audio. */
+  /* A small looping level meter: decoration only, it does not follow the sound. */
   var WAVE = '<span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>';
   function wave() { return S.c.cwave === 'on' ? WAVE : ''; }
   /* Album art as the background: a soft backdrop pre-rendered natively, shown above the photo while music plays. */
@@ -1683,7 +1699,7 @@
     ['Inputs', ['inputs', 'iask']],
     ['Clock', ['cformat', 'csec', 'cdate', 'csize', 'cweight', 'cpos']],
     ['Weather', ['cweather', 'wunit', 'wicon', 'wfx']],
-    ['Music', ['cplaying', 'cwave', 'cart', 'npdim', 'clook']],
+    ['Music', ['cplaying', 'cwave', 'cart', 'npdim', 'clook', 'plyric', 'pword', 'pbeat']],
     ['News', ['cnews', 'nsrc']],
     ['Night', ['night', 'nhours', 'ndim', 'idle']],
     ['Screensaver', ['saver', 'svsrc', 'svtime', 'svlay', 'svmotion', 'svclock', 'svpos', 'svdate', 'svmusic', 'svphoto']]];
@@ -1697,7 +1713,8 @@
       options: SOURCES.filter(function (o) { return !o.key || ONLINE_INFO[o.key]; }).filter(function (o) { return o.id !== 'phone' || PHONE; }).map(function (o) { return { value: o.id, label: T(o.name) }; }) } : null;
     if (axis === 'layout') return { id: 'layout', name: T('Layout'), kind: 'choice', value: isShelf() ? 'shelf' : S.c.layout,
       options: [{ value: 'list', label: T('List') }, { value: 'dock', label: T('Dock') }, { value: 'shelf', label: T('Shelf') }] };
-    if ((axis === 'cart' || axis === 'npdim' || axis === 'clook' || axis === 'cplaying' || axis === 'cwave' || axis === 'svmusic') && !NOWPLAYING) return null;
+    if ((axis === 'cart' || axis === 'npdim' || axis === 'clook' || axis === 'cplaying' || axis === 'cwave' || axis === 'svmusic' || axis === 'plyric' || axis === 'pword') && !NOWPLAYING) return null;
+    if (axis === 'pbeat' && !(NOWPLAYING && NOWPLAYING.beat)) return null;
     if ((axis === 'cnews' || axis === 'nsrc') && !NEWS) return null;
     if (axis === 'cwatch' && !WATCH) return null;
     if (axis === 'nsrc') return { id: 'nsrc', name: T('News source'), kind: 'list', value: S.c.nsrc,
@@ -1821,7 +1838,12 @@
         { id: 'cart', title: 'While music plays', items: [{ action: 'choice.cart.on', axis: 'cart', value: 'on', label: 'Album art as background', tick: true, applied: S.c.cart === 'on', disabled: flat }]
           .concat(options('clook', ['on'], flat || S.c.cart !== 'on')),
           reason: flat ? 'Album art needs a Photo background.' : S.c.clook === 'on' ? 'Sends only the artist, title and album.' : 'Uses only the cover the music app provides.' },
-        { id: 'npdim', title: 'Album art dimming', horizontal: true, items: options('npdim', ['none', 'soft', 'strong'], flat || S.c.cart !== 'on') }]);
+        { id: 'npdim', title: 'Album art dimming', horizontal: true, items: options('npdim', ['none', 'soft', 'strong'], flat || S.c.cart !== 'on') },
+        { id: 'pviewlink', title: '', items: [{ action: 'open.musicview', label: 'Music view', description: [S.c.plyric === 'on' ? 'Lyrics' : '', S.c.pbeat === 'on' ? 'Beat pulse' : ''].filter(Boolean).map(T).join(', ') || 'Off', pair: true }] }]);
+    /* Music view: what the full-screen player shows. */
+    if (t.group === 'musicview') return [
+      { id: 'plyric', title: '', items: options('plyric', ['on']).concat(options('pword', ['on'], S.c.plyric !== 'on')).concat(NOWPLAYING && NOWPLAYING.beat ? options('pbeat', ['on']) : []),
+        reason: S.c.pbeat === 'on' ? 'The pulse follows the TV’s sound, never the microphone. Android still calls this permission recording audio.' : 'Lyrics come from LRCLIB. Only the artist, title, album and length are sent.' }];
     if (t.group === 'news') return [
       { id: 'cnews', title: '', items: [{ action: 'choice.cnews.on', axis: 'cnews', value: 'on', label: 'Headlines under the clock', tick: true, applied: S.c.cnews === 'on' }] },
       { id: 'nsrc', title: 'Source', items: options('nsrc', ['google'].concat(newsOutlets().map(function (o) { return o.id; })), S.c.cnews !== 'on')
@@ -1982,7 +2004,10 @@
     else if (item.axis === 'source') applySource(item.value);
     else if (item.axis === 'layout') setLook({ layout: item.value === 'list' ? 'list' : 'dock', lstyle: item.value === 'shelf' ? 'shelf' : 'glass' }, { row: 'layout' });
     else if (item.axis === 'cwatch' && !watchAllowed && S.c.layout !== 'list') { if (S.c.cwatch !== 'on') setLook({ cwatch: 'on' }, { row: 'cwatch' }); WATCH.allow(); }
-    else if (TOGGLES.indexOf(item.axis) >= 0) { patch[item.axis] = S.c[item.axis] === 'on' ? 'off' : 'on'; setLook(patch, { row: item.axis }); }
+    else if (TOGGLES.indexOf(item.axis) >= 0) {
+      patch[item.axis] = S.c[item.axis] === 'on' ? 'off' : 'on'; setLook(patch, { row: item.axis });
+      if (item.axis === 'pbeat' && patch.pbeat === 'on') { if (NOWPLAYING.beat.start()) NOWPLAYING.beat.stop(); else NOWPLAYING.beat.allow(); } // only the music view listens
+    }
     else if (item.axis) { patch[item.axis] = item.value; setLook(patch, { row: item.axis }); }
     else if (item.action === 'background.wallpaper') openWallpaper();
     else if (item.action === 'background.rotation') openAppearance('rotation');
@@ -1995,6 +2020,7 @@
     else if (item.action === 'open.unsplash') openAppearance('unsplash');
     else if (item.action === 'open.animated') openAppearance('animated');
     else if (item.action === 'open.saverlook') openAppearance('saverlook');
+    else if (item.action === 'open.musicview') openAppearance('musicview');
     else if (item.action === 'open.health') openHealth();
     else if (item.action === 'health.remote') perform('Accessibility settings', REMOTE.openSettings);
     else if (item.action === 'health.phone') openPhone();
@@ -2013,7 +2039,7 @@
   V.appearance = {
     norm: function (t) {
       var rows = detailRows(t), exists = false, applied = null;
-      var axis = { background: 'bg', layout: 'layout', typography: 'tweight', focus: 'focus', rotation: 'mode', online: 'source', unsplash: 'source', animated: 'source', fonts: 'font', clock: 'cformat', display: 'night', screensaver: 'saver', weather: 'wunit', news: 'nsrc', saverlook: 'svlay', music: 'npdim', icons: 'istyle', inputs: 'inputs' }[t.group];
+      var axis = { background: 'bg', layout: 'layout', typography: 'tweight', focus: 'focus', rotation: 'mode', online: 'source', unsplash: 'source', animated: 'source', fonts: 'font', clock: 'cformat', display: 'night', screensaver: 'saver', weather: 'wunit', news: 'nsrc', saverlook: 'svlay', musicview: 'plyric', music: 'npdim', icons: 'istyle', inputs: 'inputs' }[t.group];
       rows.forEach(function (items) { items.forEach(function (item) {
         if (item.action === t.f.action) exists = true;
         if (axis ? item.axis === axis && item.value === S.c[axis] : item.applied) applied = item;
@@ -2921,11 +2947,12 @@
       if (synced) {
         at = lyricIndex(synced, pos);
         if (at !== el.lines._at) moveLyrics(el.lines, at);
-        lightWords(el.lines, synced, at, pos);
+        if (S.c.pword === 'on') lightWords(el.lines, synced, at, pos);
         el.lines.style.transform = '';
       } else if (showLyrics && dur) el.lines.style.transform = 'translate3d(0,' + (-Math.round(frac * Math.max(0, el.lines.scrollHeight - 600))) + 'px,0)';
       if (tick) return;
       if (!P.tick) playerTick();
+      if (!beatTimer) beatLoop();
       if (el.back.getAttribute('src') !== (d.back || '')) { if (d.back) el.back.src = d.back; else el.back.removeAttribute('src'); }
       el.back.parentNode.className = 'pl-bg' + (d.back ? ' is-on' : '');
       setHTML(el.art, d.art ? '<img alt="" src="' + escRaw(d.art) + '">' : '<span class="pl-art-empty">' + icon('music') + '</span>');
@@ -2947,7 +2974,7 @@
         : '<p class="pl-state">' + esc(ly.state === 'pending' ? 'Looking for lyrics…' : ly.state === 'instrumental' ? 'Instrumental' : 'No lyrics for this song') + '</p>';
       if (el.lines._key !== P.lyKey + '|' + (ly && ly.state)) { el.lines._key = P.lyKey + '|' + (ly && ly.state); el.lines.innerHTML = html; el.lines._at = null; el.lines._tops = null; el.lines.className = 'pl-lines is-jump'; FILLS.player(t, el, true); void el.lines.offsetHeight; el.lines.className = 'pl-lines'; } // a new song jumps, it doesn't scroll
       var wide = !!(ly && (ly.state === 'ok' || ly.state === 'pending'));
-      el.lyrics.className = 'pl-words' + (wide ? ' is-on' : '') + (synced ? ' is-synced' : '');
+      el.lyrics.className = 'pl-words' + (wide ? ' is-on' : '') + (synced ? ' is-synced' : '') + (S.c.pword === 'on' ? '' : ' no-words');
       setHTML(el.credit, showLyrics ? esc('Lyrics from LRCLIB') : ly && ly.state === 'instrumental' ? esc('Instrumental') : ly && ly.state === 'none' ? esc('No lyrics for this song') : '');
       sheetView.className = 'view view-player' + (wide ? ' has-lyrics' : '');
     },

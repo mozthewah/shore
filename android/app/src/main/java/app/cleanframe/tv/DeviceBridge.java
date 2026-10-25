@@ -89,6 +89,21 @@ final class DeviceBridge {
     @JavascriptInterface
     public boolean nowPlayingSeek(String pkg, double ms) { return NowPlayingService.seek(context, pkg, (long) ms); }
 
+    /** Beat pulse: start returns false without permission; level is -1 while off, else 0..1. */
+    @JavascriptInterface
+    public boolean beatStart() { return Beat.start(context); }
+
+    @JavascriptInterface
+    public void beatStop() { Beat.stop(); }
+
+    @JavascriptInterface
+    public double beat() { return Beat.level(); }
+
+    @JavascriptInterface
+    public void beatAllow() {
+        if (activity != null) activity.runOnUiThread(() -> activity.requestPermissions(new String[] { Beat.PERMISSION }, 8));
+    }
+
     /** {state: pending|ok|none|instrumental, synced:[[ms, line]], plain} from LRCLIB. */
     @JavascriptInterface
     public String lyrics(String artist, String title, String album, int seconds) { return Lyrics.get(artist, title, album, seconds); }
