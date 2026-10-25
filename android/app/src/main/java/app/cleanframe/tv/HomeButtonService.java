@@ -26,6 +26,10 @@ public class HomeButtonService extends AccessibilityService {
     static volatile long allowSystemHomeUntil;
     /** True while Android has this service bound, i.e. it is enabled and receiving keys. */
     static volatile boolean connected;
+    private static HomeButtonService instance;
+    /** Sleep timer: System.currentTimeMillis() when the TV goes to standby, 0 when off. */
+    private static volatile long sleepAt;
+    private final Runnable sleepNow = () -> { sleepAt = 0; performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN); };
     private static final String TAG = "CleanFrameKeys";
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -39,13 +43,33 @@ public class HomeButtonService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
-        connected = true; RemoteKeys.notifyChanged();
+        connected = true; instance = this; RemoteKeys.notifyChanged();
         // Just after boot: open Shore now instead of waiting for Google TV Home to draw and then replacing it.
         if (SystemClock.uptimeMillis() < 180000) openCleanFrame(false);
     }
 
     @Override
-    public boolean onUnbind(Intent intent) { connected = false; RemoteKeys.notifyChanged(); return super.onUnbind(intent); }
+    public boolean onUnbind(Intent intent) {
+        connected = false; instance = null; sleepAt = 0; handler.removeCallbacks(sleepNow); RemoteKeys.notifyChanged();
+        return super.onUnbind(intent);
+    }
+
+    /**
+     * Sleep timer. The accessibility lock action puts an Android TV into standby, the same as the remote's power
+     * button; the timer lives here so it keeps running while another app is in front. Minutes 0 cancels.
+     */
+    static boolean sleepIn(int minutes) {
+        HomeButtonService s = instance;
+        if (s == null) return false;
+        s.handler.removeCallbacks(s.sleepNow);
+        if (minutes <= 0) { sleepAt = 0; return true; }
+        sleepAt = System.currentTimeMillis() + minutes * 60000L;
+        s.handler.postDelayed(s.sleepNow, minutes * 60000L);
+        return true;
+    }
+
+    /** Milliseconds until standby, 0 when no timer runs, -1 when the service is off. */
+    static long sleepLeft() { return instance == null ? -1 : sleepAt == 0 ? 0 : Math.max(1, sleepAt - System.currentTimeMillis()); }
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {

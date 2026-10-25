@@ -1,0 +1,50 @@
+name: My TV works (or doesn't)
+description: Tell me how Shore runs on your TV, so the website can list it.
+labels: [tv-report]
+body:
+  - type: input
+    id: tv
+    attributes:
+      label: TV or device model
+      placeholder: "CHiQ L32QM8G"
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android or Google TV version
+      placeholder: "Android 14"
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: How well does it work?
+      options:
+        - Everything works
+        - Works, with small problems
+        - Mostly broken
+    validations:
+      required: true
+  - type: checkboxes
+    id: works
+    attributes:
+      label: What did you try?
+      options:
+        - label: The Home button opens Shore
+        - label: Apps open from the dock
+        - label: HDMI inputs show up
+        - label: Now playing and the music view
+        - label: The screensaver
+        - label: The phone companion
+        - label: In-app updates
+  - type: input
+    id: startup
+    attributes:
+      label: Time from switching on to Shore's Home (roughly)
+      placeholder: "about 10 seconds"
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else?
+      description: Problems, workarounds or photos.

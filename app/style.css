@@ -866,6 +866,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .pl-line.is-now .pl-dots i{animation:pl-dot 1.4s ease-in-out infinite}
 .pl-line.is-now .pl-dots i:nth-child(2){animation-delay:.2s}
 .pl-line.is-now .pl-dots i:nth-child(3){animation-delay:.4s}
+.pl-tr{display:block;margin-top:4px;font-size:30px;line-height:38px;font-weight:500;letter-spacing:0;opacity:.75}
+.pl-next{margin-top:44px}
+.pl-next:empty{display:none}
+.pl-next-h{margin:0 0 10px;font-size:22px;line-height:28px;letter-spacing:1.5px;text-transform:uppercase;opacity:.55}
+.pl-next-i{margin:0;font-size:28px;line-height:40px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-next-i span{opacity:1;font-weight:600}
 @keyframes pl-dot{0%,100%{transform:scale(.7);opacity:.4}50%{transform:scale(1.15);opacity:1}}
 .pl-plain{font-size:40px;line-height:58px;font-weight:500;opacity:.85;white-space:normal}
 .pl-state{margin:0;font-size:36px;line-height:46px;opacity:.6}
@@ -898,6 +904,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .is-intro .dock .tile:nth-child(n+9) .tile-content{animation-delay:480ms}
 .setting-glyph{position:relative;flex:0 0 56px;width:56px;height:40px;margin-right:4px;color:currentColor}
 .setting-glyph .mark{position:absolute;left:0;top:0}
+/* Recently used apps after the Home apps: a hairline before them and a quieter look until focused. */
+.tile.is-recent-first::before{content:'';position:absolute;left:-5px;top:26%;width:2px;height:48%;border-radius:1px;background:currentColor;opacity:.22}
+.tile.k-recent:not(.is-focus) .tile-content{opacity:.7}
+.pin-boxes{position:absolute;left:140px;top:540px;display:flex;gap:24px}
+.pin-box{width:120px;height:140px;border-radius:28px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 2px rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:600;color:var(--ink);transition:transform 160ms ease,background 160ms ease}
+.pin-box.is-focus{background:rgba(255,255,255,.24);box-shadow:inset 0 0 0 4px var(--ink);transform:scale(1.06)}
+.pin-boxes.is-shake0{animation:pin-shake0 380ms ease}
+.pin-boxes.is-shake1{animation:pin-shake1 380ms ease}
+@keyframes pin-shake0{20%,60%{transform:translate3d(-18px,0,0)}40%,80%{transform:translate3d(18px,0,0)}}
+@keyframes pin-shake1{20%,60%{transform:translate3d(-18px,0,0)}40%,80%{transform:translate3d(18px,0,0)}}
+.pin-err{position:absolute;left:140px;top:712px;margin:0;font-size:30px;line-height:42px;color:#ff9b8f;min-height:42px}
+.pin-hint{position:absolute;left:140px;bottom:72px;margin:0;display:flex;align-items:center;gap:12px;font-size:26px;line-height:32px;color:var(--mute)}
+.pin-hint .remote-key+span{margin-right:24px}
 /* ---------- Home Assistant add-on: Smart home panel and camera live view (addons/homeassistant.js) ---------- */
 .view-ha{--ha-on:#f3c56f;--ha-frame:rgba(246,241,231,.22)}
 .bg-light .view-ha{--ha-on:#8a5a00;--ha-frame:rgba(29,26,22,.18)}

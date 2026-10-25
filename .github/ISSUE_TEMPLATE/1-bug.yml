@@ -1,0 +1,53 @@
+name: Bug report
+description: Something in Shore doesn't work or looks wrong.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time. A photo of the TV screen helps a lot.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw instead.
+      placeholder: "I pressed Home while Netflix was open and Shore showed Settings instead of Home."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Settings › Music
+        2. Press down three times
+        3. ...
+  - type: input
+    id: version
+    attributes:
+      label: Shore version
+      description: Settings › Google TV › Shore updates shows it.
+      placeholder: "0.8.62"
+    validations:
+      required: true
+  - type: input
+    id: tv
+    attributes:
+      label: TV or device model
+      placeholder: "TCL 55C6KS"
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android or Google TV version
+      placeholder: "Android TV 12"
+  - type: dropdown
+    id: language
+    attributes:
+      label: TV language
+      options: [English, Deutsch, Français, Español, Nederlands, Polski, Українська, Other]
+  - type: textarea
+    id: media
+    attributes:
+      label: Photos or screenshots
+      description: Drag images here. A photo of the TV with a phone is fine.

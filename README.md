@@ -30,9 +30,11 @@ Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://githu
 ### Home
 - Three layouts. *Dock* and *List* draw every app logo the same way: Shore's own logos in colour or in one colour, or the icons from an installed icon pack (for example one made for Projectivy Launcher). *Shelf* shows each app's own banner, with a [Top Shelf](#top-shelf) above it.
 - Shore finds your installed apps. Pick up to nine for Home and put them in order.
+- *Recently used*: in Dock, up to three apps you opened lately but haven't put on Home follow Home's apps, after a thin line. Turn it off in *Settings › Home screen*.
+- Your own icon for each app: hold OK on an app and choose *Icon*, or go to *Settings › Home screen › App icons › Per app*. Pick one of Shore's icons, the app's own icon or a one-colour version.
 - While something plays, a ♪ *Music* button joins the top-right row on Home and opens the [music view](#music-view): the cover, a progress bar you can seek, *Previous*, *Pause/Play*, *Next*, and synced lyrics. After a pause it stays for 10 minutes so you can resume. Needs Notification access, like Now playing.
 - *Continue watching*: in Dock, a row under the apps with what you were watching in apps that share it with Android (Twitch, Apple TV and others); in Shelf, each app's own items come first in its Top Shelf row. Allow it when Android asks.
-- Hold OK on an app on Home for *Open*, *Move*, *Remove* or *App info*. A normal press still opens the app; Move and Remove go through *Apps on Home*, so they can be undone.
+- Hold OK on an app on Home for *Open*, *Move*, *Remove*, *Icon* or *App info*. A normal press still opens the app; Move and Remove go through *Apps on Home*, so they can be undone.
 - HDMI devices appear when they are switched on, named over HDMI-CEC ("PlayStation 5" instead of "HDMI 1"). Switch on a console or set-top box and its tile shows up; switch it off and it disappears. Show inputs first on Home or in their own row, and Shore offers to switch when one turns on. Inputs you never use can be hidden.
 - The launcher follows the TV's system language (*Settings › System › Language*). German, French, Spanish, Dutch, Polish and Ukrainian are included; anything else falls back to English.
 
@@ -49,12 +51,15 @@ Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://githu
 - Clock: 12- or 24-hour, optional date, four sizes and weights.
 - [Under the clock](#under-the-clock-weather-music-and-news): the current weather in °C or °F (Open-Meteo, no key), what's playing in Spotify, YouTube or any other app, and news headlines from Google News, an outlet you pick or your own feed.
 - Hide controls when idle: after 1 or 5 minutes only the picture and clock stay.
+- Calendar: the next event from your calendar's iCal address (Google Calendar, iCloud, Outlook and others share one), set in the [phone companion](#phone-companion). Repeating events are understood.
 - Focus style and glass materials.
 
 ### On the TV
 - The Home button opens Shore. Hold Home for the original Google TV Home.
 - Reassign remote buttons such as the app shortcut keys or the TV button.
 - Animations pause outside Home, so menus stay snappy.
+- Sleep timer (*Settings › Night*): 30, 60, 90 or 120 minutes, then the TV switches off, even while another app is open. It needs the Shore Home button in Accessibility.
+- Parental lock (*Settings › Google TV › Parental lock*): a four-digit PIN before chosen apps open, and before Settings, Apps on Home and Quick actions. Enter it with the arrows and OK or with number keys.
 - An optional, reversible debloat list for TCL's preinstalled extras.
 
 | | |
@@ -166,7 +171,10 @@ Press ♪ *Music* on Home while something plays.
 - *Previous*, *Pause/Play*, *Next*, and a button that opens the music app.
 - Synced lyrics from [LRCLIB](https://lrclib.net), free and without an account. Lines ripple into place like Apple Music's, the line being sung grows, and its words light up in turn: exactly where LRCLIB has word timing, otherwise spread over the line. Shore only shows lyrics whose title, artist and length match the version playing, so a different edit or a cover shows none rather than the wrong words. Only the artist, title, album and length are sent.
 - Beat pulse (off by default): the beat pushes the background and the cover out a little. Shore learns where each song keeps its beat, from 808s and kicks to snares, claps and hi-hats, and starts learning again when the song changes. It uses Android's Visualizer on the TV's own sound output, never the microphone, but Android still asks to allow audio recording. Only the bass level is read, about 20 times a second, and only while the music view is open.
-- *Settings › Music › Music view* turns lyrics, word by word and the beat pulse on or off.
+- *Up next*: the next three songs, when the music app shares its queue (not every app does; Spotify on Google TV doesn't).
+- *Translate lyrics* (off by default): each synced line gets a translation into the TV's language underneath. The lyric text is sent to Google Translate; songs already in that language stay as they are.
+- While a song plays, the music view keeps the screen on and the screensaver away, like a video.
+- *Settings › Music › Music view* turns lyrics, word by word, translation, Up next and the beat pulse on or off.
 
 ### Under the clock: weather, music and news
 
@@ -222,6 +230,7 @@ To undo, run the same command with `disallow_listener`.
 - *Send to your TV*: pick photos (JPEG, PNG, WebP), GIFs or MP4 clips. Each photo first opens in a 16:9 frame, the TV's shape: drag to move it, pinch or use the slider to zoom, then **Send**. *Whole photo* sends it uncropped, *Skip* leaves it out. The crop is made on the phone at the photo's own resolution (up to 3840 px wide). They appear under **My photos**, a wallpaper source like the others. Glass is rendered once, rotation cycles through them, and GIFs and clips play animated. Choose *Settings › Phone › My photos* to use them.
 - *My photos*: see what's stored and delete single photos or all of them. Shore keeps the newest 30, in its private storage on the TV.
 - *Weather place*: the city for the weather under the clock.
+- *Calendar*: your calendar's iCal address (a `webcal://` link works too). Saving it turns on the calendar line under the clock; the TV fetches it at most every 15 minutes and keeps only the next event.
 - *News feed*: an RSS or Atom address for the headlines. Saving one makes it the news source (*Your own feed* in *Settings › News*); clearing it goes back to Google News.
 - *TV settings*: every setting from the TV's own Settings, grouped the same way (background and wallpaper, layout, text, clock, focus and colour, night and idle, screensaver), as buttons and switches. Changes apply on the TV at once, as if chosen with the remote, and *Start the screensaver now* is one tap. Shore must be open on the TV (in front or behind another app).
 - *Apps*: reorder Home with the arrows, remove an app, or add one of the other installed apps.
@@ -340,11 +349,10 @@ Live TV, inputs, settings, the remote, casting, updates and Google TV itself are
 
 ## Ideas
 
-Built since the last list: weather with °C/°F, Now playing with album art, Shore's own screensaver, cropping in the phone companion, HDMI-CEC names, weather effects on the photo, headlines, and German, French, Spanish, Dutch, Polish and Ukrainian. Next up:
+Built since the last list: weather with °C/°F, Now playing with album art, Shore's own screensaver, cropping in the phone companion, HDMI-CEC names, weather effects on the photo, headlines, the music view, per-app icons, recently used apps, a sleep timer, calendar events, a parental lock, and German, French, Spanish, Dutch, Polish and Ukrainian. Next up:
 
-- A sleep timer on a remote button
+- The sleep timer on a remote button
 - Typing from the phone into other apps (needs an extra accessibility permission, so it is opt-in only)
-- Calendar events under the clock (ICS link)
 - Italian and Turkish translations
 
 ## Brand

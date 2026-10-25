@@ -147,6 +147,8 @@ final class DeviceBridge {
     /** {state: pending|ok|none|instrumental, synced:[[ms, line]], plain} from LRCLIB. */
     @JavascriptInterface
     public String lyrics(String artist, String title, String album, int seconds) { return Lyrics.get(artist, title, album, seconds); }
+    @JavascriptInterface
+    public String lyricsTranslate(String text, String lang) { return Lyrics.translate(text, lang); }
 
     @JavascriptInterface
     public boolean nowPlayingSettings() {
@@ -227,6 +229,17 @@ final class DeviceBridge {
     }
 
     /** Installed icon packs: JSON array of {id, name}. */
+    /** Next event from the iCal address set on the phone: {title, start, allDay} or {}. */
+    @JavascriptInterface
+    public String calendarNext() { return phone == null ? "{}" : CalendarFeed.get(context).next(phone.calendar()); }
+
+    /** Sleep timer through the Home-button service: minutes until standby, 0 to cancel. False when the service is off. */
+    @JavascriptInterface
+    public boolean sleepIn(int minutes) { return minutes >= 0 && minutes <= 600 && HomeButtonService.sleepIn(minutes); }
+
+    @JavascriptInterface
+    public double sleepLeft() { return HomeButtonService.sleepLeft(); }
+
     /** Saves the Home wallpaper the native start screen shows next time (a JPEG data URL from the page). */
     @JavascriptInterface
     public void backdrop(String dataUrl) { if (activity != null) { if (dataUrl == null || dataUrl.isEmpty()) Backdrop.clear(context); else Backdrop.save(context, dataUrl); } }

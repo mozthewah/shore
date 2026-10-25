@@ -97,16 +97,16 @@
     cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], clook: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'],
     svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], ncalm: ['off', 'on'], wfx: ['off', 'on'], cnews: ['off', 'on'], svphoto: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
-    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'], cwatch: ['off', 'on'], plyric: ['off', 'on'], pword: ['off', 'on'], pbeat: ['off', 'on'], aha: ['off', 'on'],
+    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'], cwatch: ['off', 'on'], plyric: ['off', 'on'], pword: ['off', 'on'], pbeat: ['off', 'on'], crecent: ['off', 'on'], ccal: ['off', 'on'], pqueue: ['off', 'on'], ptrans: ['off', 'on'], aha: ['off', 'on'],
     nsrc: ['google', 'phone'].concat(NEWS_OUTLETS.map(function (o) { return o.id; })) };
   /* Newer axes with their defaults: stored, migrated and validated like the others. */
-  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore', cwatch: 'on', plyric: 'on', pword: 'on', pbeat: 'off', aha: 'off' };
+  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore', cwatch: 'on', plyric: 'on', pword: 'on', pbeat: 'off', crecent: 'on', ccal: 'off', pqueue: 'on', ptrans: 'off', aha: 'off' };
   /* On/off settings that OK flips. */
-  var TOGGLES = ['svphoto', 'ncalm', 'wfx', 'cnews', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec', 'cwatch', 'plyric', 'pword', 'pbeat', 'aha'];
+  var TOGGLES = ['svphoto', 'ncalm', 'wfx', 'cnews', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec', 'cwatch', 'plyric', 'pword', 'pbeat', 'crecent', 'ccal', 'pqueue', 'ptrans', 'aha'];
   var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', clook: 'Artist pictures', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material',
     svphoto: 'Photo title', ncalm: 'Calmer photos at night', wfx: 'Weather effects', cnews: 'Headlines', iask: 'Ask to switch', svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
-    cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver', nsrc: 'Source', istyle: 'Icon style', cwatch: 'Continue watching', plyric: 'Lyrics', pword: 'Word by word', pbeat: 'Beat pulse', aha: 'Home Assistant' };
+    cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver', nsrc: 'Source', istyle: 'Icon style', cwatch: 'Continue watching', plyric: 'Lyrics', pword: 'Word by word', pbeat: 'Beat pulse', crecent: 'Recently used', ccal: 'Calendar', pqueue: 'Up next', ptrans: 'Translate lyrics', aha: 'Home Assistant' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
     '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min', '10': 'After 10 min', '15': 'After 15 min', c: '°C', f: '°F',
@@ -122,6 +122,7 @@
     haforget: { title: 'Disconnect Home Assistant?', line: 'Shore forgets the server and its token. Connect again from your phone.', note: '', actions: [['stay', 'Keep it'], ['haforget', 'Disconnect']] }
   };
   var SVG = {
+    calendar: '<rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
     input: '<path d="M4.5 6.5h15a1.5 1.5 0 0 1 1.5 1.5v4l-3 4.5H6L3 12V8a1.5 1.5 0 0 1 1.5-1.5Z"/><path d="M7.5 10.5h9"/>',
     art: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="9.8" r="1.5"/><path d="m4.5 17.5 4.5-4.5 3 3 2.5-2.5 5 5"/>',
     apps: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>',
@@ -182,7 +183,7 @@
   function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, clook: c.clook, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material, svsrc: c.svsrc, svlay: c.svlay, svtime: c.svtime,
       svmotion: c.svmotion, iask: c.iask, ncalm: c.ncalm, wfx: c.wfx, cnews: c.cnews, svphoto: c.svphoto, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
-      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack, cwatch: c.cwatch, plyric: c.plyric, pword: c.pword, pbeat: c.pbeat, aha: c.aha }; }
+      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack, cwatch: c.cwatch, plyric: c.plyric, pword: c.pword, pbeat: c.pbeat, crecent: c.crecent, ccal: c.ccal, pqueue: c.pqueue, ptrans: c.ptrans, aha: c.aha }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
 
   /* ---------- Helpers ---------- */
@@ -203,10 +204,15 @@
   var LIVE = [], INPUTS = [];
   function isShelf() { return S.c.layout === 'dock' && S.c.lstyle === 'shelf'; }
   function inputRow() { return S.c.inputs === 'row' && S.c.layout === 'dock' && LIVE.length > 0; }
-  function visibleHome() { return !LIVE.length || inputRow() ? S.c.home : LIVE.concat(S.c.home); }
+  function visibleHome() { return (!LIVE.length || inputRow() ? S.c.home : LIVE.concat(S.c.home)).concat(recentApps()); }
+  /* Recently used: up to three apps opened lately that aren't on Home, after the Home apps in the Dock. */
+  function recentApps() {
+    if (S.c.crecent !== 'on' || S.c.layout !== 'dock' || isShelf() || !S.c.used) return [];
+    return S.c.used.filter(function (id) { var a = app(id); return a && !a.input && S.c.home.indexOf(id) < 0; }).slice(0, 3);
+  }
   function top() { return S.stack[S.stack.length - 1]; }
   function push(e) { S.stack.push(e); return e; }
-  function pop() { if (S.stack.length > 1) S.stack.pop(); }
+  function pop() { if (S.stack.length > 1) S.stack.pop(); if (S.stack.length === 1) S.unlocked = false; } // back at Home, a locked Settings asks again
   function px(n) { return n.toFixed(2) + 'px'; }
   function icon(name, cls, underlay) {
     return '<svg class="ico' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">'
@@ -481,6 +487,12 @@
     if (v && typeof v === 'object') Object.keys(v).forEach(function (id) { if (n < 300 && safeId(id) && ICON_CHOICE.test(String(v[id]))) { out[id] = String(v[id]); n++; } });
     return out;
   }
+  /* Parental lock: a hashed 4-digit PIN, whether Settings ask for it, and the apps that do. */
+  function lockOf(v) {
+    v = v && typeof v === 'object' ? v : {};
+    var pin = /^[0-9a-f]{8}$/.test(String(v.pin || '')) ? String(v.pin) : '';
+    return { pin: pin, settings: !!pin && v.settings === true, apps: pin ? idList(v.apps) : [] };
+  }
   function idList(v) { var out = []; (Array.isArray(v) ? v : []).forEach(function (id) { if (safeId(id) && out.indexOf(id) < 0 && out.length < 300) out.push(id); }); return out; }
   function clean(saved) {
     var s = saved && typeof saved === 'object' ? saved : {}, modern = s.look && typeof s.look === 'object' ? s.look : s;
@@ -511,7 +523,7 @@
       home: h, recent: recent, lastApp: h.indexOf(s.lastApp) >= 0 ? s.lastApp : h[0],
       mode: pick(s.mode, MODES.map(function (m) { return m.id; }), 'fixed'),
       source: sourceCsv(ONLINE ? ONLINE_INFO.source : 'builtin'),
-      fav: idList(s.fav), hide: idList(s.hide), hidein: idList(s.hidein), iconFor: iconMap(s.iconFor),
+      fav: idList(s.fav), hide: idList(s.hide), hidein: idList(s.hidein), iconFor: iconMap(s.iconFor), used: idList(s.used).slice(0, 8), lock: lockOf(s.lock),
       ipack: PKG_RE.test(String(modern.ipack || '')) ? String(modern.ipack) : ''
     };
     Object.keys(MORE_LOOK).forEach(function (k) { out[k] = pick(modern[k], LOOK_VALUES[k], MORE_LOOK[k]); });
@@ -577,7 +589,7 @@
   }
   function clearSession() { S.undo = []; S.removedAt = {}; S.note = null; S.err = null; }
   function begin() { S.note = null; }
-  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; c.source = S.c.source; c.fav = S.c.fav.slice(); c.hide = S.c.hide.slice(); c.hidein = S.c.hidein.slice(); c.iconFor = iconMap(S.c.iconFor); return c; }
+  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; c.source = S.c.source; c.fav = S.c.fav.slice(); c.hide = S.c.hide.slice(); c.hidein = S.c.hidein.slice(); c.iconFor = iconMap(S.c.iconFor); c.used = S.c.used.slice(); c.lock = lockOf(S.c.lock); return c; }
   function snap() { return { home: S.c.home.slice(), recent: S.c.recent.slice() }; }
   function pushRecent(list, id) { return [id].concat(without(list, id)).slice(0, 5); }
   function write(c, label) {
@@ -665,7 +677,12 @@
   function launch(id) {
     var a = app(id), c;
     if (!a || busy) return;
-    if (S.c.home.indexOf(id) >= 0) { c = next(S.c.home.slice(), S.c.recent.slice()); c.lastApp = id; write(c, 'Last app'); }
+    if (appLocked(id)) { askPin(a.name, function () { S.unlockedApp = id; launch(id); }); return; }
+    S.unlockedApp = '';
+    c = next(S.c.home.slice(), S.c.recent.slice());
+    if (S.c.home.indexOf(id) >= 0) c.lastApp = id;
+    if (!a.input) c.used = [id].concat(without(c.used, id)).slice(0, 8);
+    write(c, 'Last app');
     S.press = id; S.lastLaunch = a.name;
     perform(a.name, function (done) { FrameDevice.launchApp(a.appId, done); });
   }
@@ -673,11 +690,16 @@
   function openRec(id, it) {
     var a = app(id);
     if (!a || !it || busy) return;
+    if (appLocked(id)) { askPin(a.name, function () { S.unlockedApp = id; openRec(id, it); }); return; }
+    S.unlockedApp = '';
     S.press = id; S.lastLaunch = a.name;
     perform(a.name, function (done) { SHELF.open(a.appId, it.url, done); });
   }
   function openWatch(it) {
+    var owner = it && lockOwner(it.pkg);
     if (!it || busy) return;
+    if (owner) { askPin(app(owner).name, function () { S.unlockedApp = owner; openWatch(it); }); return; }
+    S.unlockedApp = '';
     S.lastLaunch = it.title;
     perform(it.title, function (done) { WATCH.open(it.watch, done); });
   }
@@ -733,9 +755,9 @@
      Detail comes from the media session (NowPlayingService.detail) once a second; between polls the position
      runs on locally. Lyrics come from LRCLIB through Lyrics.java and follow the position line by line. */
   var PB = ['prev', 'toggle', 'next', 'lyrics', 'app'], SEEK_STEP = 10000;
-  var P = { d: null, at: 0, pkg: '', ly: null, lyKey: '', poll: 0, tick: 0, seekTo: -1, seekUntil: 0 };
+  var P = { d: null, at: 0, pkg: '', ly: null, tr: null, lyKey: '', poll: 0, tick: 0, seekTo: -1, seekUntil: 0 };
   function openPlayer(pkg) {
-    P.pkg = pkg || ''; P.d = null; P.ly = null; P.lyKey = ''; P.seekTo = -1;
+    P.pkg = pkg || ''; P.d = null; P.ly = null; P.tr = null; P.lyKey = ''; P.seekTo = -1;
     push({ id: 'player', f: { zone: 'buttons', b: 1 } });
     playerPoll(); render();
   }
@@ -751,13 +773,17 @@
         else P.seekTo = -1;
         P.d = d; P.at = Date.now(); P.pkg = d.pkg || P.pkg;
         key = d.artist + '\n' + d.title;
-        if (key !== P.lyKey) { P.lyKey = key; P.ly = null; if (NOWPLAYING.beat) NOWPLAYING.beat.reset(); } // a new song: new lyrics, and the pulse learns its drums again
+        if (key !== P.lyKey) { P.lyKey = key; P.ly = null; P.tr = null; if (NOWPLAYING.beat) NOWPLAYING.beat.reset(); } // a new song: new lyrics, and the pulse learns its drums again
         if (S.c.plyric === 'on' && (!P.ly || P.ly.state === 'pending')) P.ly = NOWPLAYING.lyrics(d.artist, d.title, d.album, Math.round(d.dur / 1000));
+        if (S.c.ptrans === 'on' && NOWPLAYING.translate && P.ly && P.ly.state === 'ok' && P.ly.synced.length && (!P.tr || P.tr.state === 'pending'))
+          P.tr = NOWPLAYING.translate(P.ly.synced.map(function (l) { return l[1]; }), lyricLang());
       } else if (!P.d) P.d = { found: false };
-      render();
+      syncAwake(); render();
     }
     P.poll = setTimeout(playerPoll, 1000);
   }
+  /* Translations go to the TV's own language, even one Shore has no texts for. */
+  function lyricLang() { return String(navigator.language || 'en').split('-')[0].toLowerCase(); }
   /* Position now, from the last poll and the playback speed. */
   function playerPos() {
     var d = P.d;
@@ -860,9 +886,9 @@
     else if (u === 'art') { if (ANDROID) startSaver(); else perform(TV.art, FrameDevice.art); }
     else if (u === 'apps') openApps();
     else if (u === 'ha') openHa();
-    else openSettings();
+    else guarded(openSettings);
   }
-  function addAppsRoute() { openEditor('home'); }
+  function addAppsRoute() { guarded(function () { openEditor('home'); }); }
   /* ---------- Quick actions: a long OK on a Home app tile ---------- */
   var LONG_OK = 600, longOk = { code: 0, timer: 0 };
   function quickTarget() {
@@ -878,6 +904,7 @@
   function openQuick(id) {
     var a = app(id);
     if (!a || top().id !== 'home') return;
+    if (settingsLocked()) { askPin('Settings', function () { S.unlocked = true; openQuick(id); }); return; }
     if (a.input) { push({ id: 'message', content: { title: a.name, line: 'Quick actions', note: '', actions: [['quick.open:' + id, 'Switch'], ['quick.hidein:' + id, 'Hide from Home']] }, f: { b: 0 } }); render(); return; }
     push({ id: 'message', content: { title: a.name, line: 'Quick actions', note: '',
       actions: [['quick.open:' + id, 'Open'], ['quick.move:' + id, 'Move'], ['quick.icon:' + id, 'Icon'], ['quick.remove:' + id, 'Remove']].concat(FrameDevice.appInfo ? [['quick.info:' + id, 'App info']] : []) }, f: { b: 0 } });
@@ -891,7 +918,7 @@
     if (kind === 'info') { perform('App info', function (done) { FrameDevice.appInfo(app(id).appId, done); }); return; }
     if (kind === 'icon') { openAppIcon(id, true); return; }
     // Move and Remove use Apps on Home, which already has undo, so nothing here is final.
-    S.sel = id; openEditor('home'); t = top(); t.f.zone = 'home'; t.f.i = Math.max(0, S.c.home.indexOf(id));
+    S.sel = id; if (settingsLocked()) { guarded(function () { openEditor('home'); }); return; } openEditor('home'); t = top(); t.f.zone = 'home'; t.f.i = Math.max(0, S.c.home.indexOf(id));
     if (kind === 'move') { t.f.part = 'name'; t.lifted = { id: id, from: t.f.i, order: S.c.home.slice(), snap: snap() }; }
     else { t.f.part = 'remove'; editorRemove(t, id); }
   }
@@ -924,6 +951,36 @@
     if (saved) S.c.iconFor[a.id] = saved;
     return html;
   }
+  /* ---------- Parental lock ---------- */
+  function pinHash(pin) { var h = 0x811c9dc5, s = 'shore:' + pin, i; for (i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h + (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24)) >>> 0; } /* FNV-1a, exact in 32 bits */ return ('0000000' + h.toString(16)).slice(-8); }
+  function settingsLocked() { return !!S.c.lock.pin && S.c.lock.settings && !S.unlocked; }
+  function appLocked(id) { return !!S.c.lock.pin && S.c.lock.apps.indexOf(id) >= 0 && S.unlockedApp !== id; }
+  /* The Home app a Continue watching card belongs to, when that app is locked. */
+  function lockOwner(pkg) { var hit = ''; S.c.lock.apps.forEach(function (id) { var a = app(id); if (a && a.appId === pkg && appLocked(id)) hit = id; }); return hit; }
+  function guarded(fn) { if (settingsLocked()) askPin('Settings', function () { S.unlocked = true; fn(); }); else fn(); }
+  /* PIN entry: up and down change the digit, left and right move, number keys type. Four digits check at once. */
+  function askPin(what, then) { push({ id: 'pin', step: 'check', what: what, then: then, digits: [], cur: 0, err: '', f: {} }); render(); }
+  function choosePin() { push({ id: 'pin', step: 'new', what: '', then: null, digits: [], cur: 0, err: '', f: {} }); render(); }
+  function pinEntered(t) {
+    var pin = t.digits.join(''), c, then;
+    if (t.step === 'check') {
+      if (pinHash(pin) !== S.c.lock.pin) { t.digits = []; t.cur = 0; t.err = 'Wrong PIN'; t.shake = (t.shake || 0) + 1; return; }
+      then = t.then; pop(); if (then) then(); return;
+    }
+    if (t.step === 'new') { t.first = pin; t.step = 'again'; t.digits = []; t.cur = 0; t.err = ''; return; }
+    if (pin !== t.first) { t.step = 'new'; t.digits = []; t.cur = 0; t.err = 'The PINs didn’t match. Choose one again.'; return; }
+    c = next(S.c.home.slice(), S.c.recent.slice()); c.lock.pin = pinHash(pin);
+    pop(); S.unlocked = true;
+    if (write(c, 'PIN')) S.note = 'PIN saved';
+  }
+  function lockToggle(what) {
+    var c = next(S.c.home.slice(), S.c.recent.slice()), i;
+    if (!c.lock.pin) return;
+    if (what === 'settings') c.lock.settings = !c.lock.settings;
+    else { i = c.lock.apps.indexOf(what); if (i >= 0) c.lock.apps.splice(i, 1); else c.lock.apps.push(what); }
+    if (write(c, 'Parental lock')) render();
+  }
+  function lockOff() { var c = next(S.c.home.slice(), S.c.recent.slice()); c.lock = lockOf(null); if (write(c, 'Parental lock')) render(); }
   function openMessage(key) { push({ id: 'message', msg: key, f: { b: 0 } }); }
   function openApps() {
     var e = { id: 'apps', mode: 'browse', top: 0, f: { zone: 'grid', i: Math.max(0, ALPHA.indexOf(S.appsFocus)), h: 0 } };
@@ -1158,7 +1215,7 @@
       if (k === 'back') { pop(); return; }
       if (f.zone === 'head') {
         if (k === 'down' && n) f.zone = 'grid';
-        else if (k === 'ok') { if (catalog.error) refreshCatalog(); else openEditor('apps'); }
+        else if (k === 'ok') { if (catalog.error) refreshCatalog(); else guarded(function () { openEditor('apps'); }); }
         return;
       }
       if (k === 'left' && col > 0) f.i--;
@@ -1276,7 +1333,7 @@
   function closeEditor() { clearSession(); pop(); }
 
   /* ---------- Settings, Layout and messages ---------- */
-  var PARENT = { ha: 'addons', musicview: 'music', health: 'samsung', updates: 'samsung', saverlook: 'screensaver', rotation: 'background', online: 'background', unsplash: 'online', animated: 'online', fonts: 'typography', icons: 'layout', iconpack: 'icons', iconapps: 'icons', appicon: 'iconapps', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
+  var PARENT = { ha: 'addons', musicview: 'music', health: 'samsung', updates: 'samsung', saverlook: 'screensaver', rotation: 'background', online: 'background', unsplash: 'online', animated: 'online', fonts: 'typography', icons: 'layout', iconpack: 'icons', iconapps: 'icons', appicon: 'iconapps', lock: 'samsung', lockapps: 'lock', remote: 'samsung', remotepick: 'remote', remoteapp: 'remotepick' };
   function groupName(group, t) { return group === 'remotepick' ? buttonName(t.key) : group === 'appicon' && t && app(t.app) ? app(t.app).name : DETAIL_NAMES[group]; }
   function parentName(t) { return t.group === 'appicon' && t.fromHome ? 'Home' : PARENT[t.group] ? groupName(PARENT[t.group], t) : 'Settings'; }
   /* ---------- Wallpaper sources: any mix of Shore's own, My photos and online sources ----------
@@ -1357,11 +1414,11 @@
     else if (id === 'phone') openPhone();
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { addons: 'Add-ons', ha: 'Home Assistant', musicview: 'Music view', health: 'Setup and health', updates: 'Shore updates', fonts: 'Font', clock: 'Clock', display: 'Night', online: 'Wallpaper sources', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Wallpaper', layout: 'Home screen', typography: 'Text', icons: 'App icons', iconpack: 'Icon pack', iconapps: 'Per-app icons', appicon: 'Icon', inputs: 'Inputs', focus: 'Style', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', weather: 'Weather', music: 'Music', news: 'News', screensaver: 'Screensaver', saverlook: 'Arrangement and clock' };
+  var DETAIL_NAMES = { addons: 'Add-ons', ha: 'Home Assistant', musicview: 'Music view', health: 'Setup and health', updates: 'Shore updates', fonts: 'Font', clock: 'Clock', display: 'Night', online: 'Wallpaper sources', unsplash: 'Unsplash themes', animated: 'Animated wallpapers', background: 'Wallpaper', layout: 'Home screen', typography: 'Text', icons: 'App icons', iconpack: 'Icon pack', iconapps: 'Per-app icons', appicon: 'Icon', lock: 'Parental lock', lockapps: 'Locked apps', inputs: 'Inputs', focus: 'Style', rotation: 'Rotation', samsung: TV.brand, remote: 'Remote buttons', remoteapp: 'Choose an app', phone: 'Phone', weather: 'Weather', music: 'Music', news: 'News', screensaver: 'Screensaver', saverlook: 'Arrangement and clock' };
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'nsrc' ? newsSourceName(value) : axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm|svphoto|wfx|cnews|cwatch|plyric|pword|pbeat)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
+      label: axis === 'nsrc' ? newsSourceName(value) : axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm|svphoto|wfx|cnews|cwatch|plyric|pword|pbeat|crecent|ccal|pqueue|ptrans)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
   /* "Seconds" in the Format row, abbreviated where the word is long. */
   /* "Ask" (to switch inputs), short enough to share the Inputs row in every language. */
@@ -1548,7 +1605,39 @@
     var html = '', p = S.playing, w = S.c.cweather === 'on' && WEATHER ? WEATHER.text(S.c.wunit) : '', date = S.c.cdate === 'on' ? T(dateText()) : '', inside = haInside();
     if (date || w || inside) html += '<span class="cap-date">' + escRaw(date) + (date && w ? ' · ' : '') + weatherIcon() + escRaw(w) + ((date || w) && inside ? ' · ' : '') + esc(inside) + '</span>';
     if (NOWPLAYING && S.c.cplaying === 'on' && p.playing) html += '<span class="cap-date cap-playing">' + wave() + escRaw(p.title + (p.artist ? ' · ' + p.artist : '') + (p.app ? ' — ' + p.app : '')) + '</span>';
+    if (sleepLeft() > 0) html += '<span class="cap-date cap-sleep">' + icon('w-moon', 'wx') + esc(sleepText()) + '</span>';
+    if (calendarLine()) html += '<span class="cap-date cap-cal">' + icon('calendar', 'wx') + escRaw(calendarLine()) + '</span>';
     return html;
+  }
+  /* ---------- Calendar: the next event from an iCal address set on the phone (CalendarFeed.java) ---------- */
+  var CALENDAR = ANDROID && FrameDevice.calendar ? FrameDevice.calendar : null;
+  function calendarLine() {
+    if (!CALENDAR || S.c.ccal !== 'on') return '';
+    var e = CALENDAR.next(), d, now = new Date(), day, h, m;
+    if (!e || !e.title || !(e.start > 0)) return '';
+    d = new Date(e.start);
+    day = d.toDateString() === now.toDateString() ? 'Today' : new Date(now.getTime() + 86400000).toDateString() === d.toDateString() ? 'Tomorrow' : '';
+    if (!day) day = localeText('wd.' + d.getDay(), function () { try { return d.toLocaleDateString(undefined, { weekday: 'long' }); } catch (x) { return ''; } });
+    else day = T(day);
+    if (e.allDay) return day + ' · ' + e.title;
+    h = S.c.cformat === '24' ? d.getHours() : d.getHours() % 12 || 12; m = d.getMinutes();
+    return (e.start <= now.getTime() ? T('Now') : day + ' ' + (S.c.cformat === '24' && h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + (S.c.cformat === '24' ? '' : ' ' + meridiemOf(d))) + ' · ' + e.title;
+  }
+  /* ---------- Sleep timer (Android): the Home-button service puts the TV into standby ---------- */
+  var SLEEP = ANDROID && FrameDevice.sleep ? FrameDevice.sleep : null, sleepPick = 0;
+  function sleepLeft() { return SLEEP ? SLEEP.left() : -1; }
+  function sleepText() { var m = Math.max(1, Math.ceil(sleepLeft() / 60000)); return m >= 60 ? T('Sleep in ' + (m / 60 | 0) + ' hr ' + (m % 60) + ' min') : T('Sleep in ' + m + ' min'); }
+  function setSleep(minutes) {
+    if (!SLEEP) return;
+    if (!SLEEP.set(minutes)) { render(); return; }
+    sleepPick = minutes; render(); renderCaption(top(), homeState(top()));
+  }
+  function sleepSection() {
+    var left = sleepLeft(), off = left < 0, running = left > 0;
+    if (!running) sleepPick = 0;
+    return { id: 'sleep', title: 'Sleep timer', horizontal: true, items: [0, 30, 60, 90, 120].map(function (m) {
+      return { action: 'sleep.' + m, label: m ? m + ' min' : 'Off', tick: true, applied: !off && sleepPick === m, disabled: off };
+    }), reason: off ? 'Turn on the Shore Home button in Accessibility to use the sleep timer.' : running ? sleepText() + '.' : 'Switches the TV off, even while another app is open.' };
   }
   /* ---------- Screensaver: Shore's own, instead of the TV's ---------- */
   /* After the chosen idle time Shore fades to a slow slideshow of the wallpapers with a large clock, or the album
@@ -1573,14 +1662,16 @@
     saverTimer = setTimeout(function () {
       saverTimer = 0;
       if (!saverDelay()) return;
-      if (S.pending || S.remote && S.remote.learning) { saverReset(); return; } // busy: try again after another full wait
+      if (S.pending || S.remote && S.remote.learning || musicShowing()) { saverReset(); return; } // busy, or the music view is playing: try again after another full wait
       startSaver();
     }, saverDelay());
     syncAwake();
   }
   /* FLAG_KEEP_SCREEN_ON while Shore's screensaver is enabled and Shore is in front, for at most four hours of screensaver. */
+  /* The music view with a song playing is something to watch, like a video: no screensaver over it. */
+  function musicShowing() { return playerOpen() && !!P.d && !!P.d.found && !!P.d.playing; }
   function syncAwake() {
-    var on = !!SAVER_API && !DREAM && !document.hidden && S.c.saver !== 'off' && !(S.saver && Date.now() - saverSince > SAVER_AWAKE_MS);
+    var on = !!SAVER_API && !DREAM && !document.hidden && (S.c.saver !== 'off' || musicShowing()) && !(S.saver && Date.now() - saverSince > SAVER_AWAKE_MS);
     if (on === awakeOn || !SAVER_API) return;
     awakeOn = on; SAVER_API.keepAwake(on);
   }
@@ -2040,14 +2131,14 @@
      Shore applies it exactly as if it was chosen with the remote. */
   var COMPANION_GROUPS = [
     ['Wallpaper', ['bg', 'wall', 'source', 'mode', 'motion', 'ncalm']],
-    ['Home screen', ['layout', 'apps', 'controls', 'cwatch']],
+    ['Home screen', ['layout', 'apps', 'controls', 'cwatch', 'crecent']],
     ['App icons', ['istyle', 'isize']],
     ['Style', ['focus', 'material', 'tint', 'dglass']],
     ['Text', ['font', 'tweight', 'tsize']],
     ['Inputs', ['inputs', 'iask']],
-    ['Clock', ['cformat', 'csec', 'cdate', 'csize', 'cweight', 'cpos']],
+    ['Clock', ['cformat', 'csec', 'cdate', 'csize', 'cweight', 'cpos', 'ccal']],
     ['Weather', ['cweather', 'wunit', 'wicon', 'wfx']],
-    ['Music', ['cplaying', 'cwave', 'cart', 'npdim', 'clook', 'plyric', 'pword', 'pbeat']],
+    ['Music', ['cplaying', 'cwave', 'cart', 'npdim', 'clook', 'plyric', 'pword', 'pbeat', 'pqueue', 'ptrans']],
     ['News', ['cnews', 'nsrc']],
     ['Add-ons', ['aha']],
     ['Night', ['night', 'nhours', 'ndim', 'idle']],
@@ -2147,7 +2238,7 @@
         { action: 'choice.layout.shelf', axis: 'layout', value: 'shelf', label: 'Shelf', applied: isShelf() }] },
       { id: 'apps', title: 'App display', horizontal: true, items: options('apps', ['text', 'icons', 'both']) },
       { id: 'controls', title: 'Home controls', horizontal: true, items: options('controls', ['text', 'icons', 'both']) },
-      { id: 'iconlink', title: '', items: (WATCH ? [watchChoice()] : []).concat([{ action: 'open.icons', label: 'App icons', description: iconSummary(), pair: true }]) }
+      { id: 'iconlink', title: '', items: (WATCH ? [watchChoice()] : []).concat([recentChoice(), { action: 'open.icons', label: 'App icons', description: iconSummary(), pair: true }]) }
     ];
     /* App icons: style, size and an installed icon pack. */
     if (t.group === 'icons') return [
@@ -2188,7 +2279,8 @@
       { id: 'cformat', title: 'Format', horizontal: true, items: options('cformat', ['12', '24']).concat(options('cdate', ['on'])).concat(options('csec', ['on'])) },
       { id: 'csize', title: 'Clock size', horizontal: true, items: options('csize', ['small', 'medium', 'large', 'huge']) },
       { id: 'cweight', title: 'Clock weight', horizontal: true, items: options('cweight', ['auto', 'thin', 'light', 'bold']) },
-      { id: 'cpos', title: 'Clock position', horizontal: true, items: options('cpos', ['left', 'center'], S.c.layout === 'list'), reason: S.c.layout === 'list' ? 'Centred needs the Dock layout.' : '' }];
+      { id: 'cpos', title: 'Clock position', horizontal: true, items: options('cpos', ['left', 'center'], S.c.layout === 'list'), reason: S.c.layout === 'list' ? 'Centred needs the Dock layout.' : '' }]
+      .concat(CALENDAR ? [{ id: 'ccal', title: '', items: [choice('ccal', 'on')], reason: S.phone.calendar ? 'Your next event from the calendar address set on your phone.' : 'Add your calendar’s iCal address in the phone companion.' }] : []);
     if (t.group === 'weather') return [
       { id: 'cweather', title: '', items: [{ action: 'choice.cweather.on', axis: 'cweather', value: 'on', label: 'Show the weather', tick: true, applied: S.c.cweather === 'on' }],
         reason: PHONE ? 'Weather by Open-Meteo. Set your place in the phone companion.' : 'Weather by Open-Meteo.' },
@@ -2206,8 +2298,9 @@
         { id: 'pviewlink', title: '', items: [{ action: 'open.musicview', label: 'Music view', description: [S.c.plyric === 'on' ? 'Lyrics' : '', S.c.pbeat === 'on' ? 'Beat pulse' : ''].filter(Boolean).map(T).join(', ') || 'Off', pair: true }] }]);
     /* Music view: what the full-screen player shows. */
     if (t.group === 'musicview') return [
-      { id: 'plyric', title: '', items: options('plyric', ['on']).concat(options('pword', ['on'], S.c.plyric !== 'on')).concat(NOWPLAYING && NOWPLAYING.beat ? options('pbeat', ['on']) : []),
-        reason: S.c.pbeat === 'on' ? 'The pulse follows the TV’s sound, never the microphone. Android still calls this permission recording audio.' : 'Lyrics come from LRCLIB. Only the artist, title, album and length are sent.' }];
+      { id: 'plyric', title: '', items: options('plyric', ['on']).concat(options('pword', ['on'], S.c.plyric !== 'on')).concat(NOWPLAYING && NOWPLAYING.translate ? options('ptrans', ['on'], S.c.plyric !== 'on') : [])
+          .concat(NOWPLAYING && NOWPLAYING.beat ? options('pbeat', ['on']) : []).concat(options('pqueue', ['on'])),
+        reason: S.c.pbeat === 'on' ? 'The pulse follows the TV’s sound, never the microphone. Android still calls this permission recording audio.' : S.c.ptrans === 'on' && S.c.plyric === 'on' ? 'Synced lyrics are sent to Google Translate, line by line, into the TV’s language.' : 'Lyrics come from LRCLIB. Only the artist, title, album and length are sent.' }];
     if (t.group === 'news') return [
       { id: 'cnews', title: '', items: [{ action: 'choice.cnews.on', axis: 'cnews', value: 'on', label: 'Headlines under the clock', tick: true, applied: S.c.cnews === 'on' }] },
       { id: 'nsrc', title: 'Source', items: options('nsrc', ['google'].concat(newsOutlets().map(function (o) { return o.id; })), S.c.cnews !== 'on')
@@ -2218,7 +2311,7 @@
       { id: 'nhours', title: 'Night hours', horizontal: true, items: options('nhours', ['21-7', '22-6', '23-7'], S.c.night !== 'scheduled') },
       { id: 'ndim', title: 'Night dimming', horizontal: true, items: options('ndim', ['soft', 'medium', 'strong'], S.c.night === 'off') },
       { id: 'idle', title: 'Hide controls when idle', horizontal: true, items: options('idle', ['off', '1', '5']),
-        reason: S.c.idle !== 'off' ? 'The clock and picture stay. Any button brings the controls back.' : '' }];
+        reason: S.c.idle !== 'off' ? 'The clock and picture stay. Any button brings the controls back.' : '' }].concat(SLEEP ? [sleepSection()] : []);
     if (t.group === 'screensaver') return [
       { id: 'saver', title: 'Start after', horizontal: true, items: options('saver', ['off', '5', '10', '15']) },
       { id: 'svsrc', title: 'Photos', horizontal: true, items: options('svsrc', ['like', 'every', 'builtin']) },
@@ -2253,10 +2346,24 @@
     if (t.group === 'rotation') return [{ id: 'mode', title: '', items: options('mode', MODES.map(function (m) { return m.id; }), flat),
       reason: flat ? 'Choose Photo in Background to use rotation.' : '' }];
     if (PARENT[t.group] && remotePage(t)) return remoteSections(t);
+    if (t.group === 'lock') return lockSections();
+    if (t.group === 'lockapps') return [{ id: 'lockapps', title: '', items: S.c.home.concat(S.c.lock.apps.filter(function (id) { return S.c.home.indexOf(id) < 0; })).filter(function (id) { return app(id) && !app(id).input; }).map(function (id) {
+      return { action: 'lock.app.' + id, label: app(id).name, tick: true, applied: S.c.lock.apps.indexOf(id) >= 0, glyph: appMark(app(id), 56, 40, 34) };
+    }), reason: 'Locked apps ask for the PIN before they open, from Home, All apps and Continue watching.' }];
     return [{ id: 'samsung', title: '', items: [
       { action: 'samsung.home', label: TV.home, description: TV.homeLine },
       { action: 'samsung.settings', label: 'TV settings', description: 'Picture, sound and network settings' }
+      , { action: 'open.lock', label: 'Parental lock', description: S.c.lock.pin ? lockLine() : 'Off' }
     ].concat(ANDROID ? [{ action: 'open.health', label: 'Setup and health', description: healthLine() }] : []).concat(UPDATE ? [{ action: 'open.updates', label: 'Shore updates', description: updateLine() }] : []).concat(REMOTE ? [{ action: 'samsung.remote', label: 'Remote buttons', description: S.remote.keys.length ? S.remote.keys.length + (S.remote.keys.length === 1 ? ' button assigned' : ' buttons assigned') : 'Reassign the app and TV buttons' }] : []) }];
+  }
+  function lockLine() { var n = S.c.lock.apps.length, parts = []; if (S.c.lock.settings) parts.push(T('Settings')); if (n) parts.push(n === 1 ? T('1 app') : T(n + ' apps')); return parts.length ? parts.join(', ') : 'PIN set, nothing locked'; }
+  function lockSections() {
+    var pin = !!S.c.lock.pin, n = S.c.lock.apps.length;
+    return [{ id: 'lockpin', title: '', items: pin ? [{ action: 'lock.pin', label: 'Change PIN' }, { action: 'lock.off', label: 'Turn off the lock', description: 'Forgets the PIN and unlocks everything' }]
+        : [{ action: 'lock.pin', label: 'Choose a PIN', description: 'Four digits' }] },
+      { id: 'lockwhat', title: 'Ask for the PIN', items: [{ action: 'lock.settings', label: 'Settings', description: 'Also Apps on Home and Quick actions', tick: true, applied: S.c.lock.settings, disabled: !pin },
+        { action: 'open.lockapps', label: 'Apps', description: n ? (n === 1 ? '1 app locked' : n + ' apps locked') : 'None', pair: true, disabled: !pin }],
+        reason: pin ? 'Forgot the PIN? Clearing Shore’s storage in the TV’s Android settings removes it, along with Shore’s other settings.' : 'Choose a PIN first.' }];
   }
   function detailRows(t) {
     var rows = [[{ action: 'settings.back', label: parentName(t) }]];
@@ -2381,6 +2488,13 @@
     else if (item.action === 'typography.fonts') openAppearance('fonts');
     else if (item.action === 'open.icons') openAppearance('icons');
     else if (item.action === 'open.iconapps') openAppearance('iconapps');
+    else if (/^sleep\.\d+$/.test(item.action)) setSleep(+item.action.slice(6));
+    else if (item.action === 'open.lock') { if (S.c.lock.pin && !S.unlocked) askPin('Settings', function () { S.unlocked = true; openAppearance('lock'); }); else openAppearance('lock'); }
+    else if (item.action === 'open.lockapps') openAppearance('lockapps');
+    else if (item.action === 'lock.pin') choosePin();
+    else if (item.action === 'lock.off') lockOff();
+    else if (item.action === 'lock.settings') lockToggle('settings');
+    else if (item.action.indexOf('lock.app.') === 0) lockToggle(item.action.slice(9));
     else if (item.action.indexOf('iconapp.') === 0) openAppIcon(item.action.slice(8), false);
     else if (item.action.indexOf('iconset.') === 0) setAppIcon(t.app, item.action.slice(8));
     else if (item.action === 'open.iconpack') { packList = null; openAppearance('iconpack'); }
@@ -2468,6 +2582,21 @@
     }
   };
 
+  V.pin = {
+    sheet: true,
+    key: function (t, k) {
+      var d = /^d[0-9]$/.test(k) ? +k.slice(1) : -1;
+      if (k === 'back') { if (t.cur > 0) { t.cur--; t.digits.length = t.cur; } else pop(); return; }
+      t.err = '';
+      if (d >= 0) { t.digits[t.cur] = d; t.cur++; t.digits.length = t.cur; }
+      else if (k === 'up') t.digits[t.cur] = t.digits[t.cur] === undefined ? 0 : (t.digits[t.cur] + 1) % 10;
+      else if (k === 'down') t.digits[t.cur] = t.digits[t.cur] === undefined ? 9 : (t.digits[t.cur] + 9) % 10;
+      else if (k === 'right' || k === 'ok') { if (t.digits[t.cur] === undefined) t.digits[t.cur] = 0; t.cur++; t.digits.length = t.cur; }
+      else if (k === 'left' && t.cur > 0) { t.cur--; t.digits.length = t.cur + 1; }
+      if (t.cur >= 4) pinEntered(t);
+    },
+    point: function (t, z, i) { if (z === 'pin') { t.cur = Math.min(i, t.digits.length); } }
+  };
   V.message = {
     sheet: true,
     key: function (t, k) {
@@ -2657,7 +2786,7 @@
   }
 
   function homeState(t) {
-    var h = visibleHome(), hs = { mode: 'browse', zone: null, i: Math.max(0, ensureSel()), u: -1, lifted: false, from: -1, arr: null, items: h.map(function (id) { return { key: id, kind: 'app', id: id }; }) };
+    var h = visibleHome(), hs = { mode: 'browse', zone: null, i: Math.max(0, ensureSel()), u: -1, lifted: false, from: -1, arr: null, items: h.map(function (id) { return { key: id, kind: S.c.home.indexOf(id) < 0 && LIVE.indexOf(id) < 0 ? 'recent' : 'app', id: id }; }) };
     if (isSettingsDetail(t)) hs.zone = 'preview';
     else if (t.id === 'home') { hs.zone = t.f.zone; hs.u = t.f.u; hs.n = t.f.n || 0; }
     return hs;
@@ -2699,9 +2828,9 @@
     return value;
   }
   /* AM or PM in the TV's language for the 12-hour clock ("PM", "م", "nachm."), '' for 24 hours. */
-  function meridiem() {
-    if (S.c.cformat === '24') return '';
-    var pm = new Date().getHours() >= 12;
+  function meridiem() { return S.c.cformat === '24' ? '' : meridiemOf(new Date()); }
+  function meridiemOf(date) {
+    var pm = date.getHours() >= 12;
     return localeText(pm ? 'pm' : 'am', function () {
       var d = new Date(2026, 0, 1, pm ? 15 : 3), word = '';
       try { word = d.toLocaleTimeString(undefined, { hour: 'numeric', hour12: true }).replace(/[\d\s\u200e\u200f\u202f\u00a0:]+/g, ' ').trim(); } catch (e) { }
@@ -2894,6 +3023,7 @@
     c.description = S.c.layout === 'list' ? 'Dock or Shelf' : S.c.cwatch === 'on' && !watchAllowed ? 'OK to allow' : '';
     return c;
   }
+  function recentChoice() { var c = choice('crecent', 'on', S.c.layout !== 'dock' || isShelf()); c.description = c.disabled ? 'Dock only' : 'Apps you opened lately, after Home’s'; return c; }
   function watchShown() { return !!WATCH && S.c.cwatch === 'on' && S.c.layout === 'dock' && watchItems.length > 0; }
   function watchRow() { return watchShown() && !isShelf(); }
   if (WATCH) { loadWatch(); WATCH.onChange(function () { loadWatch(); recsKey = ''; render(); }); }
@@ -3022,7 +3152,7 @@
       var lifted = hs.lifted && i === anchor, partial = g.broad && (left - off < -1 || left + g.tw - off > g.shelf + 1);
       setContent(el, it.kind + '|' + (it.id || '') + '|' + (it.id ? dockLabelSize(it.id) : full) + '|' + S.c.bg + '|' + S.c.apps + '|' + S.c.lstyle + '|' + homeFont(), '<span class="tile-content">' + dockTileHtml(it, full) + '</span>');
       el.className = 'tile k-' + it.kind + (focus ? ' is-focus' : '') + (sel ? ' is-sel' : '') + (lifted ? ' is-lifted' : '') + (partial ? ' is-partial' : '')
-        + (a && !a.mark ? ' is-text' : '') + (it.kind === 'add' && full ? ' is-full' : '') + (it.kind === 'app' && S.press === it.id ? ' is-press' : '')
+        + (a && !a.mark ? ' is-text' : '') + (it.kind === 'add' && full ? ' is-full' : '') + (it.kind !== 'add' && S.press === it.id ? ' is-press' : '') + (it.kind === 'recent' && (!items[i - 1] || items[i - 1].kind !== 'recent') ? ' is-recent-first' : '')
         + (lifted && i === 0 ? ' no-l' : '') + (lifted && i >= ns - 1 ? ' no-r' : '');
       el.style.transform = 'translate3d(' + left + 'px,0,0)';
       el.setAttribute('role', 'button');
@@ -3333,7 +3463,7 @@
         + '<div class="pl-info"><p class="pl-app" data-slot="app"></p><h2 class="pl-title" data-slot="title"></h2><p class="pl-artist" data-slot="artist"></p>'
         + '<div class="pl-bar" data-slot="bar" data-z="pbar" data-i="0"><div class="pl-track"><div class="pl-fill" data-slot="fill"></div><div class="pl-knob" data-slot="knob"></div></div>'
         + '<div class="pl-times"><span data-slot="pos"></span><span data-slot="dur"></span></div></div>'
-        + '<div class="pl-buttons" data-slot="buttons"></div></div>'
+        + '<div class="pl-buttons" data-slot="buttons"></div><div class="pl-next" data-slot="queue"></div></div>'
         + '<div class="pl-words" data-slot="lyrics"><div class="pl-lines" data-slot="lines"></div></div>'
         + '<p class="pl-credit" data-slot="credit"></p><p class="pl-hint" data-slot="hint"></p>';
     },
@@ -3378,6 +3508,10 @@
         + '<div class="row-cue editor-before" data-slot="otherBefore" aria-hidden="true">' + icon('up') + '</div><div class="row-cue editor-after" data-slot="otherAfter" aria-hidden="true">' + icon('down') + '</div>';
     },
     settings: function () { return '<h2 class="s-title">' + esc('Settings') + '</h2><div class="settings-overview" data-slot="list"></div><p class="settings-overview-hint"><span class="remote-key">OK</span><span>' + esc('Open selected group') + '</span></p>'; },
+    pin: function () {
+      return '<h2 class="msg-title" data-slot="title"></h2><p class="msg-line" data-slot="line"></p><div class="pin-boxes" data-slot="boxes"></div><p class="pin-err" data-slot="err"></p>'
+        + '<p class="pin-hint"><span class="remote-key">▲▼</span><span>' + esc('Change the digit') + '</span><span class="remote-key">OK</span><span>' + esc('Next') + '</span><span class="remote-key">0–9</span><span>' + esc('Type') + '</span></p>';
+    },
     message: function (t) {
       var m = messageContent(t);
       return '<h2 class="msg-title">' + esc(m.title) + '</h2><p class="msg-line">' + esc(m.line) + '</p><p class="msg-note">' + esc(m.note) + '</p><div class="msg-acts" data-slot="acts"></div>';
@@ -3390,6 +3524,7 @@
   var FILLS = {
     player: function (t, el, tick) {
       var d = P.d || {}, f = t.f, pos = playerPos(), dur = d.dur || 0, ly = S.c.plyric === 'on' ? P.ly : null, synced = ly && ly.state === 'ok' && ly.synced.length ? ly.synced : null;
+      var tr = synced && S.c.ptrans === 'on' && P.tr && P.tr.state === 'ok' ? P.tr.lines : null;
       var showLyrics = !!(ly && ly.state === 'ok'), frac = dur ? Math.max(0, Math.min(1, pos / dur)) : 0, at, html;
       el.fill.style.transform = 'scaleX(' + frac.toFixed(4) + ')';
       el.knob.style.transform = 'translate3d(' + Math.round(frac * 640) + 'px,0,0)';
@@ -3418,15 +3553,18 @@
       }).join(''));
       var b = PB[clamp(f.b, 0, PB.length - 1)];
       setHTML(el.hint, f.zone === 'bar' ? esc('Left and right jump 10 seconds') : esc(b === 'toggle' ? (d.playing ? 'Pause' : 'Play') : b === 'prev' ? 'Previous' : b === 'next' ? 'Next' : b === 'lyrics' ? (S.c.plyric === 'on' ? 'Hide lyrics' : 'Show lyrics') : 'Open ' + (d.app || 'app')));
-      html = !ly ? '' : ly.state === 'ok' ? (synced ? synced.map(function (l) {
-          return '<p class="pl-line">' + (l[1] ? (l[2] ? l[2].map(function (w) { return w[1]; }) : l[1].split(/\s+/)).map(function (w) { return '<span class="w">' + escRaw(w) + '</span>'; }).join(' ') : '<span class="pl-dots"><i></i><i></i><i></i></span>') + '</p>';
+      html = !ly ? '' : ly.state === 'ok' ? (synced ? synced.map(function (l, i) {
+          return '<p class="pl-line">' + (l[1] ? (l[2] ? l[2].map(function (w) { return w[1]; }) : l[1].split(/\s+/)).map(function (w) { return '<span class="w">' + escRaw(w) + '</span>'; }).join(' ') : '<span class="pl-dots"><i></i><i></i><i></i></span>') + (tr && tr[i] && l[1] && tr[i] !== l[1] ? '<span class="pl-tr">' + escRaw(tr[i]) + '</span>' : '') + '</p>';
         }).join('')
         : '<div class="pl-plain">' + escRaw(ly.plain).replace(/\n/g, '<br>') + '</div>')
         : '<p class="pl-state">' + esc(ly.state === 'pending' ? 'Looking for lyrics…' : ly.state === 'instrumental' ? 'Instrumental' : 'No lyrics for this song') + '</p>';
-      if (el.lines._key !== P.lyKey + '|' + (ly && ly.state)) { el.lines._key = P.lyKey + '|' + (ly && ly.state); el.lines.innerHTML = html; el.lines._at = null; el.lines._tops = null; el.lines.className = 'pl-lines is-jump'; FILLS.player(t, el, true); void el.lines.offsetHeight; el.lines.className = 'pl-lines'; } // a new song jumps, it doesn't scroll
+      if (el.lines._key !== P.lyKey + '|' + (ly && ly.state) + '|' + !!tr) { el.lines._key = P.lyKey + '|' + (ly && ly.state) + '|' + !!tr; el.lines.innerHTML = html; el.lines._at = null; el.lines._tops = null; el.lines.className = 'pl-lines is-jump'; FILLS.player(t, el, true); void el.lines.offsetHeight; el.lines.className = 'pl-lines'; } // a new song jumps, it doesn't scroll
       var wide = !!(ly && (ly.state === 'ok' || ly.state === 'pending'));
+      setHTML(el.queue, S.c.pqueue === 'on' && d.found && d.next && d.next.length && !wide ? '<p class="pl-next-h">' + esc('Up next') + '</p>' + d.next.map(function (x) {
+        return '<p class="pl-next-i"><span>' + escRaw(x.title) + '</span>' + (x.artist ? ' · ' + escRaw(x.artist) : '') + '</p>';
+      }).join('') : '');
       el.lyrics.className = 'pl-words' + (wide ? ' is-on' : '') + (synced ? ' is-synced' : '') + (S.c.pword === 'on' ? '' : ' no-words');
-      setHTML(el.credit, showLyrics ? esc('Lyrics from LRCLIB') : ly && ly.state === 'instrumental' ? esc('Instrumental') : ly && ly.state === 'none' ? esc('No lyrics for this song') : '');
+      setHTML(el.credit, showLyrics ? esc(tr ? 'Lyrics from LRCLIB, translated by Google' : 'Lyrics from LRCLIB') : ly && ly.state === 'instrumental' ? esc('Instrumental') : ly && ly.state === 'none' ? esc('No lyrics for this song') : '');
       sheetView.className = 'view view-player' + (wide ? ' has-lyrics' : '');
     },
     ha: function (t, el) {
@@ -3642,6 +3780,15 @@
         html += '</div>';
       });
       setHTML(el.list, html);
+    },
+    pin: function (t, el) {
+      var html = '', i;
+      setHTML(el.title, t.step === 'check' ? esc('Enter the PIN') : t.step === 'new' ? esc('Choose a PIN') : esc('Enter it again'));
+      setHTML(el.line, t.step === 'check' ? esc(t.what === 'Settings' ? 'Settings are locked.' : t.what + ' is locked.') : esc('Four digits. Keep it somewhere safe.'));
+      for (i = 0; i < 4; i++) html += '<span class="pin-box' + (i === t.cur ? ' is-focus' : '') + (i < t.cur ? ' is-done' : '') + '" data-z="pin" data-i="' + i + '">' + (i < t.cur ? '•' : i === t.cur && t.digits[i] !== undefined ? t.digits[i] : '') + '</span>';
+      setHTML(el.boxes, html);
+      el.boxes.className = 'pin-boxes' + (t.shake ? ' is-shake' + (t.shake % 2) : '');
+      setHTML(el.err, esc(t.err || ''));
     },
     message: function (t, el) {
       setHTML(el.acts, messageContent(t).actions.map(function (a, i) {
@@ -3861,7 +4008,7 @@
     if (S.c.idle !== 'off' && !idleTimer && !S.idleHidden) idleReset();
     if (WEATHER && S.c.cweather === 'on') WEATHER.refresh(false);
     if (top().id === 'home' || isSettingsDetail(top())) renderCaption(top(), homeState(top()));
-    if (S.saver) renderSaver(); else if (!saverTimer) saverReset();
+    if (S.saver) renderSaver(); else if (!saverTimer) saverReset(); else syncAwake();
     if (STARTUP) saveBackdrop();
     syncAwake();
     clockTimer = setTimeout(updateClock, S.c.csec === 'on' ? 1000 - (Date.now() % 1000) + 20 : 60000 - (Date.now() % 60000) + 30);
@@ -3933,7 +4080,7 @@
   });
   var heldKeys = {};
   document.addEventListener('keydown', function (ev) {
-    var code = ev.keyCode, k = KEYS[code];
+    var code = ev.keyCode, k = KEYS[code] || (top().id === 'pin' && (code >= 48 && code <= 57 || code >= 96 && code <= 105) ? 'd' + (code >= 96 ? code - 96 : code - 48) : '');
     if (code === 9) { ev.preventDefault(); return; }
     if (!k || ev.metaKey || ev.ctrlKey || ev.altKey) return;
     ev.preventDefault();
@@ -4014,7 +4161,7 @@
   norm(); render(); fit(); focusStage(); updateClock(); syncRotation();
   if (S.firstRun) { openMessage('welcome'); render(); }
   try { if (sessionStorage.getItem('shore.restored')) { sessionStorage.removeItem('shore.restored'); openMessage('restored'); render(); } } catch (e) { }
-  window.CleanFrameSaver = function () { startSaver(); };
+  window.CleanFrameSaver = function () { if (!musicShowing()) startSaver(); };
   /* The remote's Home button: back to Home from Settings, All apps or the music view, unsaved previews dropped. */
   window.CleanFrameHomePressed = function () { if (!S.saver && top().id !== 'home') goScene('home'); };
   if (DREAM || SAVER_API && SAVER_API.requested()) startSaver();
