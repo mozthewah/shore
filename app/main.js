@@ -97,16 +97,16 @@
     cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], clook: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'],
     svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], ncalm: ['off', 'on'], wfx: ['off', 'on'], cnews: ['off', 'on'], svphoto: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
-    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'], cwatch: ['off', 'on'], plyric: ['off', 'on'], pword: ['off', 'on'], pbeat: ['off', 'on'],
+    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'], cwatch: ['off', 'on'], plyric: ['off', 'on'], pword: ['off', 'on'], pbeat: ['off', 'on'], crecent: ['off', 'on'], ccal: ['off', 'on'], pqueue: ['off', 'on'], ptrans: ['off', 'on'],
     nsrc: ['google', 'phone'].concat(NEWS_OUTLETS.map(function (o) { return o.id; })) };
   /* Newer axes with their defaults: stored, migrated and validated like the others. */
-  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore', cwatch: 'on', plyric: 'on', pword: 'on', pbeat: 'off' };
+  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore', cwatch: 'on', plyric: 'on', pword: 'on', pbeat: 'off', crecent: 'on', ccal: 'off', pqueue: 'on', ptrans: 'off' };
   /* On/off settings that OK flips. */
-  var TOGGLES = ['svphoto', 'ncalm', 'wfx', 'cnews', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec', 'cwatch', 'plyric', 'pword', 'pbeat'];
+  var TOGGLES = ['svphoto', 'ncalm', 'wfx', 'cnews', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec', 'cwatch', 'plyric', 'pword', 'pbeat', 'crecent', 'ccal', 'pqueue', 'ptrans'];
   var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', clook: 'Artist pictures', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material',
     svphoto: 'Photo title', ncalm: 'Calmer photos at night', wfx: 'Weather effects', cnews: 'Headlines', iask: 'Ask to switch', svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
-    cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver', nsrc: 'Source', istyle: 'Icon style', cwatch: 'Continue watching', plyric: 'Lyrics', pword: 'Word by word', pbeat: 'Beat pulse' };
+    cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver', nsrc: 'Source', istyle: 'Icon style', cwatch: 'Continue watching', plyric: 'Lyrics', pword: 'Word by word', pbeat: 'Beat pulse', crecent: 'Recently used', ccal: 'Calendar', pqueue: 'Up next', ptrans: 'Translate lyrics' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
     '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min', '10': 'After 10 min', '15': 'After 15 min', c: '°C', f: '°F',
@@ -178,7 +178,7 @@
   function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, clook: c.clook, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material, svsrc: c.svsrc, svlay: c.svlay, svtime: c.svtime,
       svmotion: c.svmotion, iask: c.iask, ncalm: c.ncalm, wfx: c.wfx, cnews: c.cnews, svphoto: c.svphoto, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
-      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack, cwatch: c.cwatch, plyric: c.plyric, pword: c.pword, pbeat: c.pbeat }; }
+      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack, cwatch: c.cwatch, plyric: c.plyric, pword: c.pword, pbeat: c.pbeat, crecent: c.crecent, ccal: c.ccal, pqueue: c.pqueue, ptrans: c.ptrans }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
 
   /* ---------- Helpers ---------- */
@@ -199,7 +199,12 @@
   var LIVE = [], INPUTS = [];
   function isShelf() { return S.c.layout === 'dock' && S.c.lstyle === 'shelf'; }
   function inputRow() { return S.c.inputs === 'row' && S.c.layout === 'dock' && LIVE.length > 0; }
-  function visibleHome() { return !LIVE.length || inputRow() ? S.c.home : LIVE.concat(S.c.home); }
+  function visibleHome() { return (!LIVE.length || inputRow() ? S.c.home : LIVE.concat(S.c.home)).concat(recentApps()); }
+  /* Recently used: up to three apps opened lately that aren't on Home, after the Home apps in the Dock. */
+  function recentApps() {
+    if (S.c.crecent !== 'on' || S.c.layout !== 'dock' || isShelf() || !S.c.used) return [];
+    return S.c.used.filter(function (id) { var a = app(id); return a && !a.input && S.c.home.indexOf(id) < 0; }).slice(0, 3);
+  }
   function top() { return S.stack[S.stack.length - 1]; }
   function push(e) { S.stack.push(e); return e; }
   function pop() { if (S.stack.length > 1) S.stack.pop(); }
@@ -507,7 +512,7 @@
       home: h, recent: recent, lastApp: h.indexOf(s.lastApp) >= 0 ? s.lastApp : h[0],
       mode: pick(s.mode, MODES.map(function (m) { return m.id; }), 'fixed'),
       source: sourceCsv(ONLINE ? ONLINE_INFO.source : 'builtin'),
-      fav: idList(s.fav), hide: idList(s.hide), hidein: idList(s.hidein), iconFor: iconMap(s.iconFor),
+      fav: idList(s.fav), hide: idList(s.hide), hidein: idList(s.hidein), iconFor: iconMap(s.iconFor), used: idList(s.used).slice(0, 8),
       ipack: PKG_RE.test(String(modern.ipack || '')) ? String(modern.ipack) : ''
     };
     Object.keys(MORE_LOOK).forEach(function (k) { out[k] = pick(modern[k], LOOK_VALUES[k], MORE_LOOK[k]); });
@@ -573,7 +578,7 @@
   }
   function clearSession() { S.undo = []; S.removedAt = {}; S.note = null; S.err = null; }
   function begin() { S.note = null; }
-  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; c.source = S.c.source; c.fav = S.c.fav.slice(); c.hide = S.c.hide.slice(); c.hidein = S.c.hidein.slice(); c.iconFor = iconMap(S.c.iconFor); return c; }
+  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; c.source = S.c.source; c.fav = S.c.fav.slice(); c.hide = S.c.hide.slice(); c.hidein = S.c.hidein.slice(); c.iconFor = iconMap(S.c.iconFor); c.used = S.c.used.slice(); return c; }
   function snap() { return { home: S.c.home.slice(), recent: S.c.recent.slice() }; }
   function pushRecent(list, id) { return [id].concat(without(list, id)).slice(0, 5); }
   function write(c, label) {
@@ -661,7 +666,10 @@
   function launch(id) {
     var a = app(id), c;
     if (!a || busy) return;
-    if (S.c.home.indexOf(id) >= 0) { c = next(S.c.home.slice(), S.c.recent.slice()); c.lastApp = id; write(c, 'Last app'); }
+    c = next(S.c.home.slice(), S.c.recent.slice());
+    if (S.c.home.indexOf(id) >= 0) c.lastApp = id;
+    if (!a.input) c.used = [id].concat(without(c.used, id)).slice(0, 8);
+    write(c, 'Last app');
     S.press = id; S.lastLaunch = a.name;
     perform(a.name, function (done) { FrameDevice.launchApp(a.appId, done); });
   }
@@ -1351,7 +1359,7 @@
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'nsrc' ? newsSourceName(value) : axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm|svphoto|wfx|cnews|cwatch|plyric|pword|pbeat)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
+      label: axis === 'nsrc' ? newsSourceName(value) : axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm|svphoto|wfx|cnews|cwatch|plyric|pword|pbeat|crecent|ccal|pqueue|ptrans)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
   /* "Seconds" in the Format row, abbreviated where the word is long. */
   /* "Ask" (to switch inputs), short enough to share the Inputs row in every language. */
@@ -1743,14 +1751,14 @@
      Shore applies it exactly as if it was chosen with the remote. */
   var COMPANION_GROUPS = [
     ['Wallpaper', ['bg', 'wall', 'source', 'mode', 'motion', 'ncalm']],
-    ['Home screen', ['layout', 'apps', 'controls', 'cwatch']],
+    ['Home screen', ['layout', 'apps', 'controls', 'cwatch', 'crecent']],
     ['App icons', ['istyle', 'isize']],
     ['Style', ['focus', 'material', 'tint', 'dglass']],
     ['Text', ['font', 'tweight', 'tsize']],
     ['Inputs', ['inputs', 'iask']],
-    ['Clock', ['cformat', 'csec', 'cdate', 'csize', 'cweight', 'cpos']],
+    ['Clock', ['cformat', 'csec', 'cdate', 'csize', 'cweight', 'cpos', 'ccal']],
     ['Weather', ['cweather', 'wunit', 'wicon', 'wfx']],
-    ['Music', ['cplaying', 'cwave', 'cart', 'npdim', 'clook', 'plyric', 'pword', 'pbeat']],
+    ['Music', ['cplaying', 'cwave', 'cart', 'npdim', 'clook', 'plyric', 'pword', 'pbeat', 'pqueue', 'ptrans']],
     ['News', ['cnews', 'nsrc']],
     ['Night', ['night', 'nhours', 'ndim', 'idle']],
     ['Screensaver', ['saver', 'svsrc', 'svtime', 'svlay', 'svmotion', 'svclock', 'svpos', 'svdate', 'svmusic', 'svphoto']]];
@@ -1848,7 +1856,7 @@
         { action: 'choice.layout.shelf', axis: 'layout', value: 'shelf', label: 'Shelf', applied: isShelf() }] },
       { id: 'apps', title: 'App display', horizontal: true, items: options('apps', ['text', 'icons', 'both']) },
       { id: 'controls', title: 'Home controls', horizontal: true, items: options('controls', ['text', 'icons', 'both']) },
-      { id: 'iconlink', title: '', items: (WATCH ? [watchChoice()] : []).concat([{ action: 'open.icons', label: 'App icons', description: iconSummary(), pair: true }]) }
+      { id: 'iconlink', title: '', items: (WATCH ? [watchChoice()] : []).concat([recentChoice(), { action: 'open.icons', label: 'App icons', description: iconSummary(), pair: true }]) }
     ];
     /* App icons: style, size and an installed icon pack. */
     if (t.group === 'icons') return [
@@ -2351,7 +2359,7 @@
   }
 
   function homeState(t) {
-    var h = visibleHome(), hs = { mode: 'browse', zone: null, i: Math.max(0, ensureSel()), u: -1, lifted: false, from: -1, arr: null, items: h.map(function (id) { return { key: id, kind: 'app', id: id }; }) };
+    var h = visibleHome(), hs = { mode: 'browse', zone: null, i: Math.max(0, ensureSel()), u: -1, lifted: false, from: -1, arr: null, items: h.map(function (id) { return { key: id, kind: S.c.home.indexOf(id) < 0 && LIVE.indexOf(id) < 0 ? 'recent' : 'app', id: id }; }) };
     if (isSettingsDetail(t)) hs.zone = 'preview';
     else if (t.id === 'home') { hs.zone = t.f.zone; hs.u = t.f.u; hs.n = t.f.n || 0; }
     return hs;
@@ -2588,6 +2596,7 @@
     c.description = S.c.layout === 'list' ? 'Dock or Shelf' : S.c.cwatch === 'on' && !watchAllowed ? 'OK to allow' : '';
     return c;
   }
+  function recentChoice() { var c = choice('crecent', 'on', S.c.layout !== 'dock' || isShelf()); c.description = c.disabled ? 'Dock only' : 'Apps you opened lately, after Home’s'; return c; }
   function watchShown() { return !!WATCH && S.c.cwatch === 'on' && S.c.layout === 'dock' && watchItems.length > 0; }
   function watchRow() { return watchShown() && !isShelf(); }
   if (WATCH) { loadWatch(); WATCH.onChange(function () { loadWatch(); recsKey = ''; render(); }); }
@@ -2716,7 +2725,7 @@
       var lifted = hs.lifted && i === anchor, partial = g.broad && (left - off < -1 || left + g.tw - off > g.shelf + 1);
       setContent(el, it.kind + '|' + (it.id || '') + '|' + (it.id ? dockLabelSize(it.id) : full) + '|' + S.c.bg + '|' + S.c.apps + '|' + S.c.lstyle + '|' + homeFont(), '<span class="tile-content">' + dockTileHtml(it, full) + '</span>');
       el.className = 'tile k-' + it.kind + (focus ? ' is-focus' : '') + (sel ? ' is-sel' : '') + (lifted ? ' is-lifted' : '') + (partial ? ' is-partial' : '')
-        + (a && !a.mark ? ' is-text' : '') + (it.kind === 'add' && full ? ' is-full' : '') + (it.kind === 'app' && S.press === it.id ? ' is-press' : '')
+        + (a && !a.mark ? ' is-text' : '') + (it.kind === 'add' && full ? ' is-full' : '') + (it.kind !== 'add' && S.press === it.id ? ' is-press' : '') + (it.kind === 'recent' && (!items[i - 1] || items[i - 1].kind !== 'recent') ? ' is-recent-first' : '')
         + (lifted && i === 0 ? ' no-l' : '') + (lifted && i >= ns - 1 ? ' no-r' : '');
       el.style.transform = 'translate3d(' + left + 'px,0,0)';
       el.setAttribute('role', 'button');

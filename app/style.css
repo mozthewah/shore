@@ -898,3 +898,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .is-intro .dock .tile:nth-child(n+9) .tile-content{animation-delay:480ms}
 .setting-glyph{position:relative;flex:0 0 56px;width:56px;height:40px;margin-right:4px;color:currentColor}
 .setting-glyph .mark{position:absolute;left:0;top:0}
+/* Recently used apps after the Home apps: a hairline before them and a quieter look until focused. */
+.tile.is-recent-first::before{content:'';position:absolute;left:-5px;top:26%;width:2px;height:48%;border-radius:1px;background:currentColor;opacity:.22}
+.tile.k-recent:not(.is-focus) .tile-content{opacity:.7}
