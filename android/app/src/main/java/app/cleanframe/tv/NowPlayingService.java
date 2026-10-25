@@ -175,6 +175,7 @@ public class NowPlayingService extends NotificationListenerService {
             if (cover != null) artId = write(context, key, cover);
             if (lookup && !artist.isEmpty() && (cover == null || Math.min(cover.getWidth(), cover.getHeight()) < 600)) NET.execute(() -> {
                 Bitmap hi = itunesCover(artist, title, album);
+                if (hi == null) hi = lastfmCover(artist, title, album);
                 if (hi == null) return;
                 synchronized (ART_LOCK) {
                     if (!key.equals(artKey)) return; // the track changed meanwhile
@@ -211,6 +212,25 @@ public class NowPlayingService extends NotificationListenerService {
             String url = hit.optString("artworkUrl100");
             if (!url.startsWith("https://")) return null;
             byte[] img = fetch(url.replace("100x100bb", "1000x1000bb"), 4000000);
+            return img == null ? null : BitmapFactory.decodeByteArray(img, 0, img.length);
+        } catch (Exception | OutOfMemoryError e) { return null; }
+    }
+
+    /** Last.fm (optional key in local.properties): the album's cover, or the track's album when the app names none; full size. */
+    private static Bitmap lastfmCover(String artist, String title, String album) {
+        if (BuildConfig.LASTFM_API_KEY.isEmpty()) return null;
+        try {
+            String base = "https://ws.audioscrobbler.com/2.0/?format=json&autocorrect=1&api_key=" + URLEncoder.encode(BuildConfig.LASTFM_API_KEY, "UTF-8") + "&artist=" + URLEncoder.encode(artist, "UTF-8");
+            byte[] body = fetch(base + (album.isEmpty() ? "&method=track.getInfo&track=" + URLEncoder.encode(title, "UTF-8") : "&method=album.getInfo&album=" + URLEncoder.encode(album, "UTF-8")), 400000);
+            if (body == null) return null;
+            JSONObject root = new JSONObject(new String(body, "UTF-8")), item = album.isEmpty() ? root.optJSONObject("track") : root.optJSONObject("album");
+            if (item != null && album.isEmpty()) item = item.optJSONObject("album");
+            JSONArray images = item == null ? null : item.optJSONArray("image");
+            String url = "";
+            for (int i = 0; images != null && i < images.length(); i++) { String u = images.getJSONObject(i).optString("#text"); if (u.startsWith("https://")) url = u; } // largest last
+            if (url.isEmpty() || url.contains("2a96cbd8b46e442fc41c2b86b821562f")) return null; // Last.fm's grey star placeholder
+            byte[] img = fetch(url.replaceAll("/i/u/[0-9a-z]+x[0-9a-z]+/", "/i/u/"), 6000000); // the original instead of 300 px
+            if (img == null) img = fetch(url, 2000000);
             return img == null ? null : BitmapFactory.decodeByteArray(img, 0, img.length);
         } catch (Exception | OutOfMemoryError e) { return null; }
     }

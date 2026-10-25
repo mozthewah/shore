@@ -760,6 +760,41 @@
     while (lo <= hi) { mid = (lo + hi) >> 1; if (lines[mid][0] <= pos + 250) { at = mid; lo = mid + 1; } else hi = mid - 1; }
     return at;
   }
+  /* Apple Music-like motion: every line moves on its own, the ones below a little later, so the text
+     ripples up; the line playing now grows to full size. Transforms and opacity only, no blur on the TV. */
+  function moveLyrics(box, at) {
+    var nodes = box.childNodes, tops = box._tops, y, i, d;
+    if (!tops) { tops = box._tops = []; for (i = 0; i < nodes.length; i++) tops.push(nodes[i].offsetTop); }
+    y = at > 0 ? tops[at] : 0;
+    for (i = 0; i < nodes.length; i++) {
+      d = i - at;
+      nodes[i].className = 'pl-line' + (i === at ? ' is-now' : i < at ? ' is-past' : '');
+      nodes[i].style.transitionDelay = d > 0 ? Math.min(d, 7) * 55 + 'ms' : '0ms';
+      nodes[i].style.transform = 'translate3d(0,' + (-y) + 'px,0)' + (i === at ? '' : ' scale(.94)');
+    }
+    box._at = at; box._lit = -1;
+  }
+  /* Most LRCLIB lyrics time lines, not words: then the words light up in turn, spread by their length over the time the line is sung. */
+  function lightWords(box, lines, at, pos) {
+    var line = at >= 0 ? box.childNodes[at] : null, words, t0, span, total = 0, done = 0, f, lit = 0, i;
+    if (!line || !lines[at][1]) return;
+    words = line.getElementsByClassName('w');
+    for (i = 0; i < words.length; i++) total += words[i].textContent.length + 1;
+    if (lines[at][2]) { // timed words: exact
+      for (i = 0; i < words.length && lines[at][2][i]; i++) if (lines[at][2][i][0] <= pos + 120) lit = i + 1;
+      return litWords(box, words, lit);
+    }
+    t0 = lines[at][0];
+    span = Math.min((at + 1 < lines.length ? lines[at + 1][0] : t0 + 6000) - t0 - 150, Math.max(900, total * 70));
+    f = span > 0 ? (pos + 250 - t0) / span : 1;
+    for (i = 0; i < words.length; i++) { if (done / total <= f) lit = i + 1; done += words[i].textContent.length + 1; }
+    litWords(box, words, lit);
+  }
+  function litWords(box, words, lit) {
+    if (lit === box._lit) return;
+    for (var i = 0; i < words.length; i++) { var c = i < lit ? 'w is-lit' : 'w'; if (words[i].className !== c) words[i].className = c; }
+    box._lit = lit;
+  }
   /* A light timer while the view is open: the bar, the clock digits and the lyric line, nothing else. */
   function playerTick() {
     clearTimeout(P.tick); P.tick = 0;
@@ -2885,8 +2920,9 @@
       setHTML(el.dur, d.found && dur ? '−' + playerTime(Math.max(0, dur - pos)) : '');
       if (synced) {
         at = lyricIndex(synced, pos);
-        Array.prototype.forEach.call(el.lines.childNodes, function (n, i) { var c = 'pl-line' + (i === at ? ' is-now' : i < at ? ' is-past' : ''); if (n.className !== c) n.className = c; });
-        el.lines.style.transform = 'translate3d(0,' + (at > 0 && el.lines.childNodes[at] ? -el.lines.childNodes[at].offsetTop : 0) + 'px,0)';
+        if (at !== el.lines._at) moveLyrics(el.lines, at);
+        lightWords(el.lines, synced, at, pos);
+        el.lines.style.transform = '';
       } else if (showLyrics && dur) el.lines.style.transform = 'translate3d(0,' + (-Math.round(frac * Math.max(0, el.lines.scrollHeight - 600))) + 'px,0)';
       if (tick) return;
       if (!P.tick) playerTick();
@@ -2904,10 +2940,12 @@
       }).join(''));
       var b = PB[clamp(f.b, 0, PB.length - 1)];
       setHTML(el.hint, f.zone === 'bar' ? esc('Left and right jump 10 seconds') : esc(b === 'toggle' ? (d.playing ? 'Pause' : 'Play') : b === 'prev' ? 'Previous' : b === 'next' ? 'Next' : b === 'lyrics' ? (S.c.plyric === 'on' ? 'Hide lyrics' : 'Show lyrics') : 'Open ' + (d.app || 'app')));
-      html = !ly ? '' : ly.state === 'ok' ? (synced ? synced.map(function (l) { return '<p class="pl-line">' + (l[1] ? escRaw(l[1]) : '<span class="pl-gap">♪</span>') + '</p>'; }).join('')
+      html = !ly ? '' : ly.state === 'ok' ? (synced ? synced.map(function (l) {
+          return '<p class="pl-line">' + (l[1] ? (l[2] ? l[2].map(function (w) { return w[1]; }) : l[1].split(/\s+/)).map(function (w) { return '<span class="w">' + escRaw(w) + '</span>'; }).join(' ') : '<span class="pl-dots"><i></i><i></i><i></i></span>') + '</p>';
+        }).join('')
         : '<div class="pl-plain">' + escRaw(ly.plain).replace(/\n/g, '<br>') + '</div>')
         : '<p class="pl-state">' + esc(ly.state === 'pending' ? 'Looking for lyrics…' : ly.state === 'instrumental' ? 'Instrumental' : 'No lyrics for this song') + '</p>';
-      if (el.lines._key !== P.lyKey + '|' + (ly && ly.state)) { el.lines._key = P.lyKey + '|' + (ly && ly.state); el.lines.innerHTML = html; el.lines.style.transition = 'none'; FILLS.player(t, el, true); void el.lines.offsetHeight; el.lines.style.transition = ''; } // a new song jumps, it doesn't scroll
+      if (el.lines._key !== P.lyKey + '|' + (ly && ly.state)) { el.lines._key = P.lyKey + '|' + (ly && ly.state); el.lines.innerHTML = html; el.lines._at = null; el.lines._tops = null; el.lines.className = 'pl-lines is-jump'; FILLS.player(t, el, true); void el.lines.offsetHeight; el.lines.className = 'pl-lines'; } // a new song jumps, it doesn't scroll
       var wide = !!(ly && (ly.state === 'ok' || ly.state === 'pending'));
       el.lyrics.className = 'pl-words' + (wide ? ' is-on' : '') + (synced ? ' is-synced' : '');
       setHTML(el.credit, showLyrics ? esc('Lyrics from LRCLIB') : ly && ly.state === 'instrumental' ? esc('Instrumental') : ly && ly.state === 'none' ? esc('No lyrics for this song') : '');

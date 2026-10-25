@@ -211,7 +211,10 @@
       var r;
       try { r = JSON.parse(bridge.lyrics(String(artist || ''), String(title || ''), String(album || ''), seconds | 0)) || {}; } catch (e) { r = {}; }
       return { state: /^(pending|ok|none|instrumental)$/.test(r.state) ? r.state : 'none', plain: String(r.plain || ''),
-        synced: (r.synced && r.synced.filter ? r.synced : []).filter(function (l) { return l && typeof l[0] === 'number' && typeof l[1] === 'string'; }) };
+        synced: (r.synced && r.synced.filter ? r.synced : []).filter(function (l) { return l && typeof l[0] === 'number' && typeof l[1] === 'string'; }).map(function (l) {
+          var w = l[2] && l[2].filter ? l[2].filter(function (x) { return x && typeof x[0] === 'number' && typeof x[1] === 'string'; }) : null;
+          return w && w.length ? [l[0], l[1], w] : [l[0], l[1]];
+        }) };
     },
     control: bridge.nowPlayingControl ? function (pkg, action) { try { return !!bridge.nowPlayingControl(String(pkg || ''), String(action)); } catch (e) { return false; } } : null
   };

@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
  */
 final class Lyrics {
     private static final ExecutorService NET = Executors.newSingleThreadExecutor();
+    private static final Pattern WORD = Pattern.compile("<(\\d{1,3}):(\\d{2})(?:[.:](\\d{1,3}))?>([^<]*)");
     private static final Pattern LINE = Pattern.compile("^\\[(\\d{1,3}):(\\d{2})(?:[.:](\\d{1,3}))?\\](.*)$");
     /** key -> {state, synced:[[ms, text]], plain}. */
     private static final Map<String, String> CACHE = new LinkedHashMap<String, String>(16, .75f, true) {
@@ -47,23 +48,54 @@ final class Lyrics {
         return PENDING;
     }
 
+    /** Title without what streaming services add: (feat. …), - Remastered 2011, [Explicit], - Radio Edit and similar. */
+    static String cleanTitle(String t) {
+        String s = t.replaceAll("(?i)\\s*[(\\[](feat|ft|with)\\.?\\s[^)\\]]*[)\\]]", "")
+                .replaceAll("(?i)\\s*[(\\[][^)\\]]*(remaster|explicit|clean|edit|version|mono|stereo|live|bonus|deluxe)[^)\\]]*[)\\]]", "")
+                .replaceAll("(?i)\\s+-\\s+.*(remaster|edit|version|mix|live|mono|stereo).*$", "");
+        return s.trim().isEmpty() ? t.trim() : s.trim();
+    }
+
+    /** First artist only: "A, B", "A & B", "A feat. B" and "A x B" become "A". */
+    static String mainArtist(String a) { String s = a.split("(?i)\\s*(,|&| feat\\.? | ft\\.? | x | und | and |;)\\s*")[0].trim(); return s.isEmpty() ? a.trim() : s; }
+
+    private static String norm(String s) { return s.toLowerCase(java.util.Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]", ""); }
+
+    /** Same song: the titles match once cleaned, the artist overlaps, and the length is within a few seconds when both are known. */
+    private static boolean same(JSONObject o, String artist, String title, int seconds) {
+        String t1 = norm(cleanTitle(o.optString("trackName"))), t2 = norm(cleanTitle(title));
+        String a1 = norm(o.optString("artistName")), a2 = norm(mainArtist(artist));
+        if (t1.isEmpty() || !t1.equals(t2)) return false;
+        if (a2.isEmpty() || !(a1.contains(a2) || a2.contains(a1))) return false;
+        double d = o.optDouble("duration", 0);
+        return seconds <= 0 || d <= 0 || Math.abs(d - seconds) <= 3;
+    }
+
+    /** The version playing is the one whose length matches best; synced lyrics win a tie (within a second). */
+    private static boolean better(JSONObject o, JSONObject than, int seconds) {
+        double a = seconds > 0 ? Math.abs(o.optDouble("duration", 1e9) - seconds) : 0, b = seconds > 0 ? Math.abs(than.optDouble("duration", 1e9) - seconds) : 0;
+        boolean sa = !o.optString("syncedLyrics").isEmpty(), sb = !than.optString("syncedLyrics").isEmpty();
+        if (Math.abs(a - b) <= 1) return sa && !sb;
+        return a < b;
+    }
+
+    private static boolean hasText(JSONObject o) { return !o.optString("syncedLyrics").isEmpty() || !o.optString("plainLyrics").isEmpty() || o.optBoolean("instrumental"); }
+
     private static String fetch(String artist, String title, String album, int seconds) throws Exception {
-        String q = "artist_name=" + enc(artist) + "&track_name=" + enc(title);
+        String clean = cleanTitle(title), main = mainArtist(artist);
         JSONObject hit = null;
-        String exact = http("https://lrclib.net/api/get?" + q + (album.isEmpty() ? "" : "&album_name=" + enc(album)) + (seconds > 0 ? "&duration=" + seconds : ""));
-        if (exact != null) hit = new JSONObject(exact);
-        if (hit == null || hit.optString("syncedLyrics").isEmpty() && hit.optString("plainLyrics").isEmpty()) {
-            String found = http("https://lrclib.net/api/search?" + q);
+        // An exact signature first: LRCLIB matches it on artist, title, album and length.
+        String exact = http("https://lrclib.net/api/get?artist_name=" + enc(main) + "&track_name=" + enc(clean)
+                + (album.isEmpty() ? "" : "&album_name=" + enc(album)) + (seconds > 0 ? "&duration=" + seconds : ""));
+        if (exact != null) { JSONObject o = new JSONObject(exact); if (hasText(o) && same(o, artist, title, seconds)) hit = o; }
+        if (hit == null) {
+            String found = http("https://lrclib.net/api/search?artist_name=" + enc(main) + "&track_name=" + enc(clean));
             JSONArray list = found == null ? new JSONArray() : new JSONArray(found);
-            JSONObject best = null;
             for (int i = 0; i < list.length(); i++) {
                 JSONObject o = list.getJSONObject(i);
-                if (o.optString("syncedLyrics").isEmpty() && o.optString("plainLyrics").isEmpty()) continue;
-                boolean close = seconds <= 0 || Math.abs(o.optDouble("duration", 0) - seconds) <= 3;
-                if (best == null || close && !o.optString("syncedLyrics").isEmpty()) best = o;
-                if (close && !o.optString("syncedLyrics").isEmpty()) break;
+                if (!hasText(o) || !same(o, artist, title, seconds)) continue; // a different song or version is worse than none
+                if (hit == null || better(o, hit, seconds)) hit = o;
             }
-            if (best != null) hit = best;
         }
         if (hit == null) return NONE;
         if (hit.optBoolean("instrumental")) return "{\"state\":\"instrumental\"}";
@@ -71,14 +103,24 @@ final class Lyrics {
         for (String line : hit.optString("syncedLyrics").split("\n")) {
             Matcher m = LINE.matcher(line.trim());
             if (!m.matches()) continue;
-            String frac = m.group(3) == null ? "0" : m.group(3);
-            long ms = Integer.parseInt(m.group(1)) * 60000L + Integer.parseInt(m.group(2)) * 1000L
-                    + Math.round(Integer.parseInt(frac) * Math.pow(10, 3 - frac.length()));
-            synced.put(new JSONArray().put(ms).put(m.group(4).trim()));
+            long ms = time(m.group(1), m.group(2), m.group(3));
+            String text = m.group(4).trim();
+            // Enhanced LRC times each word: "<00:12.34> word <00:12.80> next". Keep those times, show plain text.
+            JSONArray words = new JSONArray();
+            Matcher w = WORD.matcher(text);
+            while (w.find()) { String word = w.group(4).trim(); if (!word.isEmpty()) words.put(new JSONArray().put(time(w.group(1), w.group(2), w.group(3))).put(word)); }
+            JSONArray row = new JSONArray().put(ms).put(text.replaceAll("<\\d{1,3}:\\d{2}(?:[.:]\\d{1,3})?>", "").replaceAll("\\s+", " ").trim());
+            if (words.length() > 0) row.put(words);
+            synced.put(row);
         }
         String plain = hit.optString("plainLyrics");
         if (synced.length() == 0 && plain.isEmpty()) return NONE;
         return new JSONObject().put("state", "ok").put("synced", synced).put("plain", plain.length() > 20000 ? plain.substring(0, 20000) : plain).toString();
+    }
+
+    private static long time(String min, String sec, String frac) {
+        String f = frac == null ? "0" : frac;
+        return Integer.parseInt(min) * 60000L + Integer.parseInt(sec) * 1000L + Math.round(Integer.parseInt(f) * Math.pow(10, 3 - f.length()));
     }
 
     private static String enc(String s) throws Exception { return URLEncoder.encode(s, "UTF-8"); }

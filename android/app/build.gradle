@@ -34,6 +34,8 @@ android {
         buildConfigField 'String', 'KLIPY_API_KEY', '"' + secret('klipy.apiKey', 'KLIPY_API_KEY', '') + '"'
         buildConfigField 'String', 'NASA_API_KEY', '"' + secret('nasa.apiKey', 'NASA_API_KEY', 'DEMO_KEY') + '"'
         // Top Shelf recommendations (Shelf layout). Missing keys fall back to the app's banner.
+        // Music view: album covers from Last.fm when the app's own cover is small and iTunes has none.
+        buildConfigField 'String', 'LASTFM_API_KEY', '"' + secret('lastfm.apiKey', 'LASTFM_API_KEY', '') + '"'
         buildConfigField 'String', 'TMDB_TOKEN', '"' + secret('tmdb.token', 'TMDB_TOKEN', '') + '"'
         buildConfigField 'String', 'YOUTUBE_API_KEY', '"' + secret('youtube.apiKey', 'YOUTUBE_API_KEY', '') + '"'
         buildConfigField 'String', 'TWITCH_CLIENT_ID', '"' + secret('twitch.clientId', 'TWITCH_CLIENT_ID', '') + '"'
