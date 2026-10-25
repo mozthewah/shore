@@ -46,7 +46,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;bac
 .utils a{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px 0 12px;border-radius:20px;font-size:15px;text-decoration:none;color:#f6f1e7;opacity:.76;text-shadow:0 1px 2px rgba(14,10,6,.4);white-space:nowrap;transition:background-color 140ms linear,color 140ms linear}
 .utils .ico{width:18px;height:18px}
 .utils a:hover,.utils a:focus-visible{opacity:1;background:var(--solid);color:var(--solid-ink);text-shadow:none;outline:0}
-.dock{margin:auto auto 0;width:min(100%,760px);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:8px;border-radius:28px;background:rgba(255,255,255,.11);box-shadow:var(--edge);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px)}
+.dock{margin:auto auto 0;width:min(100%,760px);display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px;border-radius:28px;background:rgba(255,255,255,.11);box-shadow:var(--edge);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px)}
 .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:104px;border-radius:22px;text-decoration:none;font-size:15px;color:var(--mute);transition:background 140ms linear,color 140ms linear,transform 180ms var(--ease)}
 .tile .ico{width:30px;height:30px}
 .tile:hover,.tile:focus-visible,.dock:not(:hover):not(:focus-within) .tile.first{background:var(--lift);box-shadow:var(--edge);color:var(--ink);transform:translateY(-2px);outline:0}
@@ -144,6 +144,7 @@ footer p{margin:0}
     <a class="tile" href="#install"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="11.5" rx="2"/><path d="M8.5 19.5h7M12 16.5v3"/></svg>Install</a>
     <a class="tile" href="#phone"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 17.5h2"/></svg>Phone</a>
     <a class="tile" href="https://github.com/taynotfound/shore"><svg class="ico" viewBox="0 0 24 24"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg>Source</a>
+    <a class="tile" href="https://discord.gg/z6C4Mj9VPK"><svg class="ico" viewBox="0 0 24 24"><path d="M5 6.5c4.5-2 9.5-2 14 0 1.6 3.5 2 7 1.5 10.5-1.5 1.2-3.2 2-5 2.5l-1-2M5 6.5C3.4 10 3 13.5 3.5 17c1.5 1.2 3.2 2 5 2.5l1-2M7.5 16c3 1.3 6 1.3 9 0"/><circle cx="9.3" cy="12" r=".9"/><circle cx="14.7" cy="12" r=".9"/></svg>Discord</a>
   </nav>
   <p class="hint"><span class="key">OK</span>Download the latest APK, free under the MIT licence</p>
 </header>
@@ -154,7 +155,7 @@ footer p{margin:0}
   <div class="body">
     <figure><div class="shot"><img src="shots/home-news.jpg" width="1600" height="900" alt="Shore's Home screen over the Golden Gate Bridge: the time, the date, 7 °C and cloudy, one headline, and a dock with Stremio, Netflix, Disney+, YouTube, Apple TV and Prime Video"></div><figcaption>Home on a TCL 55C6KS, in the Dock layout.</figcaption></figure>
     <ul class="rows">
-      <li class="row"><b>Tested on</b><span>TCL 55C6KS, Android TV 12</span></li>
+      <li class="row"><b>Tested on</b><span>TCL 55C6KS (Android TV 12), TCL 65C7K, CHiQ L32QM8G (Android 14)</span></li>
       <li class="row"><b>Languages</b><span>English, German, French, Spanish, Dutch, Polish, Ukrainian</span></li>
       <li class="row"><b>Install</b><span>Once with adb, then it updates itself</span></li>
       <li class="row"><b>Price</b><span>Free, MIT licence</span></li>
@@ -276,7 +277,7 @@ footer p{margin:0}
   <div class="body">
     <details><summary>How do I get the normal Google TV home screen back?<svg class="ico" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></svg></summary><p>Hold Home for a second. To stop Home opening Shore altogether, turn off Shore Home button in Accessibility, or uninstall Shore.</p></details>
     <details><summary>What does Shore send over the internet?<svg class="ico" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></svg></summary><p>Only what the features you turned on need: weather from Open-Meteo, headlines from your news source, photos from the wallpaper sources you ticked, Top Shelf picks, and the artist and title for album art if you allow it. There are no accounts, analytics or ads.</p></details>
-    <details><summary>Will it work on my TV?<svg class="ico" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></svg></summary><p>It's built and tested on a TCL 55C6KS with Google TV on Android 12. It's an ordinary Android TV app, so other Google TV and Android TV devices will probably work, but nobody has checked yet.</p></details>
+    <details><summary>Will it work on my TV?<svg class="ico" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></svg></summary><p>It's built on a TCL 55C6KS with Google TV on Android 12, and people have it running on a TCL 65C7K and a CHiQ L32QM8G with Android 14. It's an ordinary Android TV app, so other Google TV and Android TV devices will probably work too.</p></details>
     <details><summary>Do updates keep my settings?<svg class="ico" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></svg></summary><p>Yes. Your settings and photos stay. A copy you built yourself is signed with a different key, so it tells you about new versions instead of installing them.</p></details>
     <details><summary>Who made it?<svg class="ico" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></svg></summary><p>Shore is a fork of <a href="https://github.com/nthnclrk/CleanFrame">CleanFrame</a> by Nathan Clark, which was written for Samsung's The Frame. Both are MIT licensed. Fonts, photos and app logos keep their own licences, listed in <a href="https://github.com/taynotfound/shore/blob/main/THIRD_PARTY_NOTICES.md">THIRD_PARTY_NOTICES.md</a>.</p></details>
   </div>
@@ -286,6 +287,7 @@ footer p{margin:0}
 <footer>
   <p>Photo at the top: Bridge at dusk by Justin Wolff on Unsplash, one of the 15 bundled wallpapers.<br>Unofficial. Not affiliated with TCL, Google, Samsung or any streaming service.</p>
   <p><a href="https://github.com/taynotfound/shore">Source</a> · <a href="https://github.com/taynotfound/shore/releases">Releases</a> · <a href="https://github.com/taynotfound/shore/blob/main/THIRD_PARTY_NOTICES.md">Licences</a></p>
+  <p>Questions or a TV to report? Join the <a href="https://discord.gg/z6C4Mj9VPK">Discord</a> for the fastest answers.<br>Shore is free. If you like it, you can support it on <a href="https://ko-fi.com/taygotkofi">Ko-fi</a> or <a href="https://github.com/sponsors/taynotfound">GitHub Sponsors</a>.</p>
 </footer>
 </body>
 </html>

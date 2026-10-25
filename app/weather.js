@@ -56,6 +56,24 @@
     x.onerror = x.ontimeout = function () { done(null); };
     try { x.send(); } catch (e) { done(null); }
   }
+  /* Spellings to try: as typed, then without what follows a comma ("Dammam, Saudi Arabia" -> "Dammam") and
+     without a trailing country word ("Dammam KSA"), then the time zone's city. */
+  function names(typed) {
+    var out = [], add = function (n) { n = String(n || '').replace(/\s+/g, ' ').trim(); if (n && out.indexOf(n) < 0) out.push(n); };
+    add(typed); add(typed.split(',')[0]); add(typed.split(',')[0].replace(/\s+\S+$/, '')); add(zoneCity());
+    return out;
+  }
+  /* The first place found; names in other scripts (الدمام) are looked up in their own language. */
+  function geocode(list, done) {
+    if (!list.length) { done(null); return; }
+    var n = list[0], own = String((root.navigator && root.navigator.language) || 'en').split('-')[0];
+    var lang = /[\u0600-\u06ff]/.test(n) ? 'ar' : /[\u0400-\u04ff]/.test(n) ? (own === 'uk' ? 'uk' : 'ru') : /[^\u0000-\u024f]/.test(n) ? own : '';
+    lang = lang ? '&language=' + encodeURIComponent(lang) : '';
+    get('https://geocoding-api.open-meteo.com/v1/search?count=1&format=json' + lang + '&name=' + encodeURIComponent(n), function (geo) {
+      var hit = geo && geo.results && geo.results[0];
+      if (hit && typeof hit.latitude === 'number') done(hit); else geocode(list.slice(1), done);
+    });
+  }
   function load() {
     try { var saved = JSON.parse(root.localStorage.getItem(KEY)); if (saved && typeof saved.temp === 'number') { state.temp = saved.temp; state.code = +saved.code; state.at = +saved.at || 0; state.place = String(saved.place || ''); state.day = saved.day === 0 ? 0 : 1; } } catch (e) { }
   }
@@ -64,18 +82,17 @@
   function refresh(force) {
     var name = place(), now = Date.now();
     if (!name) return;
-    if (name !== state.place) { state.temp = null; state.at = 0; }
+    if (name !== state.place) { state.temp = null; state.at = 0; state.tried = 0; state.place = name; }
     if (state.busy || !force && (now - state.at < MAX_AGE || now - state.tried < RETRY)) return;
     state.busy = true; state.tried = now;
-    get('https://geocoding-api.open-meteo.com/v1/search?count=1&format=json&name=' + encodeURIComponent(name), function (geo) {
-      var hit = geo && geo.results && geo.results[0];
-      if (!hit || typeof hit.latitude !== 'number') { state.busy = false; return; }
+    geocode(names(name), function (hit) {
+      if (!hit) { state.busy = false; return; }
       get('https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code,is_day&timezone=auto&latitude=' + hit.latitude + '&longitude=' + hit.longitude, function (data) {
         state.busy = false;
         var c = data && data.current;
         if (!c || typeof c.temperature_2m !== 'number') return;
         state.temp = c.temperature_2m; state.code = +c.weather_code; state.day = c.is_day === 0 ? 0 : 1;
-        state.at = Date.now(); state.place = name;
+        state.at = Date.now();
         save(); changed();
       });
     });

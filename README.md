@@ -16,7 +16,7 @@ While music plays, it opens the song full screen with synced lyrics that light u
 
 </div>
 
-Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://github.com/nthnclrk/CleanFrame), originally made for Samsung The Frame, to **Android TV and Google TV**. It is tuned and tested on a **TCL 55C6KS** (55" Mini LED, 4K, Android TV 12). The interface is the original HTML/CSS app; a small Java shell runs it full screen and connects it to the TV.
+Shore (formerly CleanFrame-TCL) brings [Nathan Clark's CleanFrame](https://github.com/nthnclrk/CleanFrame), originally made for Samsung The Frame, to **Android TV and Google TV**. It is tuned and tested on a **TCL 55C6KS** (55" Mini LED, 4K, Android TV 12) and also reported running on a TCL 65C7K and a CHiQ L32QM8G (Android 14). The interface is the original HTML/CSS app; a small Java shell runs it full screen and connects it to the TV.
 
 > [!NOTE]
 > **Unofficial.** Not affiliated with TCL, Google, Samsung or any streaming service. Everything here is reversible, and each step says how.
@@ -348,6 +348,10 @@ Built since the last list: weather with °C/°F, Now playing with album art, Sho
 ## Brand
 
 The half sun over three lines in ivory `#e3e6dc`, on a deep blue-grey gradient (`#20303a` to `#0f161a`) with a warm accent `#f2c58b`, set in Manrope. The same mark is the TV icon, the launcher banner, the website and the phone companion. [`docs/brand/`](docs/brand/) holds the animated banner (SVG, GIF, MP4), the logo and mark, and ready-made ads (1200×628 and 1080×1080, as PNG and MP4). `python3 scripts/brand/make_brand.py` rebuilds them from the screenshots in `site/shots/` (needs Node with Playwright, ffmpeg and Pillow).
+
+## Support
+
+Questions, bugs or a TV to report: [Discord](https://discord.gg/z6C4Mj9VPK). Shore is free. If you'd like to support it: [Ko-fi](https://ko-fi.com/taygotkofi) · [GitHub Sponsors](https://github.com/sponsors/taynotfound)
 
 ## Credits and licences
 

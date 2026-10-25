@@ -21,9 +21,9 @@ import androidx.webkit.WebViewAssetLoader;
 /** Full-screen WebView that runs the unchanged CleanFrame UI from the APK's assets. */
 public class MainActivity extends Activity {
     static final String ORIGIN = "https://appassets.androidplatform.net";
-    static final String EXTRA_SAVER = "app.cleanframe.tv.SAVER";
+    static final String EXTRA_SAVER = "app.cleanframe.tv.SAVER", EXTRA_HOME_KEY = "app.cleanframe.tv.HOME_KEY";
     private static volatile boolean saverRequest;
-    private boolean loaded;
+    private boolean loaded, resumed, homeRequest;
 
     static boolean takeSaverRequest() { boolean r = saverRequest; saverRequest = false; return r; }
     private WebView web;
@@ -167,7 +167,17 @@ public class MainActivity extends Activity {
         if (intent != null && intent.getBooleanExtra(EXTRA_SAVER, false)) {
             if (web != null && loaded) web.evaluateJavascript("window.CleanFrameSaver&&window.CleanFrameSaver()", null);
             else saverRequest = true;
+        } else if (intent != null && (intent.hasCategory(Intent.CATEGORY_HOME) || intent.getBooleanExtra(EXTRA_HOME_KEY, false))) {
+            // The Home button always lands on Home, not on the Settings or All apps page left open before an app.
+            homeRequest = true;
+            if (resumed) goHome();
         }
+    }
+
+    private void goHome() {
+        if (!homeRequest || web == null || !loaded) return;
+        homeRequest = false;
+        web.evaluateJavascript("window.CleanFrameHomePressed&&window.CleanFrameHomePressed()", null);
     }
 
     private void watchNextChanged() {
@@ -184,7 +194,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (web != null) { web.onResume(); web.resumeTimers(); web.requestFocus(); inputsChanged(); remoteChanged(); watchNextChanged(); }
+        resumed = true;
+        if (web != null) {
+            web.onResume(); web.resumeTimers(); web.requestFocus(); inputsChanged(); remoteChanged(); watchNextChanged();
+            // Some TVs hand back a black surface after an app closes until the next key press: ask for fresh frames.
+            web.postInvalidateDelayed(120); web.postInvalidateDelayed(600);
+        }
+        goHome();
         if (online != null) online.refreshIfStale();
         if (phone != null) phone.resume();
         Updater.get(this).checkIfStale();
@@ -192,6 +208,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        resumed = false;
         RemoteKeys.learn(false); // never capture a button while another app is in front
         Beat.stop();
         if (web != null) web.onPause(); // stops wallpaper rotation work while an app is open

@@ -250,15 +250,17 @@
   function iconPacks() { if (!packList) packList = ICON_PACKS ? ICON_PACKS.list() : []; return packList; }
   function packName(id) { var p = iconPacks().filter(function (x) { return x.id === id; })[0]; return p ? p.name : 'None'; }
   function iconKey() { return S.c.istyle + '|' + S.c.ipack + '|' + (packApps[S.c.ipack] ? 1 : 0); }
-  function maskIcon(src, w, h) {
-    return '<span class="mark mono-icon" style="width:' + w + 'px;height:' + h + 'px"><span class="mk" style="left:0;top:0;width:100%;height:100%;-webkit-mask-image:url(' + src + ');mask-image:url(' + src + ')"></span></span>';
+  /* A square glyph the size of Shore's own marks, centred in the w x h box. */
+  function maskIcon(src, w, h, size) {
+    var side = Math.min(w, h, Math.round(size * 1.1));
+    return '<span class="mark mono-icon" style="width:' + w + 'px;height:' + h + 'px"><span class="mk" style="left:' + Math.round((w - side) / 2) + 'px;top:' + Math.round((h - side) / 2) + 'px;width:' + side + 'px;height:' + side + 'px;-webkit-mask-image:url(' + src + ');mask-image:url(' + src + ')"></span></span>';
   }
   function appMark(a, w, h, size) {
     var pkg = a.appId && PKG_RE.test(a.appId) && !a.input ? a.appId : '', mono = S.c.istyle === 'mono' && maskSupport;
     if (pkg && ANDROID) {
-      if (packCovers(a)) return mono ? maskIcon('/appicon/mono/' + S.c.ipack + '/' + pkg + '.png', w, h) : nativeMark(a, '/appicon/pack/' + S.c.ipack + '/' + pkg + '.png', w, h, size, true);
+      if (packCovers(a)) return mono ? maskIcon('/appicon/mono/' + S.c.ipack + '/' + pkg + '.png', w, h, size) : nativeMark(a, '/appicon/pack/' + S.c.ipack + '/' + pkg + '.png', w, h, size, true);
       if (S.c.istyle === 'original') return nativeMark(a, a.icon || '/appicon/' + pkg + '.png', w, h, size, true);
-      if (mono && !a.mark) return maskIcon('/appicon/mono/_/' + pkg + '.png', w, h);
+      if (mono && !a.mark) return maskIcon('/appicon/mono/_/' + pkg + '.png', w, h, size);
     }
     return nativeMark(a, a.icon, w, h, size, false);
   }
@@ -1584,7 +1586,7 @@
   function renderSaver() {
     var p = S.playing, music = !!(NOWPLAYING && S.c.cplaying === 'on' && S.c.svmusic === 'on' && p.playing), w = S.c.cweather === 'on' && WEATHER ? WEATHER.text(S.c.wunit) : '', np = '';
     if (!S.saver) return;
-    setHTML(svInfo.querySelector('.sv-clock'), S.c.svclock === 'on' ? escRaw(clockText()) : '');
+    setHTML(svInfo.querySelector('.sv-clock'), S.c.svclock === 'on' ? clockHtml(true) : '');
     setHTML(svInfo.querySelector('.sv-date'), S.c.svdate === 'on' ? escRaw(T(dateText())) + (w ? ' · ' + weatherIcon() + escRaw(w) : '') : '');
     if (music) np = (p.art ? '<img class="sv-cover" alt="" src="' + escRaw(p.art) + '">' : '')
       + '<span class="sv-np-text"><span class="sv-title">' + wave() + escRaw(p.title) + '</span>'
@@ -2307,10 +2309,18 @@
   function dateText() {
     try { return new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }); } catch (e) { return new Date().toDateString(); }
   }
-  function clockHtml() {
-    var text = clockText(), metrics = fontMetrics[homeFont()];
-    if (!metrics || !metrics.digitCell) return text;
-    return text.replace(/[0-9]/g, function (digit) { return '<span class="clock-digit">' + digit + '</span>'; });
+  /* AM or PM in the TV's language for the 12-hour clock ("PM", "م", "nachm."), '' for 24 hours. */
+  function meridiem() {
+    if (S.c.cformat === '24') return '';
+    var d = new Date(), word = '';
+    try { word = d.toLocaleTimeString(undefined, { hour: 'numeric', hour12: true }).replace(/[\d\s\u200e\u200f\u202f\u00a0:]+/g, ' ').trim(); } catch (e) { }
+    return word && word.length <= 8 ? word : d.getHours() < 12 ? 'AM' : 'PM';
+  }
+  function clockHtml(plain) {
+    var text = clockText(), metrics = !plain && fontMetrics[homeFont()], ampm = meridiem();
+    ampm = ampm ? '<span class="ampm">' + escRaw(ampm) + '</span>' : '';
+    if (!metrics || !metrics.digitCell) return escRaw(text) + ampm;
+    return text.replace(/[0-9]/g, function (digit) { return '<span class="clock-digit">' + digit + '</span>'; }) + ampm;
   }
   function renderCaption(t, hs) {
     var html = '<span class="clock">' + clockHtml() + '</span>' + clockExtras();
@@ -2412,8 +2422,9 @@
   }
 
   function dockGeom(n) {
-    var m = DOCK_MODES[isShelf() ? 'shelf' : S.c.apps], vis = Math.max(1, Math.min(5, n)), shelfW = vis * m.pitch - 8, w = shelfW + 32;
-    var broad = S.geom === 'broad' && n > 5;
+    // As many tiles as fit in the broad shelf stay centred: five wide tiles, nine icons.
+    var m = DOCK_MODES[isShelf() ? 'shelf' : S.c.apps], fit = Math.floor(1704 / m.pitch), vis = Math.max(1, Math.min(fit, n)), shelfW = vis * m.pitch - 8, w = shelfW + 32;
+    var broad = S.geom === 'broad' && n > fit;
     if (n < 0) { w = 912; shelfW = 880; }
     else if (broad) { w = 1728; shelfW = 1696; }
     return { x: Math.round((1920 - w) / 2), y: shelfLifted() ? SHELF_ROW_Y : 908 - m.th - 32, h: m.th + 32, w: w, shelf: shelfW, vis: vis, broad: broad, empty: n < 0, tw: m.tw, th: m.th, pitch: m.pitch };
@@ -2814,6 +2825,24 @@
     setHTML(appearanceStatus, status);
     hint = selected.disabled ? '' : remoteHint(selected) || (selected.action === 'settings.back' ? 'Return to ' + (parentName(t)) : selected.action === 'settings.retry' ? 'Retry this change' : selected.axis === 'source' ? (selected.applied ? 'Remove from rotation' : 'Add to rotation') : selected.axis ? 'Apply selected setting' : selected.action === 'background.wallpaper' ? 'Choose a wallpaper' : selected.action === 'background.rotation' ? 'Choose a rotation interval' : selected.action === 'background.online' ? 'Choose a wallpaper source' : selected.action === 'phone.toggle' ? (S.phone.enabled ? 'Turn off' : 'Turn on') : selected.action === 'phone.forget' ? 'Phones scan a new code' : selected.action === 'phone.clear' ? 'Remove all my photos' : selected.action === 'nowplaying.access' ? 'Open Notification access' : /^open\./.test(selected.action) ? 'Open selected group' : selected.more ? 'Show these sources' : selected.action === 'typography.fonts' ? 'Choose a font' : selected.action === 'saver.start' ? 'Start the screensaver now' : selected.action === 'health.remote' ? 'Open Accessibility settings' : selected.action === 'health.phone' ? 'Open Phone settings' : selected.action === 'update.install' ? 'Download and install' : selected.action === 'update.check' ? 'Check now' : selected.action === 'update.auto' ? (S.update.auto ? 'Turn off' : 'Turn on') : selected.action === 'update.wait' ? 'Please wait' : 'Open on the TV');
     setHTML(appearanceDesc, hint ? '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>' : '');
+    fitRows();
+  }
+  /* A page taller than the room above the OK hint (long translations, an extra access row) scrolls
+     to keep the focused row and its section title in view instead of running under the hint. */
+  function fitRows() {
+    var rows = appearanceRows, room = 952 - rows.offsetTop, f, sec, y = 0, el, top, bottom;
+    if (rows.scrollHeight <= room + 2) { if (rows.className.indexOf('is-clipped') >= 0) { rows.className = rows.className.replace(/ ?is-clipped| ?is-more/g, ''); rows.style.maxHeight = ''; rows.scrollTop = 0; } return; }
+    rows.style.maxHeight = room + 'px';
+    if (rows.className.indexOf('is-clipped') < 0) rows.className += ' is-clipped';
+    f = rows.querySelector('.is-focus');
+    if (f) {
+      for (el = f; el && el !== rows; el = el.offsetParent) y += el.offsetTop;
+      sec = f.parentNode && f.parentNode.parentNode && /setting-section/.test(f.parentNode.parentNode.className) ? f.parentNode.parentNode : null;
+      top = sec && sec.offsetParent === rows ? Math.min(y, sec.offsetTop) : y; bottom = y + f.offsetHeight;
+      if (top < rows.scrollTop) rows.scrollTop = top;
+      else if (bottom > rows.scrollTop + room - 8) rows.scrollTop = bottom - room + 24;
+    }
+    rows.className = rows.className.replace(/ ?is-clipped| ?is-more/g, '') + ' is-clipped' + (rows.scrollTop + room < rows.scrollHeight - 4 ? ' is-more' : '');
   }
   function remoteHint(item) {
     var a = item.action;
@@ -3371,7 +3400,7 @@
   if (WEATHER) WEATHER.onChange(function () { if (S.c.cweather === 'on' && (top().id === 'home' || isSettingsDetail(top()))) renderCaption(top(), homeState(top())); if (S.c.wfx === 'on') render(); });
   if (NOWPLAYING) { pollPlaying(); setInterval(pollPlaying, 5000); }
   if (UPDATE) { S.update = UPDATE.info(); UPDATE.onChange(function () { S.update = UPDATE.info(); if (isSettingsDetail(top()) || top().id === 'settings') render(); }); }
-  if (PHONE) { S.phone = PHONE.info(); PHONE.onChange(function (count) { S.phone.count = count; if (isSettingsDetail(top()) || top().id === 'settings') render(); }); }
+  if (PHONE) { S.phone = PHONE.info(); PHONE.onChange(function (count) { S.phone.count = count; if (WEATHER && S.c.cweather === 'on') WEATHER.refresh(false); if (isSettingsDetail(top()) || top().id === 'settings') render(); }); }
   if (REMOTE) {
     REMOTE.onLearned(remoteLearned);
     REMOTE.onChange(function () { refreshRemote(); if (top().id === 'appearance') render(); });
@@ -3383,5 +3412,7 @@
   if (S.firstRun) { openMessage('welcome'); render(); }
   try { if (sessionStorage.getItem('shore.restored')) { sessionStorage.removeItem('shore.restored'); openMessage('restored'); render(); } } catch (e) { }
   window.CleanFrameSaver = function () { startSaver(); };
+  /* The remote's Home button: back to Home from Settings, All apps or the music view, unsaved previews dropped. */
+  window.CleanFrameHomePressed = function () { if (!S.saver && top().id !== 'home') goScene('home'); };
   if (DREAM || SAVER_API && SAVER_API.requested()) startSaver();
 })();

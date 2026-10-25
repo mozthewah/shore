@@ -55,7 +55,7 @@ public class HomeButtonService extends AccessibilityService {
             handler.postDelayed(longPress, LONG_PRESS_MS);
         } else if (event.getAction() == KeyEvent.ACTION_UP) {
             handler.removeCallbacks(longPress);
-            if (!longFired) openCleanFrame();
+            if (!longFired) openCleanFrame(true);
         }
         return true;
     }
@@ -82,7 +82,7 @@ public class HomeButtonService extends AccessibilityService {
     private void perform(String action) {
         DeviceBridge bridge = new DeviceBridge(this);
         boolean ok = true;
-        if (action.equals("home")) openCleanFrame();
+        if (action.equals("home")) openCleanFrame(true);
         else if (action.equals("screensaver")) ok = bridge.screensaver();
         else if (action.startsWith("app:")) ok = bridge.launch(action.substring(4));
         else if (action.startsWith("input:")) ok = bridge.openInput(action.substring(6));
@@ -95,7 +95,7 @@ public class HomeButtonService extends AccessibilityService {
         String pkg = event.getPackageName().toString();
         if (pkg.equals(GOOGLE_HOME)) {
             if (inSystemHome || SystemClock.uptimeMillis() < allowSystemHomeUntil) { inSystemHome = true; return; }
-            openCleanFrame(); // e.g. leaving an app or waking from standby lands on Google TV Home
+            openCleanFrame(false); // e.g. leaving an app or waking from standby lands on Google TV Home
             return;
         }
         for (String overlay : OVERLAYS) if (pkg.equals(overlay)) return;
@@ -105,14 +105,15 @@ public class HomeButtonService extends AccessibilityService {
     @Override
     public void onInterrupt() { handler.removeCallbacks(longPress); }
 
-    private void openCleanFrame() {
+    /** homeKey: the Home button itself, which also leaves Settings or All apps for Home. */
+    private void openCleanFrame(boolean homeKey) {
         inSystemHome = false;
-        startActivity(new Intent(this, MainActivity.class)
+        startActivity(new Intent(this, MainActivity.class).putExtra(MainActivity.EXTRA_HOME_KEY, homeKey)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
     }
 
     private void openSystemHome() {
         allowSystemHomeUntil = SystemClock.uptimeMillis() + 5000;
-        if (!new DeviceBridge(this).systemHome()) openCleanFrame();
+        if (!new DeviceBridge(this).systemHome()) openCleanFrame(false);
     }
 }

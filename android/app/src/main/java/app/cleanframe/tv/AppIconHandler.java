@@ -66,7 +66,7 @@ final class AppIconHandler implements WebViewAssetLoader.PathHandler {
             Drawable icon = pack.equals("_") ? null : IconPacks.icon(context, pack, pkg);
             if (icon == null && !mono) return null;
             try { if (icon == null) icon = pm.getApplicationIcon(pkg); } catch (PackageManager.NameNotFoundException e) { return null; }
-            Bitmap b = mono ? mono(icon) : draw(icon, SIZE, SIZE);
+            Bitmap b = mono ? mono(icon) : drawShaped(icon);
             bytes = bytes(b);
             synchronized (cache) { cache.put(path, bytes); }
         }
@@ -80,36 +80,92 @@ final class AppIconHandler implements WebViewAssetLoader.PathHandler {
         return bitmap;
     }
 
+    /** At the drawable's own shape: banner-shaped pack icons (common in Projectivy packs) stay wide instead of squashed. */
+    private static Bitmap drawShaped(Drawable icon) {
+        float r = ratio(icon);
+        return r > 1.15f ? draw(icon, Math.round(SIZE * r), SIZE) : r < .87f ? draw(icon, SIZE, Math.round(SIZE / r)) : draw(icon, SIZE, SIZE);
+    }
+
+    /** Width over height, kept between 1:2.5 and 2.5:1; square when the drawable has no size. */
+    private static float ratio(Drawable icon) {
+        int w = icon.getIntrinsicWidth(), h = icon.getIntrinsicHeight();
+        return w > 0 && h > 0 ? Math.max(.4f, Math.min(2.5f, w / (float) h)) : 1f;
+    }
+
+    /** A square bitmap with the drawable centred at its own shape. */
+    private static Bitmap letterbox(Drawable icon) {
+        float r = ratio(icon);
+        int w = r >= 1 ? SIZE : Math.round(SIZE * r), h = r >= 1 ? Math.round(SIZE / r) : SIZE, x = (SIZE - w) / 2, y = (SIZE - h) / 2;
+        Bitmap bitmap = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888);
+        icon.setBounds(x, y, x + w, y + h);
+        icon.draw(new Canvas(bitmap));
+        return bitmap;
+    }
+
     /**
-     * White glyph on transparent. Adaptive icons give their foreground layer (the logo without its plate).
-     * Flat icons lose the plate by distance from the corner colour, so a logo on a solid square stays a logo.
+     * White glyph on transparent, trimmed and centred in a square so every app's mark sits at the same size.
+     * Adaptive icons give their foreground layer (the logo without its plate). A plate that is still there
+     * (flat icons, full-bleed foregrounds) is found from the edge midpoints and removed by distance from its
+     * colour; when that leaves a near-solid block (photos, gradients) the light parts become the glyph.
      */
     private static Bitmap mono(Drawable icon) {
         Bitmap b;
-        boolean plate = true;
-        if (icon instanceof AdaptiveIconDrawable && ((AdaptiveIconDrawable) icon).getForeground() != null) {
+        boolean adaptive = icon instanceof AdaptiveIconDrawable && ((AdaptiveIconDrawable) icon).getForeground() != null;
+        if (adaptive) {
             // The foreground is 108 units with the 72-unit safe zone in the middle: draw it 1.5x and crop to the centre.
             b = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888);
             Drawable fg = ((AdaptiveIconDrawable) icon).getForeground();
             fg.setBounds(-SIZE / 4, -SIZE / 4, SIZE + SIZE / 4, SIZE + SIZE / 4);
             fg.draw(new Canvas(b));
-            plate = false;
-        } else b = draw(icon, SIZE, SIZE);
-        int[] px = new int[SIZE * SIZE];
-        b.getPixels(px, 0, SIZE, 0, 0, SIZE, SIZE);
-        int bg = px[SIZE * 6 + 6], bgA = bg >>> 24, br = (bg >> 16) & 255, bgG = (bg >> 8) & 255, bb = bg & 255;
-        boolean solid = plate && bgA > 200;
-        for (int i = 0; i < px.length; i++) {
-            int c = px[i], a = c >>> 24;
-            if (solid) {
-                int d = Math.abs(((c >> 16) & 255) - br) + Math.abs(((c >> 8) & 255) - bgG) + Math.abs((c & 255) - bb);
-                a = a * Math.min(255, Math.max(0, (d - 40) * 3)) / 255;
-            }
-            px[i] = (a << 24) | 0xffffff;
+        } else b = letterbox(icon);
+        int[] src = new int[SIZE * SIZE], px = new int[SIZE * SIZE];
+        b.getPixels(src, 0, SIZE, 0, 0, SIZE, SIZE);
+        b.recycle();
+        int in = SIZE / 16, mid = SIZE / 2, plate = 0, votes = 0, opaque = 0, raw = 0;
+        int[] edges = { src[in * SIZE + mid], src[(SIZE - 1 - in) * SIZE + mid], src[mid * SIZE + in], src[mid * SIZE + SIZE - 1 - in] };
+        for (int c : edges) {
+            if (c >>> 24 < 200) continue;
+            opaque++;
+            int same = 0;
+            for (int o : edges) if (o >>> 24 >= 200 && dist(c, o) < 60) same++;
+            if (same > votes) { votes = same; plate = c; }
         }
-        b.setPixels(px, 0, SIZE, 0, 0, SIZE, SIZE);
-        return b;
+        for (int c : src) if (c >>> 24 > 128) raw++;
+        // A plate touches the edges in one colour (two sides are enough for a letterboxed banner). An adaptive
+        // foreground normally has none, so it only counts when the foreground fills most of the icon.
+        boolean solid = votes >= 2 && votes == opaque && (!adaptive || raw > src.length * 6 / 10);
+        int covered = 0;
+        for (int i = 0; i < src.length; i++) {
+            int a = src[i] >>> 24;
+            if (solid) a = a * Math.min(255, Math.max(0, (dist(src[i], plate) - 40) * 3)) / 255;
+            px[i] = a;
+            if (a > 128) covered++;
+        }
+        if (covered > src.length * 6 / 10) {
+            // Still a block: keep what is lighter than the block's average.
+            long sum = 0;
+            for (int c : src) sum += luma(c);
+            int avg = (int) (sum / src.length);
+            for (int i = 0; i < src.length; i++) px[i] = (src[i] >>> 24) * Math.min(255, Math.max(0, (luma(src[i]) - avg - 24) * 4)) / 255;
+        }
+        int left = SIZE, top = SIZE, right = -1, bottom = -1;
+        for (int y = 0; y < SIZE; y++) for (int x = 0; x < SIZE; x++) if (px[y * SIZE + x] > 24) { left = Math.min(left, x); right = Math.max(right, x); top = Math.min(top, y); bottom = Math.max(bottom, y); }
+        Bitmap out = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888);
+        if (right < 0) return out;
+        int[] glyph = new int[SIZE * SIZE];
+        for (int i = 0; i < px.length; i++) glyph[i] = (px[i] << 24) | 0xffffff;
+        Bitmap full = Bitmap.createBitmap(glyph, SIZE, SIZE, Bitmap.Config.ARGB_8888);
+        int w = right - left + 1, h = bottom - top + 1, box = SIZE * 92 / 100;
+        float k = Math.min(box / (float) w, box / (float) h);
+        int dw = Math.round(w * k), dh = Math.round(h * k), dx = (SIZE - dw) / 2, dy = (SIZE - dh) / 2;
+        new Canvas(out).drawBitmap(full, new android.graphics.Rect(left, top, right + 1, bottom + 1), new android.graphics.Rect(dx, dy, dx + dw, dy + dh), new android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG));
+        full.recycle();
+        return out;
     }
+
+    private static int dist(int a, int b) { return Math.abs(((a >> 16) & 255) - ((b >> 16) & 255)) + Math.abs(((a >> 8) & 255) - ((b >> 8) & 255)) + Math.abs((a & 255) - (b & 255)); }
+
+    private static int luma(int c) { return (((c >> 16) & 255) * 299 + ((c >> 8) & 255) * 587 + (c & 255) * 114) / 1000; }
 
     private static byte[] bytes(Bitmap bitmap) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
