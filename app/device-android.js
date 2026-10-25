@@ -210,6 +210,7 @@
     beat: bridge.beatStart ? {
       start: function () { try { return !!bridge.beatStart(); } catch (e) { return false; } },
       stop: function () { try { bridge.beatStop(); } catch (e) { } },
+      reset: function () { try { bridge.beatReset(); } catch (e) { } },
       level: function () { try { return +bridge.beat(); } catch (e) { return -1; } },
       allow: function () { try { bridge.beatAllow(); } catch (e) { } }
     } : null,

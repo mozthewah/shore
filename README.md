@@ -159,7 +159,7 @@ Press ♪ *Music* on Home while something plays.
 - A progress bar with the time played and left. Up selects it; Left and Right jump 10 seconds when the app allows seeking.
 - *Previous*, *Pause/Play*, *Next*, and a button that opens the music app.
 - Synced lyrics from [LRCLIB](https://lrclib.net), free and without an account. Lines ripple into place like Apple Music's, the line being sung grows, and its words light up in turn: exactly where LRCLIB has word timing, otherwise spread over the line. Shore only shows lyrics whose title, artist and length match the version playing, so a different edit or a cover shows none rather than the wrong words. Only the artist, title, album and length are sent.
-- Beat pulse (off by default): kick and bass hits push the background and the cover out a little. It uses Android's Visualizer on the TV's own sound output, never the microphone, but Android still asks to allow audio recording. Only the bass level is read, about 20 times a second, and only while the music view is open.
+- Beat pulse (off by default): the beat pushes the background and the cover out a little. Shore learns where each song keeps its beat, from 808s and kicks to snares, claps and hi-hats, and starts learning again when the song changes. It uses Android's Visualizer on the TV's own sound output, never the microphone, but Android still asks to allow audio recording. Only the bass level is read, about 20 times a second, and only while the music view is open.
 - *Settings › Music › Music view* turns lyrics, word by word and the beat pulse on or off.
 
 ### Under the clock: weather, music and news

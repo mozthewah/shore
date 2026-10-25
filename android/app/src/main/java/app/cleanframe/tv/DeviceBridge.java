@@ -96,6 +96,10 @@ final class DeviceBridge {
     @JavascriptInterface
     public void beatStop() { Beat.stop(); }
 
+    /** A new song: the beat pulse learns its drums again. */
+    @JavascriptInterface
+    public void beatReset() { Beat.reset(); }
+
     @JavascriptInterface
     public double beat() { return Beat.level(); }
 

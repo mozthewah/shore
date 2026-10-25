@@ -720,7 +720,7 @@
         else P.seekTo = -1;
         P.d = d; P.at = Date.now(); P.pkg = d.pkg || P.pkg;
         key = d.artist + '\n' + d.title;
-        if (key !== P.lyKey) { P.lyKey = key; P.ly = null; }
+        if (key !== P.lyKey) { P.lyKey = key; P.ly = null; if (NOWPLAYING.beat) NOWPLAYING.beat.reset(); } // a new song: new lyrics, and the pulse learns its drums again
         if (S.c.plyric === 'on' && (!P.ly || P.ly.state === 'pending')) P.ly = NOWPLAYING.lyrics(d.artist, d.title, d.album, Math.round(d.dur / 1000));
       } else if (!P.d) P.d = { found: false };
       render();
