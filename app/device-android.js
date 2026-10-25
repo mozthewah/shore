@@ -142,6 +142,16 @@
       if (ok) reply(true, done); else launchApp(id, done);
     }
   };
+  /* Continue watching: rows apps publish to Android's Watch Next list (WatchNext.java). */
+  var watchListeners = [];
+  window.CleanFrameWatchNextChanged = function () { watchListeners.forEach(function (fn) { try { fn(); } catch (e) { } }); };
+  var watchNext = bridge.watchNext ? {
+    /* {allowed, items:[{id, pkg, title, sub, progress, left, card}]} */
+    list: function () { try { return JSON.parse(bridge.watchNext()) || {}; } catch (e) { return {}; } },
+    open: function (id, done) { var ok = false; try { ok = !!bridge.watchNextOpen(String(id)); } catch (e) { } reply(ok, done); },
+    allow: function () { try { bridge.watchNextAllow(); } catch (e) { } },
+    onChange: function (fn) { watchListeners.push(fn); }
+  } : null;
   /* Photos sent from a phone on the same network (PhoneUpload), and what is playing (NowPlayingService). */
   var phoneListeners = [];
   window.CleanFramePhoneChanged = function (count) { phoneListeners.forEach(function (fn) { try { fn(count); } catch (e) { } }); };
@@ -216,7 +226,7 @@
   window.FrameDevice = {
     platform: 'android', phone: phone, news: news, icons: icons, nowPlaying: nowPlaying, saver: saver, update: update,
     launch: launch, launchApp: launchApp, apps: apps, appInfo: appInfo,
-    inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf,
+    inputs: inputs, onInputs: function (fn) { inputListeners.push(fn); }, online: online, remote: remote, topShelf: topShelf, watchNext: watchNext,
     /* Android package behind a Home entry (for its TV banner); null for inputs and unknown IDs. */
     packageOf: function (id) { var brand = TIZEN[id] || BRAND[id] || (PACKAGES[id] ? id : ''), pkg = brand === 'youtube' ? FALLBACK.youtube : TIZEN[id] ? PACKAGES[TIZEN[id]] : PACKAGES[id] || id; // YouTube tile shows YouTube's banner
       return /^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+$/.test(pkg) ? pkg : null; },

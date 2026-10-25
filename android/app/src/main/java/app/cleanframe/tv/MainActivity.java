@@ -74,6 +74,7 @@ public class MainActivity extends Activity {
         topShelf.setListener(index -> runOnUiThread(() -> {
             if (web != null) web.evaluateJavascript("window.CleanFrameTopShelfChanged&&window.CleanFrameTopShelfChanged(" + index + ")", null);
         }));
+        WatchNext.get(this).setListener(this::watchNextChanged);
         Updater.get(this).setListener(() -> runOnUiThread(() -> {
             if (web != null) web.evaluateJavascript("window.CleanFrameUpdateChanged&&window.CleanFrameUpdateChanged()", null);
         }));
@@ -97,6 +98,7 @@ public class MainActivity extends Activity {
                 .addPathHandler("/appicon/", new AppIconHandler(this))
                 .addPathHandler("/appbanner/", new AppIconHandler(this, true))
                 .addPathHandler("/topshelf/", topShelf.handler())
+                .addPathHandler("/watchnext/", WatchNext.get(this).handler())
                 .addPathHandler("/nowplaying/", NowPlayingService.handler(this))
                 .build();
 
@@ -168,10 +170,20 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void watchNextChanged() {
+        if (web != null) web.evaluateJavascript("window.CleanFrameWatchNextChanged&&window.CleanFrameWatchNextChanged()", null);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int code, String[] permissions, int[] results) {
+        super.onRequestPermissionsResult(code, permissions, results);
+        if (code == 7) watchNextChanged();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        if (web != null) { web.onResume(); web.resumeTimers(); web.requestFocus(); inputsChanged(); remoteChanged(); }
+        if (web != null) { web.onResume(); web.resumeTimers(); web.requestFocus(); inputsChanged(); remoteChanged(); watchNextChanged(); }
         if (online != null) online.refreshIfStale();
         if (phone != null) phone.resume();
         Updater.get(this).checkIfStale();

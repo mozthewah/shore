@@ -158,6 +158,19 @@ final class DeviceBridge {
     }
 
     /** Installed icon packs: JSON array of {id, name}. */
+    /** Continue watching: {allowed, items}. */
+    @JavascriptInterface
+    public String watchNext() { return WatchNext.get(context).list(); }
+
+    @JavascriptInterface
+    public boolean watchNextOpen(String id) { return id != null && id.matches("[0-9]{1,18}") && WatchNext.get(context).open(id); }
+
+    /** Shows Android's permission dialog for reading Continue watching. */
+    @JavascriptInterface
+    public void watchNextAllow() {
+        if (activity != null) activity.runOnUiThread(() -> activity.requestPermissions(new String[] { WatchNext.PERMISSION }, 7));
+    }
+
     @JavascriptInterface
     public String iconPacks() { return IconPacks.list(context); }
 

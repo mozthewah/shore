@@ -97,16 +97,16 @@
     cformat: ['12', '24'], cdate: ['off', 'on'], cweather: ['off', 'on'], wunit: ['c', 'f'], cplaying: ['off', 'on'], cart: ['off', 'on'], clook: ['off', 'on'], saver: ['off', '5', '10', '15'], csize: ['small', 'medium', 'large', 'huge'], cweight: ['auto', 'thin', 'light', 'regular', 'bold'],
     night: ['off', 'scheduled', 'always'], nhours: ['20-7', '21-7', '22-6', '23-7'], ndim: ['soft', 'medium', 'strong'], idle: ['off', '1', '5'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'],
     svsrc: ['like', 'every', 'builtin'], svlay: ['mix', 'single', 'mosaic'], svtime: ['15', '30', '60'], svmotion: ['still', 'drift'], iask: ['off', 'on'], ncalm: ['off', 'on'], wfx: ['off', 'on'], cnews: ['off', 'on'], svphoto: ['off', 'on'], svclock: ['off', 'on'], svdate: ['off', 'on'], svmusic: ['off', 'on'], wicon: ['off', 'on'], cwave: ['off', 'on'],
-    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'],
+    cpos: ['left', 'center'], csec: ['off', 'on'], tint: ['none', 'warm', 'cool', 'rose', 'green'], dglass: ['clear', 'default', 'solid'], isize: ['small', 'default', 'large'], npdim: ['none', 'soft', 'strong'], svpos: ['move', 'fixed'], istyle: ['shore', 'original', 'mono'], cwatch: ['off', 'on'],
     nsrc: ['google', 'phone'].concat(NEWS_OUTLETS.map(function (o) { return o.id; })) };
   /* Newer axes with their defaults: stored, migrated and validated like the others. */
-  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore' };
+  var MORE_LOOK = { svphoto: 'off', ncalm: 'off', wfx: 'off', cnews: 'off', iask: 'on', svsrc: 'like', svlay: 'mix', svtime: '30', svmotion: 'drift', svclock: 'on', svdate: 'on', svmusic: 'on', wicon: 'on', cwave: 'on', cpos: 'left', csec: 'off', tint: 'none', dglass: 'default', isize: 'default', npdim: 'none', svpos: 'move', nsrc: 'google', istyle: 'shore', cwatch: 'on' };
   /* On/off settings that OK flips. */
-  var TOGGLES = ['svphoto', 'ncalm', 'wfx', 'cnews', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec'];
+  var TOGGLES = ['svphoto', 'ncalm', 'wfx', 'cnews', 'iask', 'cdate', 'cweather', 'cplaying', 'cart', 'clook', 'svclock', 'svdate', 'svmusic', 'wicon', 'cwave', 'csec', 'cwatch'];
   var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', inputs: 'Inputs', motion: 'Motion', tweight: 'Text weight', tsize: 'App name size', cformat: 'Format', cdate: 'Date', cweather: 'Weather', wunit: 'Temperature', cplaying: 'Now playing', cart: 'Album art', clook: 'Artist pictures', saver: 'Screensaver', csize: 'Clock size', cweight: 'Clock weight',
     night: 'Night mode', nhours: 'Night hours', ndim: 'Night dimming', idle: 'Hide controls when idle', focus: 'Focus', material: 'Material',
     svphoto: 'Photo title', ncalm: 'Calmer photos at night', wfx: 'Weather effects', cnews: 'Headlines', iask: 'Ask to switch', svsrc: 'Screensaver photos', svlay: 'Arrangement', svtime: 'Each slide', svmotion: 'Photo motion', svclock: 'Clock', svdate: 'Date and weather', svmusic: 'Music', wicon: 'Weather icon', cwave: 'Level meter',
-    cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver', nsrc: 'Source', istyle: 'Icon style' };
+    cpos: 'Clock position', csec: 'Seconds', tint: 'Accent', dglass: 'App row glass', isize: 'Icon size', npdim: 'Album art dimming', svpos: 'Clock on the screensaver', nsrc: 'Source', istyle: 'Icon style', cwatch: 'Continue watching' };
   var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', front: 'First in Home', row: 'Own row', still: 'Still', drift: 'Drift', auto: 'Auto', thin: 'Thin', regular: 'Regular', bold: 'Bold', small: 'Small', 'default': 'Default', large: 'Large',
     medium: 'Medium', huge: 'Huge', '12': '12-hour', '24': '24-hour', on: 'Show', scheduled: 'Timed', always: 'Always', soft: 'Soft', strong: 'Strong',
     '20-7': '20–07', '21-7': '21–07', '22-6': '22–06', '23-7': '23–07', '1': 'After 1 min', '5': 'After 5 min', '10': 'After 10 min', '15': 'After 15 min', c: '°C', f: '°F',
@@ -172,7 +172,7 @@
   function lookOf(c) { return { bg: c.bg, wall: c.wall, layout: c.layout, apps: c.apps, font: c.font, controls: c.controls, inputs: c.inputs, lstyle: c.lstyle, motion: c.motion, tweight: c.tweight, tsize: c.tsize, cformat: c.cformat, cdate: c.cdate, cweather: c.cweather, wunit: c.wunit, cplaying: c.cplaying, cart: c.cart, clook: c.clook, saver: c.saver, csize: c.csize, cweight: c.cweight,
       night: c.night, nhours: c.nhours, ndim: c.ndim, idle: c.idle, focus: c.focus, material: c.material, svsrc: c.svsrc, svlay: c.svlay, svtime: c.svtime,
       svmotion: c.svmotion, iask: c.iask, ncalm: c.ncalm, wfx: c.wfx, cnews: c.cnews, svphoto: c.svphoto, svclock: c.svclock, svdate: c.svdate, svmusic: c.svmusic, wicon: c.wicon, cwave: c.cwave,
-      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack }; }
+      cpos: c.cpos, csec: c.csec, tint: c.tint, dglass: c.dglass, isize: c.isize, npdim: c.npdim, svpos: c.svpos, nsrc: c.nsrc, istyle: c.istyle, ipack: c.ipack, cwatch: c.cwatch }; }
   function materialApplies(c) { c = c || S.c; return c.bg === 'photo' && (c.layout === 'dock' || c.focus === 'glass'); }
 
   /* ---------- Helpers ---------- */
@@ -639,6 +639,11 @@
     S.press = id; S.lastLaunch = a.name;
     perform(a.name, function (done) { SHELF.open(a.appId, it.url, done); });
   }
+  function openWatch(it) {
+    if (!it || busy) return;
+    S.lastLaunch = it.title;
+    perform(it.title, function (done) { WATCH.open(it.watch, done); });
+  }
   function refreshCatalog() {
     var request, oldFocus;
     if (catalog.loading) return;
@@ -787,7 +792,7 @@
           if (k === 'left' && f.r > 0) f.r--;
           else if (k === 'right' && f.r < R.items.length - 1) f.r++;
           else if (k === 'up' || k === 'back') f.zone = 'apps';
-          else if (k === 'ok') openRec(S.sel, R.items[f.r]);
+          else if (k === 'ok') { if (R.items[f.r].watch) openWatch(R.items[f.r]); else openRec(S.sel, R.items[f.r]); }
           return;
         }
       }
@@ -1167,7 +1172,7 @@
   function choice(axis, value, disabled) {
     if (axis === 'source') return { action: 'online.' + value, axis: axis, value: value, disabled: !!disabled, label: sourceName(value), tick: true, applied: sourceOn(value) };
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
-      label: axis === 'nsrc' ? newsSourceName(value) : axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm|svphoto|wfx|cnews)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
+      label: axis === 'nsrc' ? newsSourceName(value) : axis === 'cdate' ? 'Date' : axis === 'cweather' ? 'Weather' : axis === 'cplaying' ? 'Now playing' : axis === 'cart' ? 'Album art' : axis === 'clook' ? 'Find artist pictures online' : axis === 'saver' && value !== 'off' ? value + ' min' : axis === 'svtime' ? value + ' s' : axis === 'csec' ? shortSeconds() : axis === 'iask' ? askLabel() : /^(svclock|svdate|svmusic|wicon|cwave|ncalm|svphoto|wfx|cnews|cwatch)$/.test(axis) ? LOOK_NAMES[axis] : axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : value === 'light' && /weight$/.test(axis) ? weightLight() : VALUE_NAMES[value] };
   }
   /* "Seconds" in the Format row, abbreviated where the word is long. */
   /* "Ask" (to switch inputs), short enough to share the Inputs row in every language. */
@@ -1559,7 +1564,7 @@
      Shore applies it exactly as if it was chosen with the remote. */
   var COMPANION_GROUPS = [
     ['Wallpaper', ['bg', 'wall', 'source', 'mode', 'motion', 'ncalm']],
-    ['Home screen', ['layout', 'apps', 'controls']],
+    ['Home screen', ['layout', 'apps', 'controls', 'cwatch']],
     ['App icons', ['istyle', 'isize']],
     ['Style', ['focus', 'material', 'tint', 'dglass']],
     ['Text', ['font', 'tweight', 'tsize']],
@@ -1582,6 +1587,7 @@
       options: [{ value: 'list', label: T('List') }, { value: 'dock', label: T('Dock') }, { value: 'shelf', label: T('Shelf') }] };
     if ((axis === 'cart' || axis === 'npdim' || axis === 'clook' || axis === 'cplaying' || axis === 'cwave' || axis === 'svmusic') && !NOWPLAYING) return null;
     if ((axis === 'cnews' || axis === 'nsrc') && !NEWS) return null;
+    if (axis === 'cwatch' && !WATCH) return null;
     if (axis === 'nsrc') return { id: 'nsrc', name: T('News source'), kind: 'list', value: S.c.nsrc,
       options: ['google'].concat(newsOutlets().map(function (o) { return o.id; })).concat(['phone']).map(function (v) { return { value: v, label: T(newsSourceName(v)) }; }) };
     if (!LOOK_VALUES[axis]) return null;
@@ -1662,7 +1668,7 @@
         { action: 'choice.layout.shelf', axis: 'layout', value: 'shelf', label: 'Shelf', applied: isShelf() }] },
       { id: 'apps', title: 'App display', horizontal: true, items: options('apps', ['text', 'icons', 'both']) },
       { id: 'controls', title: 'Home controls', horizontal: true, items: options('controls', ['text', 'icons', 'both']) },
-      { id: 'iconlink', title: '', items: [{ action: 'open.icons', label: 'App icons', description: iconSummary(), pair: true }] }
+      { id: 'iconlink', title: '', items: (WATCH ? [watchChoice()] : []).concat([{ action: 'open.icons', label: 'App icons', description: iconSummary(), pair: true }]) }
     ];
     /* App icons: style, size and an installed icon pack. */
     if (t.group === 'icons') return [
@@ -1863,6 +1869,7 @@
     } else if (item.axis === 'mode') applyRotation(item.value);
     else if (item.axis === 'source') applySource(item.value);
     else if (item.axis === 'layout') setLook({ layout: item.value === 'list' ? 'list' : 'dock', lstyle: item.value === 'shelf' ? 'shelf' : 'glass' }, { row: 'layout' });
+    else if (item.axis === 'cwatch' && !watchAllowed && S.c.layout !== 'list') { if (S.c.cwatch !== 'on') setLook({ cwatch: 'on' }, { row: 'cwatch' }); WATCH.allow(); }
     else if (TOGGLES.indexOf(item.axis) >= 0) { patch[item.axis] = S.c[item.axis] === 'on' ? 'off' : 'on'; setLook(patch, { row: item.axis }); }
     else if (item.axis) { patch[item.axis] = item.value; setLook(patch, { row: item.axis }); }
     else if (item.action === 'background.wallpaper') openWallpaper();
@@ -2301,13 +2308,38 @@
     if (Date.now() < dockEdgeUntil) dockEdgeFrame = window.requestAnimationFrame(trackDockEdges);
   }
 
+  /* ---------- Continue watching (Dock and Shelf, Android shell) ----------
+     Rows apps publish to Android's Watch Next list, read by WatchNext.java. Dock shows them as one row under
+     the apps; Shelf puts each app's own items first in its Top Shelf row. */
+  var WATCH = ANDROID && FrameDevice.watchNext ? FrameDevice.watchNext : null, watchItems = [], watchAllowed = false;
+  function minutesLeft(m) { return m >= 60 ? T((m / 60 | 0) + ' hr ' + (m % 60) + ' min left') : T(m + ' min left'); }
+  function loadWatch() {
+    var w = WATCH ? WATCH.list() : {}, pkgRe = /^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$/;
+    watchAllowed = !!w.allowed;
+    watchItems = (w.items && w.items.filter ? w.items : []).filter(function (it) {
+      return it && /^\d{1,18}$/.test(it.id) && pkgRe.test(it.pkg) && typeof it.title === 'string' && /^(\/watchnext\/img\/\d{1,18}\.jpg)?$/.test(it.card || '');
+    }).map(function (it) {
+      var left = +it.left | 0, sub = [String(it.sub || ''), left > 0 ? minutesLeft(left) : ''].filter(Boolean).join(' · ');
+      return { watch: it.id, pkg: it.pkg, title: it.title, sub: sub, card: it.card || '', hero: '', progress: Math.max(0, Math.min(1, +it.progress || 0)) };
+    });
+  }
+  /* The toggle says what is missing on its own row; this page has no room for a note. */
+  function watchChoice() {
+    var c = choice('cwatch', 'on', S.c.layout === 'list');
+    c.description = S.c.layout === 'list' ? 'Dock or Shelf' : S.c.cwatch === 'on' && !watchAllowed ? 'OK to allow' : '';
+    return c;
+  }
+  function watchShown() { return !!WATCH && S.c.cwatch === 'on' && S.c.layout === 'dock' && watchItems.length > 0; }
+  function watchRow() { return watchShown() && !isShelf(); }
+  if (WATCH) { loadWatch(); WATCH.onChange(function () { loadWatch(); recsKey = ''; render(); }); }
+
   /* ---------- Top Shelf (Shelf layout, Android shell) ----------
      The focused app's first recommendation (or its blurred TV banner) becomes the backdrop, and Down
      opens a row of its recommendations. Images arrive pre-rendered from TopShelf.java; nothing blurs here. */
   var SHELF = ANDROID && FrameDevice.topShelf ? FrameDevice.topShelf : null, shelfIndex = {}, shelfAsked = '';
   var SHELF_ROW_Y = 400, REC_LEFT = 140, REC_PITCH = 376, REC_VIEW = 1920 - 2 * REC_LEFT;
   var heroEl = document.createElement('div'), heroImgs = [document.createElement('img'), document.createElement('img')], heroFront = 0, heroSrc = '', heroTimer = 0;
-  var heroText = document.createElement('div'), recsEl = document.createElement('div'), recsTrack = document.createElement('div'), recsTitle = document.createElement('div'), recsKey = '';
+  var heroText = document.createElement('div'), recsEl = document.createElement('div'), recsTrack = document.createElement('div'), recsTitle = document.createElement('div'), recsHead = document.createElement('div'), recsKey = '';
   heroEl.className = 'hero'; heroEl.setAttribute('aria-hidden', 'true');
   heroImgs.forEach(function (img) { img.className = 'hero-img'; img.alt = ''; heroEl.appendChild(img); });
   heroEl.appendChild(document.createElement('div')).className = 'hero-shade';
@@ -2315,7 +2347,8 @@
   IMG.photo.parentNode.insertBefore(npEl, heroEl); // album art: above the photo, below a Top Shelf hero
   heroText.className = 'hero-text'; heroText.setAttribute('aria-live', 'polite');
   recsEl.className = 'recs'; recsTrack.className = 'recs-track'; recsTitle.className = 'recs-title';
-  recsEl.appendChild(recsTrack); recsEl.appendChild(recsTitle);
+  recsHead.className = 'recs-head';
+  recsEl.appendChild(recsHead); recsEl.appendChild(recsTrack); recsEl.appendChild(recsTitle);
   homeEl.insertBefore(heroText, dock); homeEl.insertBefore(recsEl, dock);
 
   function cleanShelfIndex(index) {
@@ -2329,12 +2362,17 @@
     return out;
   }
   function shelfPkg(id) { var a = app(id); return a && !a.input && FrameDevice.packageOf ? FrameDevice.packageOf(a.appId) : null; }
+  /* Shelf: the focused app's Continue watching, then what is trending on it. Dock: one Continue watching row for every app. */
   function recsFor(id) {
-    var pkg = SHELF && isShelf() ? shelfPkg(id) : null, e = pkg ? shelfIndex[pkg] : null;
-    return e ? { pkg: pkg, service: e.service, items: e.items } : null;
+    var pkg, e, items;
+    if (watchRow()) return { pkg: '', service: '', row: true, items: watchItems };
+    pkg = SHELF && isShelf() ? shelfPkg(id) : null; e = pkg ? shelfIndex[pkg] : null;
+    items = pkg && watchShown() ? watchItems.filter(function (it) { return it.pkg === pkg; }) : [];
+    if (e) items = items.concat(e.items);
+    return items.length ? { pkg: pkg, service: e ? e.service : '', items: items } : null;
   }
   /* Stable layout: the row moves up once any Home app has recommendations, not per focused app. */
-  function shelfLifted() { return !!SHELF && isShelf() && visibleHome().some(function (id) { return !!recsFor(id); }); }
+  function shelfLifted() { return watchRow() || !!SHELF && isShelf() && visibleHome().some(function (id) { return !!recsFor(id); }); }
   function requestShelf() {
     var pkgs = [];
     if (!SHELF || !isShelf()) return;
@@ -2360,26 +2398,30 @@
     }, 160);
   }
   function renderTopShelf(t, sheet) {
-    var on = !!SHELF && isShelf() && !sheet && t.id === 'home' && !S.idleHidden, f = t.f || {};
-    var zone = on && (f.zone === 'apps' || f.zone === 'recs') ? f.zone : null, R = zone ? recsFor(S.sel) : null;
+    var row = watchRow(), on = (row || !!SHELF && isShelf()) && !sheet && t.id === 'home' && !S.idleHidden, f = t.f || {};
+    var zone = on && (f.zone === 'apps' || f.zone === 'recs') ? f.zone : null, R = zone || row && on ? recsFor(S.sel) : null;
     var r = R ? clamp(f.r || 0, 0, R.items.length - 1) : 0, item = R ? R.items[zone === 'recs' ? r : 0] : null, pkg = zone ? shelfPkg(S.sel) : null;
     var off = R ? clamp((r - 2) * REC_PITCH, 0, Math.max(0, R.items.length * REC_PITCH - 24 - REC_VIEW)) : 0, key;
-    if (on) requestShelf();
-    showHero(item ? item.hero : pkg ? '/topshelf/banner/' + pkg + '.jpg' : '');
-    setHTML(heroText, item ? '<span class="hero-title">' + esc(item.title) + '</span><span class="hero-service">' + esc('Trending on ' + R.service) + '</span>' : '');
+    if (on && !row) requestShelf();
+    if (row) { item = null; pkg = null; } // the Dock keeps its wallpaper; the row is the only change
+    showHero(item ? item.hero || '/topshelf/banner/' + pkg + '.jpg' : pkg ? '/topshelf/banner/' + pkg + '.jpg' : '');
+    setHTML(heroText, item ? '<span class="hero-title">' + esc(item.title) + '</span><span class="hero-service">' + esc(item.watch ? 'Continue watching' : 'Trending on ' + R.service) + '</span>' : '');
     heroText.className = 'hero-text' + (item ? ' is-on' : '');
-    key = R ? R.pkg + '|' + R.items.map(function (it) { return it.card; }).join() : '';
+    key = R ? R.pkg + '|' + R.items.map(function (it) { return it.card + ':' + (it.progress || 0); }).join() : '';
     if (key !== recsKey) {
       recsKey = key;
       setHTML(recsTrack, R ? R.items.map(function (it, i) {
-        return '<span class="rec" style="transform:translate3d(' + (i * REC_PITCH) + 'px,0,0)"><img alt="" src="' + esc(it.card) + '" onerror="this.style.visibility=\'hidden\'"></span>';
+        return '<span class="rec" style="transform:translate3d(' + (i * REC_PITCH) + 'px,0,0)">'
+          + (it.card ? '<img alt="" src="' + esc(it.card) + '" onerror="this.style.visibility=\'hidden\'">' : '<span class="rec-name">' + escRaw(it.title) + '</span>')
+          + (it.progress > 0 ? '<span class="rec-bar"><span style="width:' + Math.round(it.progress * 100) + '%"></span></span>' : '') + '</span>';
       }).join('') : '');
     }
     Array.prototype.forEach.call(recsTrack.childNodes, function (el, i) { el.className = 'rec' + (zone === 'recs' && i === r ? ' is-focus' : ''); });
     recsTrack.style.transform = 'translate3d(' + (-off) + 'px,0,0)';
     setHTML(recsTitle, zone === 'recs' && R ? '<span class="recs-name">' + esc(R.items[r].title) + '</span>' + (R.items[r].sub ? '<span class="recs-sub">' + esc(R.items[r].sub) + '</span>' : '') : '');
     recsTitle.style.transform = 'translate3d(' + (r * REC_PITCH - off) + 'px,0,0)';
-    recsEl.className = 'recs' + (R ? ' is-on' : '') + (zone === 'recs' ? ' is-active' : '');
+    setHTML(recsHead, row ? esc('Continue watching') : '');
+    recsEl.className = 'recs' + (R && on ? ' is-on' : '') + (zone === 'recs' ? ' is-active' : '') + (row ? ' has-head' : '');
   }
   if (SHELF) {
     shelfIndex = cleanShelfIndex(SHELF.index());
@@ -2394,7 +2436,7 @@
     var items = hs.items, n = items.length, empty = hs.mode !== 'arrange' && !n, g = dockGeom(empty ? -1 : n);
     var anchor = clamp(hs.i, 0, Math.max(0, n - 1)), off = empty ? 0 : dockOffset(n, anchor, g);
     var full = hs.arr ? live(hs.arr.slots).length >= CAP : false, ns = hs.arr ? hs.arr.slots.length : n;
-    var tileFocus = hs.zone === 'apps' || hs.zone === 'tiles', tileSel = hs.zone === 'act' || hs.zone === 'ctl' || hs.zone === 'preview' || hs.zone === 'recs';
+    var tileFocus = hs.zone === 'apps' || hs.zone === 'tiles', tileSel = hs.zone === 'act' || hs.zone === 'ctl' || hs.zone === 'preview' || hs.zone === 'recs' && !watchRow();
     var focusItem = items[anchor], s, ax, label, width;
 
     dock.className = 'dock' + (empty ? ' is-empty' : '');
