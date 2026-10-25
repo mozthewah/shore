@@ -24,8 +24,8 @@ const HA_FAKE = {
     { name: 'Kitchen', ids: ['light.kitchen_pendant', 'light.kitchen_strip', 'fan.kitchen', 'binary_sensor.kitchen_motion'] },
     { name: 'Front Door', ids: ['camera.front_door', 'event.front_door_ding', 'lock.front_door'] }],
   states: {
-    'light.living_room_lamp': { s: 'on', n: 'Living Room Lamp' }, 'light.living_room_ceiling': { s: 'off', n: 'Living Room Ceiling' }, 'switch.tv_backlight': { s: 'off', n: 'TV backlight' },
-    'climate.living_room': { s: 'cool', n: 'Living Room', t: 22.4 }, 'sensor.living_room_temperature': { s: '21.6', n: 'Living Room Temperature', u: '°C', c: 'temperature' },
+    'light.living_room_lamp': { s: 'on', n: 'Living Room Lamp' }, 'light.living_room_ceiling': { s: 'off', n: 'Living Room Ceiling', cm: ['color_temp', 'hs'], kmin: 2200, kmax: 6500 }, 'switch.tv_backlight': { s: 'off', n: 'TV backlight' },
+    'climate.living_room': { s: 'cool', n: 'Living Room', t: 22.4, tt: 21, tmin: 7, tmax: 35, ts: 0.5, hm: ['off', 'heat', 'cool', 'auto'] }, 'sensor.living_room_temperature': { s: '21.6', n: 'Living Room Temperature', u: '°C', c: 'temperature' },
     'sensor.living_room_humidity': { s: '48', n: 'Living Room Humidity', u: '%', c: 'humidity' }, 'media_player.living_room': { s: 'playing', n: 'Living Room' },
     'light.kitchen_pendant': { s: 'on', n: 'Kitchen Pendant' }, 'light.kitchen_strip': { s: 'unavailable', n: 'Kitchen Strip' }, 'fan.kitchen': { s: 'off', n: 'Kitchen Fan' },
     'binary_sensor.kitchen_motion': { s: 'on', n: 'Kitchen Motion', c: 'motion' }, 'camera.front_door': { s: 'idle', n: 'Front Door' },
@@ -1051,6 +1051,39 @@ try {
     await nav('ok');
     where = await call('where');
     check('OK switches the chip at once and asks Home Assistant', /On$/.test(where.focus) && (await haCalls()).some(c => c[0] === 'toggle' && c[1] === 'light.living_room_ceiling'), where);
+    await current.screenshot({ path: out + 'ha-panel.jpg', quality: 90 });
+    check('The panel line names what is unavailable', /lights on · Kitchen Strip unavailable/.test(await current.locator('.view-ha .s-sub').innerText()), await current.locator('.view-ha .s-sub').innerText());
+    await current.keyboard.down('Enter'); await current.waitForTimeout(800); await current.keyboard.up('Enter');
+    where = await call('where');
+    check('Holding OK on a light opens its controls with a single focus', where.view === 'hactl' && where.focusCount === 1 && where.focusAction === 'hactl.power', where);
+    check('A held OK doesn’t also switch the light', (await haCalls()).filter(c => c[0] === 'toggle').length === 1);
+    await nav('down', 'right', 'right');
+    await current.waitForFunction(() => (window.__haCalls || []).some(c => c[0] === 'call' && c[2] === 'turn_on' && c[3].brightness_pct));
+    check('Right on Brightness sends one change once the remote rests', JSON.stringify((await haCalls()).filter(c => c[0] === 'call').map(c => c[3])) === JSON.stringify([{ brightness_pct: 20 }]), await haCalls());
+    await nav('down', 'right', 'ok');
+    where = await call('where');
+    check('Colour row: whites then colours, one focus', where.focusAction === 'hactl.color.1' && where.focusCount === 1 && await current.locator('.hc-sw').count() === 12, where);
+    await current.waitForFunction(() => (window.__haCalls || []).some(c => c[0] === 'call' && c[3].color_temp_kelvin));
+    await current.screenshot({ path: out + 'ha-light-controls.jpg', quality: 90 });
+    check('OK on a white sets its colour temperature', (await haCalls()).some(c => c[0] === 'call' && c[3].color_temp_kelvin === 3500));
+    await nav('back');
+    where = await call('where');
+    check('Back closes the controls onto the chip', where.view === 'ha' && where.focusAction === 'ha.toggle.light.living_room_ceiling', where);
+    await nav('right', 'right', 'right');
+    where = await call('where');
+    check('Focus reaches the thermostat', where.focusAction === 'ha.toggle.climate.living_room', where);
+    await nav('ok');
+    where = await call('where');
+    check('OK on a thermostat opens its controls', where.view === 'hactl' && where.focusAction === 'hactl.target' && /21°/.test(await current.locator('.hc-temp').innerText()), where);
+    await nav('right');
+    check('Right raises the target at once', /21\.5°/.test(await current.locator('.hc-temp').innerText()), await current.locator('.hc-temp').innerText());
+    await current.waitForFunction(() => (window.__haCalls || []).some(c => c[0] === 'call' && c[2] === 'set_temperature'));
+    check('The new target reaches Home Assistant', (await haCalls()).some(c => c[2] === 'set_temperature' && c[3].temperature === 21.5));
+    await nav('down', 'right', 'ok');
+    await current.waitForFunction(() => (window.__haCalls || []).some(c => c[0] === 'call' && c[2] === 'set_hvac_mode'));
+    await current.screenshot({ path: out + 'ha-thermostat-controls.jpg', quality: 90 });
+    check('OK on a mode sets it', (await haCalls()).some(c => c[2] === 'set_hvac_mode' && c[3].hvac_mode === 'auto') && (await call('where')).focusCount === 1);
+    await nav('back');
     await nav('down', 'ok');
     check('A device Shore can’t switch only shows its state', (await call('where')).focusCount === 1 && !(await haCalls()).some(c => c[0] === 'toggle' && c[1] !== 'light.living_room_ceiling'));
     await nav('up', 'right', 'right', 'right', 'right');

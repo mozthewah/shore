@@ -263,6 +263,7 @@
     areas: function (names) { try { bridge.haAreas(JSON.stringify(names || [])); } catch (e) { } },
     refresh: function () { try { bridge.haRefresh(); } catch (e) { } },
     toggle: function (id) { try { bridge.haToggle(String(id)); } catch (e) { } },
+    call: bridge.haCall ? function (id, service, data) { try { bridge.haCall(String(id), String(service), JSON.stringify(data || {})); } catch (e) { } } : null,
     forget: function () { try { bridge.haForget(); } catch (e) { } },
     camera: {
       start: function (id) { try { return +bridge.haCameraStart(String(id)) || 0; } catch (e) { return 0; } },

@@ -70,6 +70,10 @@ final class DeviceBridge {
     @JavascriptInterface
     public void haToggle(String entity) { if (activity != null) HomeAssistant.get(context).toggle(entity); }
 
+    /** Brightness, colour, thermostat target or mode; HomeAssistant.call checks the service and every field. */
+    @JavascriptInterface
+    public void haCall(String entity, String service, String json) { if (activity != null) HomeAssistant.get(context).call(entity, service, json); }
+
     /** Forgets the server and its token. */
     @JavascriptInterface
     public void haForget() { if (activity != null) HomeAssistant.get(context).forget(); }

@@ -9,9 +9,12 @@
   /* "Open (door)": a key apart from the verb "Open", shown as "Open" where no translation has it. */
   function TT(key) { var w = T(key); return w === key ? key.replace(/ \(.*\)$/, '') : w; }
   var NATIVE = window.FrameDevice && FrameDevice.homeAssistant || null, src = NATIVE, running = false, listeners = [];
-  var latest = null, built = null, overrides = {};
+  var latest = null, built = null, overrides = {}, pending = {};
   var DOMAIN_ORDER = ['light', 'switch', 'fan', 'climate', 'media_player', 'lock', 'cover', 'vacuum', 'humidifier', 'alarm_control_panel', 'binary_sensor', 'sensor', 'event'];
   var TOGGLE = ['light', 'switch', 'fan', 'lock'], LIT = ['light', 'switch', 'fan'];
+  /* Attributes the native side adds for the light and thermostat controls (HomeAssistant.java). */
+  var EXTRA = ['b', 'cm', 'hs', 'k', 'kmin', 'kmax', 'mode', 'tt', 'tlo', 'thi', 'tmin', 'tmax', 'ts', 'hm', 'act'];
+  var COLOR_MODES = ['hs', 'xy', 'rgb', 'rgbw', 'rgbww'];
 
   /* ---------- States into rooms (ported from TvLauncher's HomeSection.kt) ---------- */
   function domainOf(id) { return id.slice(0, id.indexOf('.')); }
@@ -33,6 +36,7 @@
     var s = e.s, d = e.d, c = e.c || '', on = s === 'on', t, n;
     if (s === 'unavailable' || s === 'unknown') return T('Unavailable');
     if (d === 'climate') return typeof e.t === 'number' ? word(s) + ' · ' + num(e.t) + '°' : word(s);
+    if (d === 'light' && on && typeof e.b === 'number') return e.b + '%';
     if (d === 'binary_sensor') return TT(/^(motion|occupancy|presence|moving|sound|vibration)$/.test(c) ? (on ? 'Detected' : 'Clear (motion)') : /^(door|window|opening|garage_door)$/.test(c) ? (on ? 'Open (door)' : 'Closed')
       : c === 'connectivity' ? (on ? 'Connected' : 'Offline') : c === 'battery' ? (on ? 'Low' : 'Normal') : (on ? 'On (light)' : 'Off (light)'));
     if (d === 'event' || d === 'sensor' && c === 'timestamp') { t = when(s); return t ? T(ago(t)) : '—'; }
@@ -64,23 +68,48 @@
   }
   function climateSensor(e) { return e.d === 'sensor' && (e.c === 'temperature' || e.c === 'humidity'); }
   function entry(id, s) {
-    var o = overrides[id];
-    return { id: id, d: domainOf(id), s: o ? o.s : String(s.s), n: s.n, u: s.u, c: s.c, t: s.t };
+    var o = overrides[id] || {}, e = { id: id, d: domainOf(id), s: o.s || String(s.s), n: s.n, u: s.u, c: s.c, t: s.t };
+    EXTRA.forEach(function (k) { e[k] = o.hasOwnProperty(k) ? o[k] : s[k]; });
+    return e;
+  }
+  function list(v) { return v instanceof Array ? v.filter(function (x) { return typeof x === 'string'; }) : []; }
+  function finite(v) { return typeof v === 'number' && isFinite(v) ? v : null; }
+  /* What a long OK on a chip can adjust: brightness and colour on a light, target and mode on a thermostat. */
+  function controlOf(e) {
+    var cm = list(e.cm), dim, color, temp, modes;
+    if (e.s === 'unavailable' || e.s === 'unknown' && e.d !== 'climate') return null;
+    if (e.d === 'light') {
+      color = cm.some(function (m) { return COLOR_MODES.indexOf(m) >= 0; }); temp = cm.indexOf('color_temp') >= 0;
+      dim = color || temp || cm.some(function (m) { return m !== 'onoff'; });
+      if (!dim) return null;
+      return { kind: 'light', on: e.s === 'on', b: finite(e.b), color: color, temp: temp, hs: e.hs instanceof Array && e.hs.length === 2 ? [+e.hs[0] || 0, +e.hs[1] || 0] : null,
+        k: finite(e.k), kmin: finite(e.kmin) || 2000, kmax: finite(e.kmax) || 6500, mode: typeof e.mode === 'string' ? e.mode : '' };
+    }
+    if (e.d === 'climate') {
+      modes = list(e.hm);
+      if (!modes.length && finite(e.tt) === null) return null;
+      var max = finite(e.tmax), f = max !== null && max > 45;
+      return { kind: 'climate', mode: e.s, modes: modes, target: finite(e.tt), lo: finite(e.tlo), hi: finite(e.thi), now: finite(e.t), action: typeof e.act === 'string' ? e.act : '',
+        min: finite(e.tmin) !== null ? e.tmin : f ? 45 : 7, max: max !== null ? max : f ? 95 : 35, step: finite(e.ts) || (f ? 1 : 0.5) };
+    }
+    return null;
   }
   function info() {
     if (!latest) latest = src ? src.info() : { configured: false, enabled: false, status: 'off', error: '', at: 0, areas: [], selected: [], states: {} };
     return latest;
   }
-  /* {status, error, configured, at, areas: [names], selected, rooms: [{name, on, items}], cameras: [{id, name, room, activity}], indoor: {temp, tunit, humidity}} */
+  /* {status, error, configured, at, areas: [names], selected, rooms: [{name, on, items: [{id, name, room, state, active, toggle, off, lit, control}]}],
+     cameras: [{id, name, room, activity}], indoor: {temp, tunit, humidity}, unavailable: [full names]} */
   function model() {
     if (built) return built;
-    var i = info(), chosen = i.selected, rooms = [], cameras = [], indoor = null;
+    var i = info(), chosen = i.selected, rooms = [], cameras = [], indoor = null, gone = [];
     i.areas.forEach(function (a) {
       if (chosen.length && chosen.indexOf(a.name) < 0) return;
       var ents = a.ids.filter(function (id) { return typeof id === 'string' && id.indexOf('.') > 0 && i.states[id]; }).map(function (id) { return entry(id, i.states[id]); });
       var activity = 0, temp, hum, items;
       ents.forEach(function (e) { if (e.d === 'event') activity = Math.max(activity, when(e.s)); });
       ents.forEach(function (e) { var n = displayName(e, a.name); if (e.d === 'camera') cameras.push({ id: e.id, name: n === TT('Camera (device)') ? a.name : n, room: a.name, activity: activity, off: e.s === 'unavailable' }); });
+      ents.forEach(function (e) { if (e.s === 'unavailable' && !climateSensor(e) && e.d !== 'event') gone.push(String(e.n || e.id)); });
       // The first room with a reading supplies both, so temperature and humidity come from the same place.
       if (!indoor) {
         ents.forEach(function (e) { if (climateSensor(e) && numeric(e.s)) { if (e.c === 'temperature' && !temp) temp = e; if (e.c === 'humidity' && !hum) hum = e; } });
@@ -91,17 +120,19 @@
         p = p < 0 ? 99 : p; q = q < 0 ? 99 : q;
         return p - q || String(x.n).toLowerCase().localeCompare(String(y.n).toLowerCase());
       }).map(function (e) {
-        return { id: e.id, name: displayName(e, a.name), state: stateText(e), active: isActive(e), toggle: TOGGLE.indexOf(e.d) >= 0 && e.s !== 'unavailable', off: e.s === 'unavailable', lit: LIT.indexOf(e.d) >= 0 && e.s === 'on' };
+        return { id: e.id, name: displayName(e, a.name), room: a.name, state: stateText(e), active: isActive(e), toggle: TOGGLE.indexOf(e.d) >= 0 && e.s !== 'unavailable', off: e.s === 'unavailable', lit: LIT.indexOf(e.d) >= 0 && e.s === 'on', control: controlOf(e) };
       });
       if (items.length) rooms.push({ name: a.name, on: items.filter(function (x) { return x.lit; }).length, items: items });
     });
-    built = { status: i.status, error: i.error, configured: i.configured, url: i.url, at: i.at, areas: i.areas.map(function (a) { return a.name; }), selected: chosen.slice(), rooms: rooms, cameras: cameras, indoor: indoor };
+    built = { status: i.status, error: i.error, configured: i.configured, url: i.url, at: i.at, areas: i.areas.map(function (a) { return a.name; }), selected: chosen.slice(), rooms: rooms, cameras: cameras, indoor: indoor, unavailable: gone };
     return built;
   }
+  /* Drops changes still waiting to be sent. */
+  function flushless() { Object.keys(pending).forEach(function (k) { clearTimeout(pending[k].timer); }); pending = {}; }
   function changed() {
     var before = latest && latest.at;
     latest = null; built = null;
-    if (info().at !== before) overrides = {}; // fresh states replace the guesses made on OK
+    if (info().at !== before) Object.keys(overrides).forEach(function (id) { if (!(overrides[id].until > Date.now())) delete overrides[id]; }); // fresh states replace the guesses made on OK
     listeners.forEach(function (fn) { try { fn(); } catch (e) { } });
   }
   if (NATIVE) NATIVE.onChange(changed);
@@ -221,6 +252,15 @@
         if (s) s.s = domainOf(id) === 'lock' ? (s.s === 'locked' ? 'unlocked' : 'locked') : s.s === 'on' ? 'off' : 'on';
         later();
       },
+      call: function (id, service, d) {
+        var s = data.states[id];
+        calls.push(['call', id, service, d]);
+        if (!s) return;
+        if (service === 'turn_on') { s.s = 'on'; if (d.brightness_pct) s.b = d.brightness_pct; if (d.hs_color) { s.hs = d.hs_color; s.mode = 'hs'; } if (d.color_temp_kelvin) { s.k = d.color_temp_kelvin; s.mode = 'color_temp'; } }
+        if (service === 'set_temperature') s.tt = d.temperature;
+        if (service === 'set_hvac_mode') s.s = d.hvac_mode;
+        later();
+      },
       forget: function () { calls.push(['forget']); data.configured = false; later(); },
       camera: { start: function (id) { calls.push(['camera', id]); return 0; }, offer: function () { }, hangup: function () { } }
     };
@@ -232,7 +272,7 @@
     /* Called by main.js when the add-on is switched on (also at start, after Home has painted) and off. */
     start: function () { if (!src || running) return; running = true; src.enable(true); changed(); },
     /* force: tell the native side even when nothing runs here, so its saved switch matches Shore's after a restore. */
-    stop: function (force) { if (!src || !running && !force) return; hangup(); running = false; src.enable(false); overrides = {}; changed(); },
+    stop: function (force) { if (!src || !running && !force) return; hangup(); running = false; src.enable(false); overrides = {}; flushless(); changed(); },
     refresh: function () { if (running && src) src.refresh(); },
     model: model,
     /* "5 min ago" (English, for main.js to translate). */
@@ -241,8 +281,29 @@
     toggle: function (id) {
       var i = info(), s = i.states[id], d = domainOf(id);
       if (!running || !s || TOGGLE.indexOf(d) < 0 || s.s === 'unavailable') return false;
-      overrides[id] = { s: d === 'lock' ? (entry(id, s).s === 'locked' ? 'unlocked' : 'locked') : entry(id, s).s === 'on' ? 'off' : 'on' };
+      (overrides[id] || (overrides[id] = {})).s = d === 'lock' ? (entry(id, s).s === 'locked' ? 'unlocked' : 'locked') : entry(id, s).s === 'on' ? 'off' : 'on';
       built = null; src.toggle(id);
+      return true;
+    },
+    /* Brightness, colour, target or mode: shown at once, sent once the remote rests (a held Right sends one change).
+       service: turn_on (light) with {brightness_pct | hs_color | color_temp_kelvin}, set_temperature, set_hvac_mode;
+       guess: the state fields to show meanwhile ({s, b, hs, k, mode, tt}). */
+    set: function (id, service, data, guess) {
+      var i = info(), s = i.states[id], key = id + '|' + service, p, o;
+      if (!running || !s || !src || !src.call || !controlOf(entry(id, s))) return false;
+      o = overrides[id] || (overrides[id] = {});
+      Object.keys(guess || {}).forEach(function (k) { o[k] = guess[k]; });
+      o.until = Infinity; built = null;
+      p = pending[key] || (pending[key] = { data: {} });
+      // A colour replaces a white and the other way round; brightness stays alongside.
+      if (data.hs_color || data.color_temp_kelvin) { delete p.data.hs_color; delete p.data.color_temp_kelvin; }
+      Object.keys(data).forEach(function (k) { p.data[k] = data[k]; });
+      clearTimeout(p.timer);
+      p.timer = setTimeout(function () {
+        delete pending[key];
+        if (overrides[id]) overrides[id].until = Date.now() + 2500;
+        if (running && src && src.call) src.call(id, service, p.data);
+      }, 350);
       return true;
     },
     setAreas: function (names) { if (src) { src.areas(names); built = null; } },
@@ -257,6 +318,6 @@
       active: function () { return cam ? cam.id : ''; }
     },
     /* Browser checks only: replaces the Android data source with made-up areas and states. */
-    qa: function (fake) { hangup(); running = false; src = fake ? mock(fake) : NATIVE; latest = null; built = null; overrides = {}; changed(); }
+    qa: function (fake) { hangup(); running = false; src = fake ? mock(fake) : NATIVE; latest = null; built = null; overrides = {}; flushless(); changed(); }
   };
 }());

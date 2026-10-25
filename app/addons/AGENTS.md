@@ -57,12 +57,12 @@ Run `npm run check`, `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` and `npm 
 
 | Part | File |
 | --- | --- |
-| REST polling (areas through `/api/template`, `/api/states`), toggles, settings, WebRTC signalling relay | `android/app/src/main/java/app/cleanframe/tv/HomeAssistant.java` |
+| REST polling (areas through `/api/template`, `/api/states`), toggles, light/thermostat service calls (`call()`, an allowlist of services and fields), settings, WebRTC signalling relay | `android/app/src/main/java/app/cleanframe/tv/HomeAssistant.java` |
 | Minimal WebSocket client for the signalling | `android/.../HaSocket.java` |
 | Bridge methods `ha*`, events `CleanFrameHAChanged` / `CleanFrameHACamera` | `DeviceBridge.java`, `MainActivity.java`, `app/device-android.js` |
 | Address and token entry (`POST /api/ha`, `/api/ha/clear`) | `Companion.java`, `assets-android/companion/` |
 | Rooms, chip states, indoor reading, camera player, test mock | `app/addons/homeassistant.js` |
-| Settings › Add-ons, the Smart home control, panel, live view, caption | `app/main.js` (sections "Add-ons" and "Home Assistant add-on"), `app/style.css` |
+| Settings › Add-ons, the Smart home control, panel, light/thermostat controls (`V.hactl`, long OK), live view, caption | `app/main.js` (sections "Add-ons" and "Home Assistant add-on"), `app/style.css` |
 | Cleartext http for LAN servers; token excluded from backups | `res/xml/network_security_config.xml`, `backup_rules.xml`, `data_extraction_rules.xml` |
 | Browser checks | `scripts/check-browser.mjs`, "Home Assistant add-on…" |
 

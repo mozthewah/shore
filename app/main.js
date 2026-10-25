@@ -150,6 +150,7 @@
     lyrics: '<path d="M4.5 6h11M4.5 10.5h11M4.5 15h6"/><path d="M15.5 19v-6.5l4-1"/><circle cx="14" cy="19" r="1.6"/>',
     open: '<path d="M14 4.5h5.5V10"/><path d="m19.5 4.5-8 8"/><path d="M17 13.5v4.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 5 18V9a1.5 1.5 0 0 1 1.5-1.5H11"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
+    minus: '<path d="M5 12h14"/>',
     music: '<path d="M9 17.5V6l10-2v11.5"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/>',
     left: '<path d="m14.5 5-7 7 7 7"/>',
     right: '<path d="m9.5 5 7 7-7 7"/>',
@@ -869,6 +870,10 @@
     if (t.id !== 'home') return '';
     if (t.f.zone === 'input' && inputRow()) return LIVE[t.f.n] || '';
     return t.f.zone === 'apps' && S.sel && (S.c.home.indexOf(S.sel) >= 0 || LIVE.indexOf(S.sel) >= 0) ? S.sel : '';
+  }
+  function holdAction() {
+    var id = quickTarget(), item = haHeld();
+    return id ? function () { openQuick(id); } : item ? function () { openHaControl(item); } : null;
   }
   function openQuick(id) {
     var a = app(id);
@@ -1698,7 +1703,7 @@
     addonsSynced = true;
     if (want === HA.running() && !(first && !want && !DREAM)) return;
     if (want) HA.start();
-    else { HA.stop(first); while (top().id === 'ha' || top().id === 'hacam') pop(); }
+    else { HA.stop(first); while (top().id === 'ha' || top().id === 'hacam' || top().id === 'hactl') pop(); }
   }
 
   /* ---------- Home Assistant add-on: a Smart home control on Home opens rooms and cameras (addons/homeassistant.js) ---------- */
@@ -1758,6 +1763,7 @@
   function haItem(t, L) { var line = L.lines[t.f.l]; return t.f.zone === 'rooms' && line ? line.items[t.f.i] || null : null; }
   function haToggle(item) {
     if (!item) return;
+    if (!item.toggle && item.control) { openHaControl(item); return; }
     if (!item.toggle) { S.note = item.off ? 'Unavailable' : 'Shore switches lights, switches, fans and locks.'; return; }
     S.note = null; HA.toggle(item.id);
   }
@@ -1811,6 +1817,119 @@
     key: function (t, k) { if (k === 'back' || k === 'ok') closeHaCam(); },
     point: function (t, z) { if (z === 'hacam-close') closeHaCam(); }
   };
+  /* ---------- Smart home controls: a long OK on a light, or OK on a thermostat ----------
+     A sheet of rows: a light's power, brightness and colour; a thermostat's target and mode. Left and Right
+     adjust brightness and the target at once (sent when the remote rests); colours and modes apply on OK. */
+  var HC_WHITES = [['Warm white', 2700, '#ffbf7a'], ['Soft white', 3500, '#ffd6a8'], ['Daylight', 5000, '#fff0dc'], ['Cool white', 6500, '#e4ecff']];
+  var HC_HUES = [['Red', 0], ['Orange', 28], ['Yellow', 50], ['Green', 125], ['Teal', 175], ['Blue', 225], ['Purple', 275], ['Pink', 325]];
+  var HC_MODES = { off: 'Off', heat: 'Heat', cool: 'Cool', heat_cool: 'Heat and cool', auto: 'Auto', dry: 'Dry', fan_only: 'Fan only' };
+  function TT(key) { var w = T(key); return w === key ? key.replace(/ \(.*\)$/, '') : w; }
+  function haHeld() {
+    var t = top(), item;
+    if (t.id !== 'ha') return null;
+    item = haItem(t, haLayout());
+    return item && item.control ? item : null;
+  }
+  function haFind(id) {
+    var found = null;
+    if (HA && HA.running()) HA.model().rooms.forEach(function (r) { r.items.forEach(function (it) { if (it.id === id) found = it; }); });
+    return found;
+  }
+  function openHaControl(item) {
+    if (!item || !item.control || top().id !== 'ha') return;
+    var t = { id: 'hactl', item: item.id, mode: item.control.kind, f: { zone: '', s: 0, m: 0 } }, c = item.control;
+    S.note = null;
+    t.f.s = Math.max(0, hcCurrent(c));
+    t.f.m = Math.max(0, c.kind === 'climate' ? c.modes.indexOf(c.mode) : 0);
+    push(t); norm(); render();
+  }
+  /* Swatches a light offers: whites within its range, then colours. [label, css, {hs_color|color_temp_kelvin}, guess] */
+  function hcSwatches(c) {
+    var out = [];
+    if (c.temp) HC_WHITES.forEach(function (w) {
+      var k = clamp(w[1], c.kmin, c.kmax);
+      if (!out.some(function (o) { return o[2].color_temp_kelvin === k; })) out.push([w[0], w[2], { color_temp_kelvin: k }, { mode: 'color_temp', k: k }]);
+    });
+    if (c.color) HC_HUES.forEach(function (h) { out.push([h[0], 'hsl(' + h[1] + ',92%,60%)', { hs_color: [h[1], 90] }, { mode: 'hs', hs: [h[1], 90] }]); });
+    return out;
+  }
+  /* The swatch nearest to the light's colour now, or -1. */
+  function hcCurrent(c) {
+    var list = c.kind === 'light' ? hcSwatches(c) : [], best = -1, gap = Infinity;
+    list.forEach(function (w, i) {
+      var d = w[2].color_temp_kelvin ? (c.mode === 'color_temp' && c.k ? Math.abs(c.k - w[2].color_temp_kelvin) / 40 : Infinity)
+        : c.hs && c.hs[1] > 25 && c.mode !== 'color_temp' ? Math.min(Math.abs(c.hs[0] - w[2].hs_color[0]), 360 - Math.abs(c.hs[0] - w[2].hs_color[0])) : Infinity;
+      if (d < gap) { gap = d; best = i; }
+    });
+    return best;
+  }
+  function hcRows(c) {
+    if (c.kind === 'light') return ['power', 'bright'].concat(c.color || c.temp ? ['color'] : []);
+    return (c.target !== null || c.lo !== null && c.hi !== null ? ['target'] : []).concat(c.modes.length ? ['modes'] : []);
+  }
+  function hcStep(item, dir) {
+    var c = item.control, v;
+    if (c.kind === 'light') {
+      v = c.on && c.b !== null ? c.b : 0;
+      v = dir > 0 ? Math.min(100, Math.floor(v / 10) * 10 + 10) : Math.max(1, Math.ceil(v / 10) * 10 - 10);
+      HA.set(item.id, 'turn_on', { brightness_pct: v }, { s: 'on', b: v });
+      return;
+    }
+    if (c.target === null) { S.note = 'Set the range in Home Assistant'; return; }
+    v = clamp(Math.round((c.target + dir * c.step) / c.step) * c.step, c.min, c.max);
+    v = Math.round(v * 10) / 10;
+    if (v !== c.target) HA.set(item.id, 'set_temperature', { temperature: v }, { tt: v });
+  }
+  var HC_ACTIONS = { heating: 'Heating', cooling: 'Cooling', drying: 'Drying', fan: 'Fan', preheating: 'Preheating', defrosting: 'Defrosting' };
+  function cap(s) { s = String(s).replace(/_/g, ' '); return s.charAt(0).toUpperCase() + s.slice(1); }
+  function haDegrees(v) { return v === null ? '–' : String(Math.abs(v) >= 100 || v % 1 === 0 ? Math.round(v) : v.toFixed(1)) + '°'; }
+  V.hactl = {
+    sheet: true,
+    norm: function (t) {
+      var item = haFind(t.item), rows;
+      if (!item || !item.control || item.control.kind !== t.mode) { t.gone = true; return; }
+      rows = hcRows(item.control);
+      if (rows.indexOf(t.f.zone) < 0) t.f.zone = rows[0] || '';
+      t.f.s = clamp(t.f.s, 0, Math.max(0, hcSwatches(item.control).length - 1));
+      t.f.m = clamp(t.f.m, 0, Math.max(0, item.control.modes ? item.control.modes.length - 1 : 0));
+    },
+    key: function (t, k) {
+      var item = haFind(t.item), c = item && item.control, f = t.f, rows, r, sw;
+      if (k === 'back' || !c || t.gone) { pop(); return; }
+      rows = hcRows(c); r = rows.indexOf(f.zone);
+      if (k !== 'ok') S.note = null;
+      if (k === 'up') { if (r > 0) f.zone = rows[r - 1]; return; }
+      if (k === 'down') { if (r < rows.length - 1) f.zone = rows[r + 1]; return; }
+      if (f.zone === 'bright' || f.zone === 'target') { if (k === 'left' || k === 'right') hcStep(item, k === 'right' ? 1 : -1); return; }
+      if (f.zone === 'power') { if (k === 'ok') HA.toggle(item.id); return; }
+      if (f.zone === 'color') {
+        sw = hcSwatches(c);
+        if (k === 'left' && f.s > 0) f.s--;
+        else if (k === 'right' && f.s < sw.length - 1) f.s++;
+        else if (k === 'ok' && sw[f.s]) { sw[f.s][3].s = 'on'; HA.set(item.id, 'turn_on', sw[f.s][2], sw[f.s][3]); }
+        return;
+      }
+      if (f.zone === 'modes') {
+        if (k === 'left' && f.m > 0) f.m--;
+        else if (k === 'right' && f.m < c.modes.length - 1) f.m++;
+        else if (k === 'ok' && c.modes[f.m]) HA.set(item.id, 'set_hvac_mode', { hvac_mode: c.modes[f.m] }, { s: c.modes[f.m] });
+      }
+    },
+    point: function (t, z, i) {
+      if (z === 'hcpower') { t.f.zone = 'power'; this.key(t, 'ok'); }
+      else if (z === 'hcbright') t.f.zone = 'bright';
+      else if (z === 'hctemp') t.f.zone = 'target';
+      else if (z === 'hcstep') { t.f.zone = top().mode === 'light' ? 'bright' : 'target'; this.key(t, i ? 'right' : 'left'); }
+      else if (z === 'hcsw') { t.f.zone = 'color'; t.f.s = i; this.key(t, 'ok'); }
+      else if (z === 'hcmode') { t.f.zone = 'modes'; t.f.m = i; this.key(t, 'ok'); }
+    }
+  };
+  /* " · Kitchen Strip unavailable" after the lights line: up to two names, then a count. */
+  function haGone(m) {
+    var g = m.unavailable || [];
+    if (!g.length) return '';
+    return ' · ' + (g.length > 2 ? esc(g.length + ' unavailable') : escRaw(g.join(', ')) + ' ' + esc('unavailable'));
+  }
   function haCamError(msg) {
     return msg === 'auth' ? 'Home Assistant refused the token' : msg === 'unsupported' ? 'This camera doesn’t offer live video here'
       : msg === 'webrtc' ? 'This TV can’t play this camera' : msg === 'timeout' ? 'No live video' : msg === 'unavailable' ? 'The camera is unavailable' : 'The camera stopped';
@@ -1818,7 +1937,10 @@
   if (HA) HA.onChange(function () {
     // New states arrive while Home, the panel or Settings may show them. Later, never inside render().
     clearTimeout(haTimer);
-    haTimer = setTimeout(function () { var t = top(); haTimer = 0; if (t.id === 'home' || t.id === 'ha' || t.id === 'hacam' || t.id === 'settings' || isSettingsDetail(t)) { norm(); render(); } }, 0);
+    haTimer = setTimeout(function () {
+      var t = top(), it; haTimer = 0;
+      if (t.id === 'hactl') { it = haFind(t.item); if (!it || !it.control || it.control.kind !== t.mode) { pop(); t = top(); } } // gone or unavailable: back to the panel
+      if (t.id === 'home' || t.id === 'ha' || t.id === 'hacam' || t.id === 'hactl' || t.id === 'settings' || isSettingsDetail(t)) { norm(); render(); } }, 0);
   });
   /* ---------- Updates: the native side checks the public releases and opens Android's installer ---------- */
   var UPDATE = ANDROID && FrameDevice.update ? FrameDevice.update : null;
@@ -3198,6 +3320,23 @@
         + '<div class="row-cue ha-before" data-slot="before" aria-hidden="true">' + icon('up') + '</div><div class="row-cue ha-after" data-slot="after" aria-hidden="true">' + icon('down') + '</div>'
         + '<p class="settings-overview-hint ha-hint" data-slot="hint"></p>';
     },
+    hactl: function (t) {
+      var light = t.mode === 'light';
+      return '<h2 class="s-title" data-slot="title"></h2><p class="s-sub" data-slot="sub"></p>'
+        + (light
+          ? '<div class="hc-row hc-power" data-slot="power"></div>'
+            + '<div class="hc-row hc-bright" data-slot="brow"><p class="hc-label"><span>' + esc('Brightness') + '</span><span class="hc-value" data-slot="bval"></span></p>'
+            + '<div class="hc-slider" data-slot="bar"><button type="button" tabindex="-1" class="hc-nudge" data-z="hcstep" data-i="0" aria-label="' + esc('Dimmer') + '">' + icon('left') + '</button>'
+            + '<div class="hc-track"><div class="hc-fill" data-slot="fill"></div><div class="hc-knob" data-slot="knob"></div></div>'
+            + '<button type="button" tabindex="-1" class="hc-nudge" data-z="hcstep" data-i="1" aria-label="' + esc('Brighter') + '">' + icon('right') + '</button></div></div>'
+            + '<div class="hc-row hc-colors" data-slot="crow"><p class="hc-label"><span>' + esc('Colour') + '</span><span class="hc-value" data-slot="cval"></span></p><div class="hc-swatches" data-slot="swatches"></div></div>'
+          : '<div class="hc-row hc-target" data-slot="trow"><p class="hc-label"><span>' + esc('Target temperature') + '</span></p>'
+            + '<div class="hc-dial"><button type="button" tabindex="-1" class="hc-nudge hc-round" data-z="hcstep" data-i="0" aria-label="' + esc('Cooler') + '">' + icon('minus') + '</button>'
+            + '<span class="hc-temp" data-slot="temp"></span><button type="button" tabindex="-1" class="hc-nudge hc-round" data-z="hcstep" data-i="1" aria-label="' + esc('Warmer') + '">' + icon('plus') + '</button></div>'
+            + '<p class="hc-now" data-slot="now"></p></div>'
+            + '<div class="hc-row hc-modes" data-slot="mrow"><p class="hc-label"><span>' + esc('Mode') + '</span></p><div class="hc-pills" data-slot="modes"></div></div>')
+        + '<p class="settings-overview-hint hc-hint" data-slot="hint"></p>';
+    },
     hacam: function () {
       return '<div class="ha-live"><img class="ha-live-still" data-slot="still" alt=""><video class="ha-live-video" data-slot="video" muted playsinline autoplay></video></div><div class="ha-live-shade" aria-hidden="true"></div>'
         + '<p class="ha-live-badge" data-slot="badge"></p><h2 class="ha-live-title" data-slot="title"></h2><p class="ha-live-state" data-slot="state"></p>'
@@ -3271,7 +3410,7 @@
       // Scrolling stops at the start of a row (a room name or a line of chips), so no row is left half out of view and hidden.
       function rowStart(at) { var best = 0; L.heads.concat(L.lines).forEach(function (r) { if (r.y >= at && (!best || r.y < best)) best = r.y; }); return at <= 0 ? 0 : best || at; }
       m.rooms.forEach(function (r) { lit += r.on; });
-      setHTML(el.sub, S.note ? esc(S.note) : m.status === 'ok' ? esc(lit === 1 ? '1 light on' : lit ? lit + ' lights on' : 'All lights off') : esc(haStatus()));
+      setHTML(el.sub, S.note ? esc(S.note) : m.status === 'ok' ? esc(lit === 1 ? '1 light on' : lit ? lit + ' lights on' : 'All lights off') + haGone(m) : esc(haStatus()));
       setHTML(el.head, headButtons([['settings', 'Settings', '', 'settings']], f.zone === 'head' ? 0 : -1, 'ha'));
       el.head.className = 's-head' + (f.zone === 'head' ? ' is-awake' : '');
       // The focused line stays in view, with its room's name when it is the room's first line.
@@ -3317,8 +3456,52 @@
       setHTML(el.empty, L.lines.length || cams.length ? '' : '<p>' + esc(!m.configured ? 'Connect Home Assistant from your phone: Settings › Add-ons › Home Assistant.' : m.status === 'ok' ? 'No devices in the rooms you chose. In Home Assistant, give your devices an area.' : haStatus()) + '</p>');
       el.before.className = 'row-cue ha-before' + (t.top > 0 ? ' is-on' : '');
       el.after.className = 'row-cue ha-after' + (L.height > t.top + HA_VIEW ? ' is-on' : '');
-      hint = f.zone === 'head' ? 'Open Home Assistant settings' : f.zone === 'cams' ? 'Watch live' : !item ? '' : !item.toggle ? '' : /^lock\./.test(item.id) ? (item.active ? 'Unlock' : 'Lock') : item.active ? 'Switch off' : 'Switch on';
-      setHTML(el.hint, hint ? '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>' : '');
+      hint = f.zone === 'head' ? 'Open Home Assistant settings' : f.zone === 'cams' ? 'Watch live' : !item ? '' : !item.toggle ? (item.control ? 'Temperature and mode' : '') : /^lock\./.test(item.id) ? (item.active ? 'Unlock' : 'Lock') : item.active ? 'Switch off' : 'Switch on';
+      setHTML(el.hint, (hint ? '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>' : '')
+        + (item && item.toggle && item.control ? '<span class="remote-key hc-hold">' + esc('Hold OK') + '</span><span>' + esc(item.control.color || item.control.temp ? 'Brightness and colour' : 'Brightness') + '</span>' : ''));
+    },
+    hactl: function (t, el) {
+      var item = haFind(t.item), c = item && item.control, f = t.f, hint = '', sw, cur, b, on;
+      if (!c || c.kind !== t.mode) return;
+      setHTML(el.title, escRaw(item.name));
+      setHTML(el.sub, S.note ? esc(S.note) : escRaw(item.room) + ' · ' + esc(item.state));
+      if (c.kind === 'light') {
+        on = c.on; b = on ? (c.b === null ? 100 : c.b) : 0;
+        setHTML(el.power, '<p class="hc-label"><span>' + esc('Power') + '</span></p><button type="button" tabindex="-1" class="hc-switch' + (on ? ' is-on' : '') + (f.zone === 'power' ? ' is-focus' : '')
+          + '" data-z="hcpower" data-i="0" data-action="hactl.power" aria-label="' + esc(on ? 'Switch off' : 'Switch on') + '"><span class="hc-switch-knob"></span><span class="hc-switch-word">' + esc(TT(on ? 'On (light)' : 'Off (light)')) + '</span></button>');
+        el.power.className = 'hc-row hc-power' + (f.zone === 'power' ? ' is-on' : '');
+        setHTML(el.bval, on ? b + '%' : esc(TT('Off (light)')));
+        el.fill.style.transform = 'scaleX(' + (b / 100).toFixed(3) + ')';
+        el.knob.style.transform = 'translate3d(' + Math.round(b / 100 * 1180) + 'px,0,0)';
+        el.bar.className = 'hc-slider' + (f.zone === 'bright' ? ' is-focus' : '') + (on ? '' : ' is-dark');
+        attrs(el.bar, 'hcbright', 0, 'hactl.brightness'); el.bar.setAttribute('aria-label', T('Brightness') + ', ' + b + '%');
+        el.brow.className = 'hc-row hc-bright' + (f.zone === 'bright' ? ' is-on' : '');
+        sw = hcSwatches(c); cur = on ? hcCurrent(c) : -1;
+        el.crow.style.display = sw.length ? '' : 'none';
+        el.crow.className = 'hc-row hc-colors' + (f.zone === 'color' ? ' is-on' : '');
+        setHTML(el.cval, sw[f.s] && f.zone === 'color' ? esc(sw[f.s][0]) : cur >= 0 ? esc(sw[cur][0]) : '');
+        setHTML(el.swatches, sw.map(function (w, i) {
+          return '<button type="button" tabindex="-1" class="hc-sw' + (i === cur ? ' is-current' : '') + (f.zone === 'color' && f.s === i ? ' is-focus' : '') + '" data-z="hcsw" data-i="' + i + '" data-action="hactl.color.' + i + '" aria-label="' + esc(w[0]) + '">'
+            + '<span class="hc-dot" style="background:' + w[1] + '"></span>' + (i === cur ? icon('check', 'hc-tick') : '') + '</button>';
+        }).join(''));
+        hint = f.zone === 'power' ? (on ? 'Switch off' : 'Switch on') : f.zone === 'bright' ? 'Left and right change the brightness' : 'Set this colour';
+        setHTML(el.hint, f.zone === 'bright' ? '<span>' + esc(hint) + '</span>' : '<span class="remote-key">OK</span><span>' + esc(hint) + '</span>');
+        return;
+      }
+      setHTML(el.temp, c.target !== null ? esc(haDegrees(c.target)) : c.lo !== null && c.hi !== null ? esc(haDegrees(c.lo) + ' – ' + haDegrees(c.hi)) : '–');
+      el.temp.className = 'hc-temp' + (f.zone === 'target' ? ' is-focus' : '') + (c.target === null ? ' is-range' : '');
+      attrs(el.temp, 'hctemp', 0, 'hactl.target'); el.temp.setAttribute('aria-label', T('Target temperature') + ', ' + (c.target === null ? '' : haDegrees(c.target)));
+      el.trow.style.display = hcRows(c).indexOf('target') >= 0 ? '' : 'none';
+      el.trow.className = 'hc-row hc-target' + (f.zone === 'target' ? ' is-on' : '');
+      setHTML(el.now, c.now !== null ? esc('Now ' + haDegrees(c.now)) + (c.action && c.action !== 'off' && c.action !== 'idle' ? ' · ' + esc(TT(HC_ACTIONS[c.action] || cap(c.action))) : '') : '');
+      el.mrow.style.display = c.modes.length ? '' : 'none';
+      el.mrow.className = 'hc-row hc-modes' + (f.zone === 'modes' ? ' is-on' : '');
+      setHTML(el.modes, c.modes.map(function (m, i) {
+        return '<button type="button" tabindex="-1" class="hc-pill' + (m === c.mode ? ' is-current' : '') + (f.zone === 'modes' && f.m === i ? ' is-focus' : '') + '" data-z="hcmode" data-i="' + i + '" data-action="hactl.mode.' + escRaw(m) + '">'
+          + (m === c.mode ? icon('check') : '') + '<span>' + esc(HC_MODES[m] || cap(m)) + '</span></button>';
+      }).join(''));
+      hint = f.zone === 'target' ? (c.target === null ? 'Set the range in Home Assistant' : 'Left and right change the temperature') : '';
+      setHTML(el.hint, f.zone === 'modes' ? '<span class="remote-key">OK</span><span>' + esc('Use this mode') + '</span>' : hint ? '<span>' + esc(hint) + '</span>' : '');
     },
     hacam: function (t, el) {
       var c = t.cam, still = HA.camera.still(c.id);
@@ -3727,8 +3910,9 @@
     if (S.idleHidden) { idleReset(); return; } // the first press only brings the controls back
     idleReset();
     if (k === 'ok' || k === 'back') { if (ev.repeat || heldKeys[code]) return; heldKeys[code] = true; }
-    // On a Home app tile, OK acts on release: held for LONG_OK it opens the tile's quick actions instead.
-    if (k === 'ok' && quickTarget()) { var id = quickTarget(); clearTimeout(longOk.timer); longOk = { code: code, timer: setTimeout(function () { longOk.timer = 0; openQuick(id); }, LONG_OK) }; return; }
+    // On a Home app tile or an adjustable Smart home chip, OK acts on release: held for LONG_OK it opens the tile's quick actions or the chip's controls instead.
+    var held = k === 'ok' && holdAction();
+    if (held) { clearTimeout(longOk.timer); longOk = { code: code, timer: setTimeout(function () { longOk.timer = 0; held(); }, LONG_OK) }; return; }
     press(k);
   });
   document.addEventListener('keyup', function (ev) {

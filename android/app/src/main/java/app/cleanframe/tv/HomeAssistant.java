@@ -76,7 +76,10 @@ final class HomeAssistant {
     String url() { return prefs.getString("url", ""); }
     private String token() { return prefs.getString("token", ""); }
 
-    /** What the page shows: {configured, enabled, url, status, error, at, areas:[{name, ids}], selected, states:{id: {s, n, u, c, t}}}. */
+    /**
+     * What the page shows: {configured, enabled, url, status, error, at, areas:[{name, ids}], selected, states:{id: {s, n, u, c, t, ...}}}.
+     * Lights add b, cm, hs, k, kmin, kmax, mode; thermostats add tt, tlo, thi, tmin, tmax, ts, hm, act.
+     */
     String info() {
         try {
             return new JSONObject().put("configured", configured()).put("enabled", enabled()).put("url", url())
@@ -168,6 +171,46 @@ final class HomeAssistant {
         });
     }
 
+    /**
+     * Light brightness and colour, thermostat target and mode. Only these services, and only these fields
+     * with values in range, reach Home Assistant: light.turn_on {brightness_pct, hs_color, color_temp_kelvin},
+     * climate.set_temperature {temperature} and climate.set_hvac_mode {hvac_mode}.
+     */
+    void call(String entity, String service, String json) {
+        if (entity == null || service == null || !entity.matches("(light|climate)\\.[A-Za-z0-9_]{1,200}") || !enabled() || !configured()) return;
+        String domain = entity.substring(0, entity.indexOf('.'));
+        JSONObject now = states.optJSONObject(entity);
+        if (now == null || "unavailable".equals(now.optString("s"))) return;
+        JSONObject in, out = new JSONObject();
+        try {
+            in = new JSONObject(json == null || json.length() > 2000 ? "{}" : json);
+            out.put("entity_id", entity);
+            if (domain.equals("light") && service.equals("turn_on")) {
+                if (in.has("brightness_pct")) out.put("brightness_pct", Math.max(1, Math.min(100, in.getInt("brightness_pct"))));
+                JSONArray hs = in.optJSONArray("hs_color");
+                if (hs != null && hs.length() == 2) out.put("hs_color", new JSONArray().put(Math.max(0, Math.min(360, hs.getDouble(0)))).put(Math.max(0, Math.min(100, hs.getDouble(1)))));
+                else if (in.has("color_temp_kelvin")) out.put("color_temp_kelvin", Math.max(1000, Math.min(12000, in.getInt("color_temp_kelvin"))));
+            } else if (domain.equals("climate") && service.equals("set_temperature")) {
+                double t = in.getDouble("temperature");
+                if (Double.isNaN(t) || t < -50 || t > 150) return;
+                out.put("temperature", t);
+            } else if (domain.equals("climate") && service.equals("set_hvac_mode")) {
+                String mode = in.optString("hvac_mode");
+                JSONArray offered = now.optJSONArray("hm");
+                boolean ok = false;
+                for (int i = 0; offered != null && i < offered.length(); i++) ok |= mode.equals(offered.optString(i));
+                if (!ok) return;
+                out.put("hvac_mode", mode);
+            } else return;
+        } catch (Exception e) { return; }
+        final String base = url(), key = token(), body = out.toString();
+        worker.execute(() -> {
+            try { request(base, key, "/api/services/" + domain + "/" + service, body); }
+            catch (Exception ignored) { }
+            worker.schedule(this::poll, 600, TimeUnit.MILLISECONDS);
+        });
+    }
+
     // ---------- Polling ----------
 
     private synchronized void schedule() {
@@ -204,6 +247,8 @@ final class HomeAssistant {
                 if (!a.optString("unit_of_measurement").isEmpty()) e.put("u", clip(a.optString("unit_of_measurement"), 16));
                 if (!a.optString("device_class").isEmpty()) e.put("c", clip(a.optString("device_class"), 40));
                 if (a.has("current_temperature") && !a.isNull("current_temperature")) e.put("t", a.optDouble("current_temperature"));
+                if (id.startsWith("light.")) lightAttributes(a, e);
+                else if (id.startsWith("climate.")) climateAttributes(a, e);
                 out.put(id, e);
             }
             areas = found; states = out; at = System.currentTimeMillis(); status = "ok"; error = "";
@@ -213,6 +258,34 @@ final class HomeAssistant {
             status = "error"; error = "server";
         } finally { busy = false; }
         notifyChanged();
+    }
+
+    /** Light controls: brightness (0-100), colour modes, hue/saturation and colour temperature with its range. */
+    private static void lightAttributes(JSONObject a, JSONObject e) throws Exception {
+        JSONArray modes = a.optJSONArray("supported_color_modes"), cm = new JSONArray();
+        for (int i = 0; modes != null && i < modes.length() && i < 12; i++) cm.put(clip(modes.optString(i), 20));
+        e.put("cm", cm);
+        if (!a.isNull("brightness") && a.has("brightness")) e.put("b", Math.round(a.optDouble("brightness") * 100 / 255));
+        JSONArray hs = a.optJSONArray("hs_color");
+        if (hs != null && hs.length() == 2) e.put("hs", new JSONArray().put(hs.optDouble(0)).put(hs.optDouble(1)));
+        if (!a.isNull("color_temp_kelvin") && a.has("color_temp_kelvin")) e.put("k", a.optInt("color_temp_kelvin"));
+        if (a.has("min_color_temp_kelvin")) e.put("kmin", a.optInt("min_color_temp_kelvin"));
+        if (a.has("max_color_temp_kelvin")) e.put("kmax", a.optInt("max_color_temp_kelvin"));
+        if (!a.optString("color_mode").isEmpty()) e.put("mode", clip(a.optString("color_mode"), 20));
+    }
+
+    /** Thermostat controls: target (or low/high range), its limits and step, and the modes it offers. */
+    private static void climateAttributes(JSONObject a, JSONObject e) throws Exception {
+        if (a.has("temperature") && !a.isNull("temperature")) e.put("tt", a.optDouble("temperature"));
+        if (a.has("target_temp_low") && !a.isNull("target_temp_low")) e.put("tlo", a.optDouble("target_temp_low"));
+        if (a.has("target_temp_high") && !a.isNull("target_temp_high")) e.put("thi", a.optDouble("target_temp_high"));
+        if (a.has("min_temp")) e.put("tmin", a.optDouble("min_temp"));
+        if (a.has("max_temp")) e.put("tmax", a.optDouble("max_temp"));
+        if (a.has("target_temp_step")) e.put("ts", a.optDouble("target_temp_step"));
+        JSONArray modes = a.optJSONArray("hvac_modes"), hm = new JSONArray();
+        for (int i = 0; modes != null && i < modes.length() && i < 12; i++) hm.put(clip(modes.optString(i), 20));
+        e.put("hm", hm);
+        if (!a.optString("hvac_action").isEmpty()) e.put("act", clip(a.optString("hvac_action"), 20));
     }
 
     private static String clip(String s, int max) { return s.length() <= max ? s : s.substring(0, max); }
