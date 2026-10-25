@@ -899,14 +899,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .setting-glyph{position:relative;flex:0 0 56px;width:56px;height:40px;margin-right:4px;color:currentColor}
 .setting-glyph .mark{position:absolute;left:0;top:0}
 /* ---------- Home Assistant add-on: Smart home panel and camera live view (addons/homeassistant.js) ---------- */
-.view-ha{--ha-on:#f3c56f}
-.bg-light .view-ha{--ha-on:#8a5a00}
-.ha-rooms{position:absolute;left:112px;top:232px;width:1136px;height:720px;overflow:hidden}
-.ha-rooms.is-wide{width:1696px}
-.ha-rooms-in{position:absolute;left:0;top:0;width:100%;transition:transform 220ms var(--ease);will-change:transform}
-.ha-head{position:absolute;left:0;top:0;height:64px;display:flex;align-items:baseline;gap:20px;padding:10px 0 0 4px;white-space:nowrap}
-.ha-room{font-size:34px;line-height:44px;font-weight:600;letter-spacing:-.5px}
-.ha-lit{font-size:24px;line-height:44px;font-weight:600;color:var(--ha-on)}
+.view-ha{--ha-on:#f3c56f;--ha-frame:rgba(246,241,231,.22)}
+.bg-light .view-ha{--ha-on:#8a5a00;--ha-frame:rgba(29,26,22,.18)}
+/* 12px of room around the chips for the room outline. */
+.ha-rooms{position:absolute;left:100px;top:220px;width:1160px;height:744px;overflow:hidden}
+.ha-rooms.is-wide{width:1720px}
+.ha-rooms-in{position:absolute;left:12px;top:12px;width:100%;transition:transform 220ms var(--ease);will-change:transform}
+.ha-frame{position:absolute;left:0;top:0;border:2px solid var(--ha-frame);border-radius:30px;box-sizing:border-box;opacity:0;pointer-events:none;transition:opacity 160ms linear}
+.ha-frame.is-on{opacity:1}
+.ha-head{position:absolute;left:0;top:0;height:64px;box-sizing:border-box;display:flex;align-items:baseline;gap:16px;padding:10px 0 0 4px;white-space:nowrap}
+.ha-room{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:34px;line-height:44px;font-weight:600;letter-spacing:-.5px}
+.ha-lit{flex:none;font-size:24px;line-height:44px;font-weight:600;color:var(--ha-on)}
 .ha-chip{position:absolute;left:0;top:0;width:268px;height:112px;border-radius:24px;opacity:.82;transition:background-color 140ms linear,opacity 140ms linear}
 .ha-chip.is-focus{opacity:1;background:var(--plate);box-shadow:var(--plate-edge)}
 .ha-chip.is-off{opacity:.42}

@@ -1748,16 +1748,40 @@
     HA.setAreas(list.length === m.areas.length ? [] : list);
   }
   /* The panel: rooms in rows of chips on the left, cameras in a column on the right. Positions are fixed on the
-     1920 x 1080 stage, so chips and cards slide with transforms only. */
+     1920 x 1080 stage, so chips and cards slide with transforms only. Rooms with a line or less of devices share a
+     row, side by side on the chip grid, while they fit; a bigger room takes whole rows. Each chip keeps its column
+     (slot), so Up and Down go to the nearest chip above or below. */
   var HA_HEAD = 64, HA_LINE = 128, HA_GAP = 28, HA_PITCH = 284, HA_VIEW = 720, HA_CAM = 376, HA_CAM_VIEW = 720;
   function haLayout() {
-    var m = HA.model(), per = m.cameras.length ? 4 : 6, lines = [], heads = [], y = 0;
-    m.rooms.forEach(function (room, r) {
-      heads.push({ key: 'room:' + room.name, room: room, y: y }); y += HA_HEAD;
-      for (var i = 0; i < room.items.length; i += per) { lines.push({ room: r, first: i === 0, y: y, items: room.items.slice(i, i + per) }); y += HA_LINE; }
+    var m = HA.model(), per = m.cameras.length ? 4 : 6, lines = [], heads = [], y = 0, open = null;
+    function close() { if (open) { y += HA_HEAD + HA_LINE + HA_GAP; open = null; } }
+    m.rooms.forEach(function (room) {
+      var n = room.items.length, i, j, line;
+      if (n <= per) {
+        if (open && open.used + n > per) close();
+        if (!open) { open = { used: 0, line: { first: true, y: y + HA_HEAD, items: [], slots: [], rooms: [] } }; lines.push(open.line); }
+        heads.push({ key: 'room:' + room.name, room: room, y: y, slot: open.used, width: n, lines: 1 });
+        for (j = 0; j < n; j++) { open.line.items.push(room.items[j]); open.line.slots.push(open.used + j); open.line.rooms.push(heads.length - 1); }
+        open.used += n;
+        return;
+      }
+      close();
+      heads.push({ key: 'room:' + room.name, room: room, y: y, slot: 0, width: per, lines: Math.ceil(n / per) }); y += HA_HEAD;
+      for (i = 0; i < n; i += per) {
+        line = { first: i === 0, y: y, items: room.items.slice(i, i + per), slots: [], rooms: [] };
+        for (j = 0; j < line.items.length; j++) { line.slots.push(j); line.rooms.push(heads.length - 1); }
+        lines.push(line); y += HA_LINE;
+      }
       y += HA_GAP;
     });
+    close();
     return { m: m, lines: lines, heads: heads, height: Math.max(0, y - HA_GAP) };
+  }
+  /* The chip in a line nearest to a column. */
+  function haNearest(line, slot) {
+    var best = 0;
+    line.slots.forEach(function (s, i) { if (Math.abs(s - slot) < Math.abs(line.slots[best] - slot)) best = i; });
+    return best;
   }
   function openHa() { HA.refresh(); S.note = null; push({ id: 'ha', top: 0, ctop: 0, f: { zone: 'rooms', l: 0, i: 0, c: 0 } }); }
   function haItem(t, L) { var line = L.lines[t.f.l]; return t.f.zone === 'rooms' && line ? line.items[t.f.i] || null : null; }
@@ -1801,8 +1825,8 @@
       }
       if (k === 'left' && f.i > 0) f.i--;
       else if (k === 'right') { if (f.i < line.items.length - 1) f.i++; else if (cams.length) { f.zone = 'cams'; HA.camera.snapshot(cams[f.c].id); } }
-      else if (k === 'up') { if (f.l > 0) { f.l--; f.i = Math.min(f.i, L.lines[f.l].items.length - 1); } else f.zone = 'head'; }
-      else if (k === 'down' && f.l < L.lines.length - 1) { f.l++; f.i = Math.min(f.i, L.lines[f.l].items.length - 1); }
+      else if (k === 'up') { if (f.l > 0) { f.l--; f.i = haNearest(L.lines[f.l], line.slots[f.i]); } else f.zone = 'head'; }
+      else if (k === 'down' && f.l < L.lines.length - 1) { f.l++; f.i = haNearest(L.lines[f.l], line.slots[f.i]); }
       else if (k === 'ok') haToggle(line.items[f.i]);
     },
     point: function (t, z, i, id) {
@@ -3315,7 +3339,7 @@
     },
     ha: function () {
       return '<h2 class="s-title">' + esc('Smart home') + '</h2><p class="s-sub" data-slot="sub"></p><div class="s-head" data-slot="head"></div>'
-        + '<div class="ha-rooms" data-slot="view"><div class="ha-rooms-in" data-slot="rooms"></div></div>'
+        + '<div class="ha-rooms" data-slot="view"><div class="ha-rooms-in" data-slot="rooms"><div class="ha-frame" data-slot="frame" aria-hidden="true"></div></div></div>'
         + '<div class="ha-cams" data-slot="camview"><div class="ha-cams-in" data-slot="cams"></div></div><div class="ha-empty" data-slot="empty"></div>'
         + '<div class="row-cue ha-before" data-slot="before" aria-hidden="true">' + icon('up') + '</div><div class="row-cue ha-after" data-slot="after" aria-hidden="true">' + icon('down') + '</div>'
         + '<p class="settings-overview-hint ha-hint" data-slot="hint"></p>';
@@ -3420,24 +3444,32 @@
         if (line.y + HA_LINE > t.top + HA_VIEW) t.top = rowStart(line.y + HA_LINE - HA_VIEW);
       }
       t.top = clamp(t.top, 0, rowStart(L.height - HA_VIEW));
-      L.heads.forEach(function (h) { entries.push({ key: h.key, head: h.room, y: h.y }); });
-      L.lines.forEach(function (ln, l) { ln.items.forEach(function (it, i) { entries.push({ key: it.id, item: it, l: l, i: i, y: ln.y }); }); });
+      L.heads.forEach(function (h) { entries.push({ key: h.key, head: h.room, y: h.y, x: h.slot * HA_PITCH, w: h.width * HA_PITCH - 16 }); });
+      L.lines.forEach(function (ln, l) { ln.items.forEach(function (it, i) { entries.push({ key: it.id, item: it, l: l, i: i, x: ln.slots[i] * HA_PITCH, y: ln.y }); }); });
       keyed(el.rooms, entries, function (node, e) {
         var focus, shown = e.y >= t.top && e.y + (e.head ? HA_HEAD : HA_LINE - 16) <= t.top + HA_VIEW; // whole rows only: the cues say there is more
         node.style.visibility = shown ? 'visible' : 'hidden';
         if (e.head) {
           setContent(node, 'head|' + e.head.name + '|' + e.head.on, '<span class="ha-room">' + escRaw(e.head.name) + '</span>' + (e.head.on ? '<span class="ha-lit">' + esc(e.head.on + ' on') + '</span>' : ''));
-          node.className = 'ha-head'; node.style.transform = 'translate3d(0,' + e.y + 'px,0)';
+          node.className = 'ha-head'; node.style.width = e.w + 'px'; node.style.transform = 'translate3d(' + e.x + 'px,' + e.y + 'px,0)';
           return;
         }
         focus = f.zone === 'rooms' && f.l === e.l && f.i === e.i;
         setContent(node, e.item.name + '|' + e.item.state, '<span class="panel-content"><span class="ha-name">' + escRaw(e.item.name) + '</span><span class="ha-state">' + escRaw(e.item.state) + '</span></span>');
         node.className = 'ha-chip' + (focus ? ' is-focus' : '') + (e.item.active ? ' is-active' : '') + (e.item.off ? ' is-off' : '') + (e.item.toggle ? ' can-toggle' : '');
-        node.style.transform = 'translate3d(' + (e.i * HA_PITCH) + 'px,' + e.y + 'px,0)';
+        node.style.transform = 'translate3d(' + e.x + 'px,' + e.y + 'px,0)';
         node.setAttribute('role', 'button'); node.setAttribute('aria-label', e.item.name + ', ' + e.item.state); node.setAttribute('data-id', e.item.id);
         attrs(node, 'hachip', e.i, 'ha.toggle.' + e.item.id);
       });
       el.rooms.style.transform = 'translate3d(0,' + (-t.top) + 'px,0)';
+      // A thin outline around the focused chip's room, so rooms sharing a row stay apart.
+      var room = f.zone === 'rooms' && line ? L.heads[line.rooms[f.i]] : null;
+      if (room) {
+        el.frame.style.width = (room.width * HA_PITCH + 4) + 'px';
+        el.frame.style.height = (HA_HEAD + room.lines * HA_LINE + 4) + 'px';
+        el.frame.style.transform = 'translate3d(' + (room.slot * HA_PITCH - 10) + 'px,' + (room.y - 6) + 'px,0)';
+      }
+      el.frame.className = 'ha-frame' + (room ? ' is-on' : '');
       el.view.className = 'ha-rooms' + (wide ? ' is-wide' : '');
       if (f.zone === 'cams') { if (f.c * HA_CAM < t.ctop) t.ctop = f.c * HA_CAM; if ((f.c + 1) * HA_CAM > t.ctop + HA_CAM_VIEW) t.ctop = (f.c + 1) * HA_CAM - HA_CAM_VIEW; }
       t.ctop = clamp(t.ctop, 0, Math.max(0, cams.length * HA_CAM - HA_CAM_VIEW));

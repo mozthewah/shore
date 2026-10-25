@@ -1102,6 +1102,19 @@ try {
     await group('addons'); await act('choice.aha.on'); await ready();
     await scene('home');
     check('Switching off stops it and removes the control', (await stored()).look.aha === 'off' && (await haCalls()).some(c => c[0] === 'enable' && c[1] === false) && !(await call('actions')).includes('util.ha'));
+    await group('addons'); await act('choice.aha.on'); await ready();
+    await current.evaluate(fake => ShoreQA.homeAssistant(fake), {
+      areas: [{ name: 'Bedroom', ids: ['light.bed'] }, { name: 'Office', ids: ['light.desk', 'switch.printer'] }, { name: 'Hall', ids: ['light.hall'] }, { name: 'Porch', ids: ['light.porch', 'light.step', 'light.gate'] }],
+      states: { 'light.bed': { s: 'on', n: 'Bedroom Lamp' }, 'light.desk': { s: 'off', n: 'Desk' }, 'switch.printer': { s: 'off', n: 'Printer' }, 'light.hall': { s: 'off', n: 'Hall' }, 'light.porch': { s: 'off', n: 'Porch' }, 'light.step': { s: 'off', n: 'Step' }, 'light.gate': { s: 'off', n: 'Gate' } } });
+    await scene('home'); await current.waitForFunction(() => ShoreQA.actions().includes('util.ha'));
+    await act('util.ha');
+    const heads = await current.evaluate(() => [...document.querySelectorAll('.ha-head')].map(h => h.style.transform));
+    check('Small rooms share a row on the chip grid', heads.filter(t => /^translate3d\([^,]+,\s*0px/.test(t)).length === 3 && heads.length === 4, heads);
+    await nav('right', 'right', 'right', 'down');
+    where = await call('where');
+    check('Down goes to the nearest chip below', where.focusAction === 'ha.toggle.light.step' && where.focusCount === 1, where);
+    await current.screenshot({ path: out + 'ha-panel-small-rooms.jpg', quality: 90 });
+    await nav('back');
     await current.evaluate(() => ShoreQA.homeAssistant(null));
   });
   section = 'Run integrity';
